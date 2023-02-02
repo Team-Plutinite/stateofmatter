@@ -696,9 +696,25 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: walkSpeed
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: jumpHeight
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 2389748625049299336, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 2389748625049299340, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: m_Drag
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2389748625049299340, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: m_Mass
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2389748625049299340, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: m_UseGravity
