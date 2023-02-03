@@ -40,8 +40,14 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Check if the player can jump
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, GetComponent<CapsuleCollider>().height*0.6f);
+        // Check if the player is in the air or in an incline that is too steep
+        isGrounded = Physics.Raycast(
+            transform.position, 
+            Vector3.down, 
+            out RaycastHit hit, // Store the hit info temprarily
+            GetComponent<CapsuleCollider>().height * 0.6f) &&
+            Vector3.Dot(Vector3.down, hit.normal) <= -Mathf.Cos(maxIncline * Mathf.Deg2Rad);
+        
 
         Vector3 movementForce = Vector3.zero;
 
