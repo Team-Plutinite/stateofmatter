@@ -4,17 +4,27 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    // Instance Editable variables
     public float maxWalkSpeed = 5.0f;
     public float movementAccel = 1000.0f;
     public float jumpHeight = 200.0f;
     public float sensitivity = 10.0f;
-    private Quaternion camRotQuat;
-
     public float movementDrag = 0.5f;
 
-    private Transform camTransform;
+    [Tooltip("Set the max incline angle the player can walk up, in degrees")]
+    public float maxIncline = 35;
+
+    // Reference to player rigid body
     private Rigidbody body;
-    private float camPitch = 0, camYaw = 0;
+
+    // Camera variables
+    private Transform camTransform;
+    private float camPitch = 0;
+    private Quaternion camRotQuat;
+
+    // Raycast down to check if player is grounded
+    [SerializeField]
+    private bool isGrounded;
 
     // Start is called before the first frame update
     void Start()
@@ -22,12 +32,17 @@ public class PlayerController : MonoBehaviour
         camTransform = transform.GetChild(0);
         body = GetComponent<Rigidbody>();
 
+        isGrounded = false;
+
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Check if the player can jump
+        isGrounded = Physics.Raycast(transform.position, Vector3.down, GetComponent<CapsuleCollider>().height*0.6f);
+
         Vector3 movementForce = Vector3.zero;
 
         // -- CAMERA CONTROL -- \\
@@ -58,7 +73,7 @@ public class PlayerController : MonoBehaviour
 
         // -- JUMP -- \\
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
             // Reset vertical vel
             body.velocity = new(body.velocity.x, 0, body.velocity.z);
