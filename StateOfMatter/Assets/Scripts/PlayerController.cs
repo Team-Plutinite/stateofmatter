@@ -6,7 +6,8 @@ public class PlayerController : MonoBehaviour
 {
     // Instance Editable variables
     public float maxWalkSpeed = 5.0f;
-    public float movementAccel = 1000.0f;
+    public float movementAccelGround = 1000.0f;
+    public float movementAccelAir = 100.0f;
     public float jumpHeight = 200.0f;
     public float sensitivity = 10.0f;
     public float movementDrag = 0.5f;
@@ -42,14 +43,13 @@ public class PlayerController : MonoBehaviour
     {
         // Check if the player is in the air or in an incline that is too steep
         isGrounded = Physics.Raycast(
-            transform.position, 
-            Vector3.down, 
-            out RaycastHit hit, // Store the hit info temprarily
-            GetComponent<CapsuleCollider>().height * 0.6f) &&
-            Vector3.Dot(Vector3.down, hit.normal) <= -Mathf.Cos(maxIncline * Mathf.Deg2Rad);
-        
-
-        Vector3 movementForce = Vector3.zero;
+            transform.position, // start at center of player
+            Vector3.down, // Trace down
+            out RaycastHit hit, // Store the hit info temporarily
+            GetComponent<CapsuleCollider>().height * 0.55f) // Trace down by slightly over half player height
+            &&
+            // Is the angle between the player and surface greater than maxIncline?
+            Vector3.Dot(Vector3.down, hit.normal) <= -Mathf.Cos(maxIncline * Mathf.Deg2Rad); 
 
         // -- CAMERA CONTROL -- \\
 
@@ -60,22 +60,30 @@ public class PlayerController : MonoBehaviour
 
         // -- BASIC MOVEMENT HANDLING -- \\
 
+        Vector3 movementForce = Vector3.zero;
         if (Input.GetKey(KeyCode.W)) movementForce += transform.forward;
         if (Input.GetKey(KeyCode.S)) movementForce -= transform.forward;
         if (Input.GetKey(KeyCode.A)) movementForce -= transform.right;
         if (Input.GetKey(KeyCode.D)) movementForce += transform.right;
         movementForce.Normalize(); // Fix the diagonal speed thing
 
-        // Artificial drag that only acts on X and Z (so gravity is not affected)
+        // Accelerate the player in their movement direction
+        body.AddForce((isGrounded ? movementAccelGround : movementAccelAir) * movementForce);
 
-        Vector3 velOnXZ = body.velocity;
-        velOnXZ.y = 0;
-        // this goes in opposite direction of velocity
-        Vector3 dragForce = -movementDrag * velOnXZ.normalized;
-        if (velOnXZ.sqrMagnitude >= 0.25f)
-            body.AddForce(dragForce);
-        else
-            body.AddForce(-velOnXZ * movementDrag);
+        // Artificial drag that only acts on ground
+
+        if (isGrounded)
+        {
+            Vector3 velOnXZ = body.velocity;
+            velOnXZ.y = 0;
+            // this goes in opposite direction of velocity
+            Vector3 dragForce = -movementDrag * velOnXZ.normalized;
+            //Vector3 dragForce = velOnXZ * -movementDrag;
+            if (velOnXZ.sqrMagnitude >= 0.25f)
+                body.AddForce(dragForce);
+            else
+                body.AddForce(-velOnXZ * movementDrag);
+        }
 
         // -- JUMP -- \\
 
@@ -91,10 +99,8 @@ public class PlayerController : MonoBehaviour
         float tempY = horizVel.y;
         horizVel.y = 0;
         horizVel = Mathf.Clamp(horizVel.magnitude, 0, maxWalkSpeed) * horizVel.normalized;
+        Debug.Log(horizVel.magnitude);
         horizVel.y = tempY;
         body.velocity = horizVel;
-
-        // Accelerate the player in their movement direction
-        body.AddForce(movementAccel * movementForce);
     }
 }

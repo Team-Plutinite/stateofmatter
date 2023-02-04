@@ -205,7 +205,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxWalkSpeed: 8
-  movementAccel: 50
+  movementAccelGround: 1000
+  movementAccelAir: 100
   jumpHeight: 200
   sensitivity: 2.5
-  movementDrag: 50
+  movementDrag: 20
+  maxIncline: 45
+  isGrounded: 0

@@ -772,14 +772,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1623811334}
-  m_LocalRotation: {x: 0, y: 0, z: 0.27396762, w: 0.96173894}
+  m_LocalRotation: {x: -0, y: -0, z: 0.18844707, w: 0.9820834}
   m_LocalPosition: {x: 12.00024, y: 3.00006, z: 0}
   m_LocalScale: {x: 50, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 8
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 31.801}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 21.724}
 --- !u!1 &1880983684
 GameObject:
   m_ObjectHideFlags: 0
@@ -996,19 +996,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: maxIncline
-      value: 15
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: maxWalkSpeed
-      value: 8
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: movementDrag
-      value: 20
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: movementAccel
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: movementAccelAir
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: movementAccelGround
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 2389748625049299336, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: m_Name
@@ -1016,7 +1024,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2389748625049299340, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: m_Drag
-      value: 0.01
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2389748625049299340, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: m_Mass
