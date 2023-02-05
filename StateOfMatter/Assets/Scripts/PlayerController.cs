@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
 
     // Camera variables
     private Transform camTransform;
-    private float camPitch = 0;
+    private float camPitch = 0, camYaw = 0;
     private Quaternion camRotQuat;
 
     // Raycast down to check if player is grounded
@@ -46,9 +46,10 @@ public class PlayerController : MonoBehaviour
         // -- CAMERA CONTROL -- \\
 
         camPitch += Input.GetAxisRaw("Mouse X") * sensitivity;
+        camYaw = Mathf.Clamp(camYaw + (Input.GetAxisRaw("Mouse Y") * sensitivity), -90, 90);
         camRotQuat.eulerAngles = new(0, camPitch, 0);
         body.MoveRotation(camRotQuat.normalized); // camera pitch (also character transform pitch)
-        camTransform.Rotate(camTransform.right, -Input.GetAxisRaw("Mouse Y") * sensitivity, Space.World); // camera yaw
+        camTransform.localRotation = Quaternion.Euler(-camYaw, 0, 0); // camera yaw
 
         // -- BASIC MOVEMENT HANDLING -- \\
 
