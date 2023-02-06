@@ -204,11 +204,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29429876c237bad4d8c341b2fbb50160, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxWalkSpeed: 8
-  movementAccelGround: 1000
-  movementAccelAir: 100
-  movementDrag: 20
-  jumpHeight: 200
-  sensitivity: 2.5
-  maxIncline: 45
+  maxWalkSpeed: 6
+  movementAccelGround: 20
+  movementAccelAir: 2
+  groundDrag: 10
+  airDrag: 1.5
+  jumpHeight: 300
+  jumpCooldown: 0.25
+  lookSensitivity: 2.5
+  maxIncline: 47.5
   isGrounded: 0
+  isCrouched: 0
