@@ -57,7 +57,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 54.41891
+  field of view: 61.59699
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -205,7 +205,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxWalkSpeed: 8
-  movementAccel: 50
+  movementAccelGround: 1000
+  movementAccelAir: 100
+  movementDrag: 20
   jumpHeight: 200
   sensitivity: 2.5
-  movementDrag: 50
+  maxIncline: 45
+  isGrounded: 0
