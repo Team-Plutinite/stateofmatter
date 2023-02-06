@@ -6,13 +6,15 @@ public class PlayerController : MonoBehaviour
 {
     // Instance Editable variables
     public float maxWalkSpeed = 5.0f;
-    public float movementAccelGround = 1000.0f;
-    public float movementAccelAir = 100.0f;
-    public float movementDrag = 0.5f;
-    public float jumpHeight = 200.0f;
-    public float sensitivity = 10.0f;
+    public float movementAccelGround = 20.0f;
+    public float movementAccelAir = 2.0f;
+    public float groundDrag = 10.0f;
+    public float airDrag = 2.0f;
+    public float jumpHeight = 300.0f;
+    public float jumpCooldown = 0.25f;
+    public float lookSensitivity = 2.5f;
     [Tooltip("Set the max incline angle the player can walk up, in degrees")]
-    public float maxIncline = 35;
+    public float maxIncline = 47.5f;
 
     // Reference to player rigid body
     private Rigidbody body;
@@ -25,6 +27,9 @@ public class PlayerController : MonoBehaviour
     // Raycast down to check if player is grounded
     [SerializeField]
     private bool isGrounded;
+    [SerializeField]
+    private bool isCrouched;
+    private float jumpTime;
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +38,8 @@ public class PlayerController : MonoBehaviour
         body = GetComponent<Rigidbody>();
 
         isGrounded = false;
+        isCrouched = false;
+        jumpTime = 0.0f;
 
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
     }
@@ -45,8 +52,8 @@ public class PlayerController : MonoBehaviour
 
         // -- CAMERA CONTROL -- \\
 
-        camPitch += Input.GetAxisRaw("Mouse X") * sensitivity;
-        camYaw = Mathf.Clamp(camYaw + (Input.GetAxisRaw("Mouse Y") * sensitivity), -90, 90);
+        camPitch += Input.GetAxisRaw("Mouse X") * lookSensitivity;
+        camYaw = Mathf.Clamp(camYaw + (Input.GetAxisRaw("Mouse Y") * lookSensitivity), -90, 90);
         camRotQuat.eulerAngles = new(0, camPitch, 0);
         body.MoveRotation(camRotQuat.normalized); // camera pitch (also character transform pitch)
         camTransform.localRotation = Quaternion.Euler(-camYaw, 0, 0); // camera yaw
@@ -62,28 +69,70 @@ public class PlayerController : MonoBehaviour
 
         // Accelerate the player in their movement direction and apply ground drag force
         body.AddForce((isGrounded ? movementAccelGround : movementAccelAir) * movementForce);
-        ApplyGroundDrag(slopeHit);
+        ApplyDrag(slopeHit);
         ClampHorizSpeed(slopeHit, isSlopeWall);
 
-        // -- JUMP -- \\
-
-        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
+        // -- GROUND-ONLY MOVEMENT CONTROLS -- \\
+        jumpTime -= Time.deltaTime; // jumping cooldown
+        if (isGrounded)
         {
-            // Reset vertical vel
-            body.velocity = new(body.velocity.x, 0, body.velocity.z);
-            body.AddForce(transform.up * jumpHeight);
+            // -- CROUCH/UNCROUCH -- \\
+            if (Input.GetKey(KeyCode.LeftControl))
+                TryCrouch();
+            else
+                TryUncrouch();
+
+            // -- JUMP -- \\
+            if (jumpTime <= 0 && Input.GetKeyDown(KeyCode.Space))
+            {
+                jumpTime = jumpCooldown;
+                isGrounded = false;
+                // Reset vertical vel
+                body.velocity = new(body.velocity.x, 0, body.velocity.z);
+                body.AddForce(transform.up * jumpHeight);
+                TryUncrouch(); // uncrouch the player if they're crouching
+            }
+        }
+    }
+
+    // Attempt a crouch
+    void TryCrouch()
+    {
+        if (!isCrouched)
+        {
+            isCrouched = true;
+            transform.localScale = new(transform.localScale.x, transform.localScale.y / 2, transform.localScale.z);
+            body.AddForce(new(0, -250));
+        }
+    }
+
+    // Uncrouch, if currently crouched
+    void TryUncrouch()
+    {
+        if (isCrouched)
+        {
+            isCrouched = false;
+            transform.localScale = new(transform.localScale.x, transform.localScale.y * 2, transform.localScale.z);
         }
     }
 
     // Check if the player is currently on a floor/ramp, update values accodingly
     private bool CheckGroundedAndSlope(out RaycastHit hit, out bool isSlopeWall)
     {
+        // Don't run this method if the player just jumped
+        if (jumpTime > 0)
+        {
+            isSlopeWall = false;
+            hit = new();
+            return false;
+        }
+
         // Check if the player is in the air or in an incline that is too steep
         if (Physics.Raycast(
             transform.position,                              // start at center of player
             Vector3.down,                                    // Trace down
             out hit,                                         // Store the hit info temporarily
-            GetComponent<CapsuleCollider>().height * 0.6f)) // Trace down by slightly over half player height
+            GetComponent<CapsuleCollider>().height * transform.localScale.y * 0.6f)) // Trace down by slightly over half player height
         {
             // Is the angle between the player and surface greater than maxIncline?
             if (Vector3.Dot(Vector3.down, hit.normal) <= -Mathf.Cos(maxIncline * Mathf.Deg2Rad))
@@ -99,19 +148,18 @@ public class PlayerController : MonoBehaviour
     }
 
     // Helper function to calculate artificial drag that only acts while on ground
-    private void ApplyGroundDrag(RaycastHit slopeHit)
+    // I COULD turn this whole thing into a giant one-liner, but for the sake of readability I'll leave it as is
+    private void ApplyDrag(RaycastHit slopeHit)
     {
-        if (isGrounded)
-        {
-            Vector3 velProjected = Vector3.ProjectOnPlane(body.velocity, slopeHit.normal);
-            // this goes in opposite direction of velocity
-            Vector3 dragForce = -movementDrag * velProjected.normalized;
-            //Vector3 dragForce = velOnXZ * -movementDrag;
-            if (velProjected.sqrMagnitude >= 0.25f)
-                body.AddForce(dragForce);
-            else
-                body.AddForce(-velProjected * movementDrag);
-        }
+        // Use ground or air drag based on if player is in the air or not
+        float dragIntensity = isGrounded ? groundDrag : airDrag;
+
+        // Get velocity of player projected onto the surface walked on (or the XZ plane if airborne)
+        Vector3 velProjected = isGrounded ? Vector3.ProjectOnPlane(body.velocity, slopeHit.normal) : new(body.velocity.x, 0, body.velocity.z);
+
+        // Apply the drag force (also compensate for jittering around when velocity is too low)
+        body.AddForce(-dragIntensity * (velProjected.sqrMagnitude >= 0.25f ? velProjected.normalized : velProjected));
+        //Vector3 dragForce = velProjected * -dragIntensity;
     }
 
     // Helper function to clamp horizontal speed
