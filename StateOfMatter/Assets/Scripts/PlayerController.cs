@@ -47,9 +47,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        isGrounded = CheckGroundedAndSlope(out RaycastHit slopeHit, out bool isSlopeWall);
-        body.useGravity = !isGrounded; // so player isn't sliding down a slope
-
         // -- CAMERA CONTROL -- \\
 
         camPitch += Input.GetAxisRaw("Mouse X") * lookSensitivity;
@@ -57,20 +54,6 @@ public class PlayerController : MonoBehaviour
         camRotQuat.eulerAngles = new(0, camPitch, 0);
         body.MoveRotation(camRotQuat.normalized); // camera pitch (also character transform pitch)
         camTransform.localRotation = Quaternion.Euler(-camYaw, 0, 0); // camera yaw
-
-        // -- BASIC MOVEMENT HANDLING -- \\
-
-        Vector3 movementForce = Vector3.zero;
-        if (Input.GetKey(KeyCode.W)) movementForce += transform.forward;
-        if (Input.GetKey(KeyCode.S)) movementForce -= transform.forward;
-        if (Input.GetKey(KeyCode.A)) movementForce -= transform.right;
-        if (Input.GetKey(KeyCode.D)) movementForce += transform.right;
-        if (!isSlopeWall) movementForce = Vector3.ProjectOnPlane(movementForce, slopeHit.normal).normalized;
-
-        // Accelerate the player in their movement direction and apply ground drag force
-        body.AddForce((isGrounded ? movementAccelGround : movementAccelAir) * movementForce);
-        ApplyDrag(slopeHit);
-        ClampHorizSpeed(slopeHit, isSlopeWall);
 
         // -- GROUND-ONLY MOVEMENT CONTROLS -- \\
         jumpTime -= Time.deltaTime; // jumping cooldown
@@ -95,14 +78,34 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        isGrounded = CheckGroundedAndSlope(out RaycastHit slopeHit, out bool isSlopeWall);
+        body.useGravity = !isGrounded; // so player isn't sliding down a slope
+
+        // -- BASIC MOVEMENT HANDLING -- \\
+
+        Vector3 movementForce = Vector3.zero;
+        if (Input.GetKey(KeyCode.W)) movementForce += transform.forward;
+        if (Input.GetKey(KeyCode.S)) movementForce -= transform.forward;
+        if (Input.GetKey(KeyCode.A)) movementForce -= transform.right;
+        if (Input.GetKey(KeyCode.D)) movementForce += transform.right;
+        if (!isSlopeWall) movementForce = Vector3.ProjectOnPlane(movementForce, slopeHit.normal).normalized;
+
+        // Accelerate the player in their movement direction and apply ground drag force
+        body.AddForce((isGrounded ? movementAccelGround : movementAccelAir) * movementForce);
+        ApplyDrag(slopeHit);
+        ClampHorizSpeed(slopeHit, isSlopeWall);
+    }
+
     // Attempt a crouch
     void TryCrouch()
     {
         if (!isCrouched)
         {
             isCrouched = true;
-            transform.localScale = new(transform.localScale.x, transform.localScale.y / 2, transform.localScale.z);
-            body.AddForce(new(0, -250));
+            GetComponent<CapsuleCollider>().height /= 2;
+            body.AddForce(new(0, -250)); // push the player down so they aren't floating for a second
         }
     }
 
@@ -112,7 +115,7 @@ public class PlayerController : MonoBehaviour
         if (isCrouched)
         {
             isCrouched = false;
-            transform.localScale = new(transform.localScale.x, transform.localScale.y * 2, transform.localScale.z);
+            GetComponent<CapsuleCollider>().height *= 2;
         }
     }
 
@@ -132,7 +135,7 @@ public class PlayerController : MonoBehaviour
             transform.position,                              // start at center of player
             Vector3.down,                                    // Trace down
             out hit,                                         // Store the hit info temporarily
-            GetComponent<CapsuleCollider>().height * transform.localScale.y * 0.6f)) // Trace down by slightly over half player height
+            GetComponent<CapsuleCollider>().height * 0.6f)) // Trace down by slightly over half player height
         {
             // Is the angle between the player and surface greater than maxIncline?
             if (Vector3.Dot(Vector3.down, hit.normal) <= -Mathf.Cos(maxIncline * Mathf.Deg2Rad))
@@ -160,7 +163,6 @@ public class PlayerController : MonoBehaviour
         // Apply the drag force (also compensate for jittering around when velocity is too low)
         //body.AddForce(-dragIntensity * (velProjected.sqrMagnitude >= 0.25f ? velProjected.normalized : velProjected));
         body.AddForce(-dragIntensity * velProjected);
-        //Vector3 dragForce = velProjected * -dragIntensity;
     }
 
     // Helper function to clamp horizontal speed
