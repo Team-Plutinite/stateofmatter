@@ -158,7 +158,8 @@ public class PlayerController : MonoBehaviour
         Vector3 velProjected = isGrounded ? Vector3.ProjectOnPlane(body.velocity, slopeHit.normal) : new(body.velocity.x, 0, body.velocity.z);
 
         // Apply the drag force (also compensate for jittering around when velocity is too low)
-        body.AddForce(-dragIntensity * (velProjected.sqrMagnitude >= 0.25f ? velProjected.normalized : velProjected));
+        //body.AddForce(-dragIntensity * (velProjected.sqrMagnitude >= 0.25f ? velProjected.normalized : velProjected));
+        body.AddForce(-dragIntensity * velProjected);
         //Vector3 dragForce = velProjected * -dragIntensity;
     }
 
@@ -170,7 +171,7 @@ public class PlayerController : MonoBehaviour
         velFlat.y = body.velocity.y;
         body.velocity = velFlat;
         // Keep player from bouncing on a ramp when going up
-        if (isGrounded && !isSlopeWall)
-            body.AddForce(-hit.normal * 10);
+        //if (isGrounded && !isSlopeWall)
+        //    body.AddForce(-hit.normal * 10);
     }
 }
