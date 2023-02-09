@@ -81,7 +81,8 @@ public class PlayerController : MonoBehaviour
 
         jumpTime -= Time.deltaTime; // jumping cooldown
         if (isGrounded && jumpTime <= 0.0f)
-        {            // -- CROUCH/UNCROUCH -- \\
+        {            
+            // -- CROUCH/UNCROUCH -- \\
             if (Input.GetKey(KeyCode.LeftControl))
                 TryCrouch();
             else
@@ -102,7 +103,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        CheckAirborne();
+        CheckAirborne(); // Updates isGrounded and isSlopeWall bools
         body.useGravity = !isGrounded; // so player isn't sliding down a slope
 
         // -- BASIC MOVEMENT HANDLING -- \\
