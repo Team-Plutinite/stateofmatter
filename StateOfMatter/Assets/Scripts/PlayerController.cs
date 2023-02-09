@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour
     private bool isCrouched;
     private float jumpTime;
 
+    private Dictionary<GameObject, List<ContactPoint>> collisionMap;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -43,6 +45,7 @@ public class PlayerController : MonoBehaviour
         isCrouched = false;
         jumpTime = 0.0f;
         groundNormal = Vector3.zero;
+        collisionMap = new();
 
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
     }
@@ -83,7 +86,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        //isGrounded = CheckGroundedAndSlope(out RaycastHit slopeHit, out bool isSlopeWall);
+        CheckAirborne();
         body.useGravity = !isGrounded; // so player isn't sliding down a slope
 
         // -- BASIC MOVEMENT HANDLING -- \\
@@ -133,22 +136,31 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnCollisionStay(Collision collision)
+    // Check all contact points to see if any of them are ground points
+    // If there are ground points, the player is grounded.
+    void CheckAirborne()
     {
-        List<ContactPoint> contacts = new();
-        int contactPts = collision.GetContacts(contacts);
+        Queue<ContactPoint> totalContacts = new();
         bool possibleGround = false;
         bool possibleSlopeWall = false;
         Vector3 avgNormal = Vector3.zero;
 
-        if (contactPts > 0)
+        // Add all contact points to the list
+        foreach (GameObject key in collisionMap.Keys)
         {
-            for (int i = 0; i < contactPts; i++)
+            foreach (ContactPoint pt in collisionMap[key])
+                totalContacts.Enqueue(pt);
+        }
+
+        if (totalContacts.Count > 0)
+        {
+            ContactPoint c;
+            while (totalContacts.TryDequeue(out c))
             {
-                if (transform.position.y - contacts[i].point.y > GetComponent<CapsuleCollider>().height * 0.35f)
+                if (transform.position.y - (c.point.y + c.separation) > GetComponent<CapsuleCollider>().height * 0.3f)
                 {
                     possibleGround = true;
-                    avgNormal += contacts[i].normal;
+                    avgNormal += c.normal;
                 }
             }
             avgNormal.Normalize();
@@ -159,46 +171,20 @@ public class PlayerController : MonoBehaviour
                 possibleGround = false;
             }
         }
-
         groundNormal = avgNormal;
         isGrounded = possibleGround;
         isSlopeWall = possibleSlopeWall;
     }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        List<ContactPoint> pts = new();
+        int ptCount = collision.GetContacts(pts);
+
+        collisionMap[collision.gameObject] = pts.GetRange(0, ptCount);
+    }
     private void OnCollisionExit(Collision collision)
     {
-        groundNormal = Vector3.zero;
-        isGrounded = false;
-        isSlopeWall = false;
+        collisionMap.Remove(collision.gameObject);
     }
-
-    //// Check if the player is currently on a floor/ramp, update values accodingly
-    //private bool CheckGroundedAndSlope(out RaycastHit hit, out bool isSlopeWall)
-    //{
-    //    // Don't run this method if the player just jumped
-    //    if (jumpTime > 0)
-    //    {
-    //        isSlopeWall = false;
-    //        hit = new();
-    //        return false;
-    //    }
-
-    //    // Check if the player is in the air or in an incline that is too steep
-    //    if (Physics.Raycast(
-    //        transform.position,                              // start at center of player
-    //        Vector3.down,                                    // Trace down
-    //        out hit,                                         // Store the hit info temporarily
-    //        GetComponent<CapsuleCollider>().height * 0.6f)) // Trace down by slightly over half player height
-    //    {
-    //        // Is the angle between the player and surface greater than maxIncline?
-    //        if (Vector3.Dot(Vector3.down, hit.normal) <= -Mathf.Cos(maxIncline * Mathf.Deg2Rad))
-    //        {
-    //            isSlopeWall = false;
-    //            return true;
-    //        }
-    //        else isSlopeWall = true; // Too steep, so this ramp should be considered a wall
-    //        return false;
-    //    }
-    //    isSlopeWall = false;
-    //    return false;
-    //}
 }
