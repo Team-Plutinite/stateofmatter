@@ -2,16 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+enum PlayerMoveState
+{
+    Idle,
+    IdleCrouched,
+    Moving,
+    MovingCrouched,
+    Jumping,
+    Airborne
+}
+
 public class PlayerController : MonoBehaviour
 {
+    private PlayerMoveState moveState;
+
     // Instance Editable variables
     public float maxWalkSpeed = 5.0f;
-    public float movementAccelGround = 20.0f;
+    public float movementAccelGround = 50.0f;
+    public float crouchSpeedMultiplier = 0.5f;
     public float movementAccelAir = 2.0f;
     public float groundDrag = 10.0f;
+
     public float airDrag = 2.0f;
     public float jumpHeight = 300.0f;
     public float jumpCooldown = 0.25f;
+
     public float lookSensitivity = 2.5f;
     [Tooltip("Set the max incline angle the player can walk up, in degrees")]
     public float maxIncline = 47.5f;
@@ -38,6 +53,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        moveState = PlayerMoveState.Idle;
         camTransform = transform.GetChild(0);
         body = GetComponent<Rigidbody>();
 
@@ -62,17 +78,17 @@ public class PlayerController : MonoBehaviour
         camTransform.localRotation = Quaternion.Euler(-camYaw, 0, 0); // camera yaw
 
         // -- GROUND-ONLY MOVEMENT CONTROLS -- \\
+
         jumpTime -= Time.deltaTime; // jumping cooldown
-        if (isGrounded)
-        {
-            // -- CROUCH/UNCROUCH -- \\
+        if (isGrounded && jumpTime <= 0.0f)
+        {            // -- CROUCH/UNCROUCH -- \\
             if (Input.GetKey(KeyCode.LeftControl))
                 TryCrouch();
             else
                 TryUncrouch();
 
             // -- JUMP -- \\
-            if (jumpTime <= 0 && Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space))
             {
                 jumpTime = jumpCooldown;
                 isGrounded = false;
@@ -99,7 +115,9 @@ public class PlayerController : MonoBehaviour
         if (!isSlopeWall) movementForce = Vector3.ProjectOnPlane(movementForce, groundNormal).normalized;
 
         // Accelerate the player in their movement direction and apply ground drag force
-        body.AddForce((isGrounded ? movementAccelGround : movementAccelAir) * movementForce);
+        body.AddForce((isGrounded ? 
+            isCrouched ? crouchSpeedMultiplier * movementAccelGround : movementAccelGround : 
+            movementAccelAir) * movementForce);
 
             // APPLY WALKING DRAG FORCE \\
 
@@ -115,6 +133,9 @@ public class PlayerController : MonoBehaviour
         body.velocity = new(velFlat.x, body.velocity.y, velFlat.z);
     }
 
+    // Returns the current movement state of the player.
+    PlayerMoveState MoveState { get; }
+
     // Attempt a crouch
     void TryCrouch()
     {
@@ -122,6 +143,7 @@ public class PlayerController : MonoBehaviour
         {
             isCrouched = true;
             GetComponent<CapsuleCollider>().height /= 2;
+            Debug.Log("asd");
             body.AddForce(new(0, -250)); // push the player down so they aren't floating for a second
         }
     }
@@ -131,8 +153,12 @@ public class PlayerController : MonoBehaviour
     {
         if (isCrouched)
         {
-            isCrouched = false;
-            GetComponent<CapsuleCollider>().height *= 2;
+            // If there's nothing above the player, uncrouch
+            if (!Physics.SphereCast(new(transform.position, Vector3.up), GetComponent<CapsuleCollider>().radius, GetComponent<CapsuleCollider>().height))
+            {
+                isCrouched = false;
+                GetComponent<CapsuleCollider>().height *= 2;
+            }
         }
     }
 
