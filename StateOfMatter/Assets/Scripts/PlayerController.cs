@@ -27,6 +27,8 @@ public class PlayerController : MonoBehaviour
     // Raycast down to check if player is grounded
     [SerializeField]
     private bool isGrounded;
+    private bool isSlopeWall;
+    private Vector3 groundNormal; // Surface normal of where player is stepping
     [SerializeField]
     private bool isCrouched;
     private float jumpTime;
@@ -40,6 +42,7 @@ public class PlayerController : MonoBehaviour
         isGrounded = false;
         isCrouched = false;
         jumpTime = 0.0f;
+        groundNormal = Vector3.zero;
 
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
     }
@@ -80,7 +83,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        isGrounded = CheckGroundedAndSlope(out RaycastHit slopeHit, out bool isSlopeWall);
+        //isGrounded = CheckGroundedAndSlope(out RaycastHit slopeHit, out bool isSlopeWall);
         body.useGravity = !isGrounded; // so player isn't sliding down a slope
 
         // -- BASIC MOVEMENT HANDLING -- \\
@@ -90,12 +93,23 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.S)) movementForce -= transform.forward;
         if (Input.GetKey(KeyCode.A)) movementForce -= transform.right;
         if (Input.GetKey(KeyCode.D)) movementForce += transform.right;
-        if (!isSlopeWall) movementForce = Vector3.ProjectOnPlane(movementForce, slopeHit.normal).normalized;
+        if (!isSlopeWall) movementForce = Vector3.ProjectOnPlane(movementForce, groundNormal).normalized;
 
         // Accelerate the player in their movement direction and apply ground drag force
         body.AddForce((isGrounded ? movementAccelGround : movementAccelAir) * movementForce);
-        ApplyDrag(slopeHit);
-        ClampHorizSpeed(slopeHit, isSlopeWall);
+
+            // APPLY WALKING DRAG FORCE \\
+
+        // Get velocity of player projected onto the surface walked on (or the XZ plane if airborne)
+        Vector3 velProjected = isGrounded ? Vector3.ProjectOnPlane(body.velocity, groundNormal) : 
+            new(body.velocity.x, 0, body.velocity.z);
+        body.AddForce(-(isGrounded ? groundDrag : airDrag) * velProjected);
+
+            // CLAMP WALK SPEED \\
+
+        Vector3 velFlat = new(body.velocity.x, 0, body.velocity.z);
+        velFlat = Mathf.Clamp(velFlat.magnitude, 0, maxWalkSpeed) * velFlat.normalized;
+        body.velocity = new(velFlat.x, body.velocity.y, velFlat.z);
     }
 
     // Attempt a crouch
@@ -119,61 +133,72 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Check if the player is currently on a floor/ramp, update values accodingly
-    private bool CheckGroundedAndSlope(out RaycastHit hit, out bool isSlopeWall)
+    private void OnCollisionStay(Collision collision)
     {
-        // Don't run this method if the player just jumped
-        if (jumpTime > 0)
-        {
-            isSlopeWall = false;
-            hit = new();
-            return false;
-        }
+        List<ContactPoint> contacts = new();
+        int contactPts = collision.GetContacts(contacts);
+        bool possibleGround = false;
+        bool possibleSlopeWall = false;
+        Vector3 avgNormal = Vector3.zero;
 
-        // Check if the player is in the air or in an incline that is too steep
-        if (Physics.Raycast(
-            transform.position,                              // start at center of player
-            Vector3.down,                                    // Trace down
-            out hit,                                         // Store the hit info temporarily
-            GetComponent<CapsuleCollider>().height * 0.6f)) // Trace down by slightly over half player height
+        if (contactPts > 0)
         {
-            // Is the angle between the player and surface greater than maxIncline?
-            if (Vector3.Dot(Vector3.down, hit.normal) <= -Mathf.Cos(maxIncline * Mathf.Deg2Rad))
+            for (int i = 0; i < contactPts; i++)
             {
-                isSlopeWall = false;
-                return true;
+                if (transform.position.y - contacts[i].point.y > GetComponent<CapsuleCollider>().height * 0.35f)
+                {
+                    possibleGround = true;
+                    avgNormal += contacts[i].normal;
+                }
             }
-            else isSlopeWall = true; // Too steep, so this ramp should be considered a wall
-            return false;
+            avgNormal.Normalize();
+
+            if (possibleGround && Vector3.Dot(Vector3.down, avgNormal) > -Mathf.Cos(maxIncline * Mathf.Deg2Rad))
+            {
+                possibleSlopeWall = true;
+                possibleGround = false;
+            }
         }
+
+        groundNormal = avgNormal;
+        isGrounded = possibleGround;
+        isSlopeWall = possibleSlopeWall;
+    }
+    private void OnCollisionExit(Collision collision)
+    {
+        groundNormal = Vector3.zero;
+        isGrounded = false;
         isSlopeWall = false;
-        return false;
     }
 
-    // Helper function to calculate artificial drag that only acts while on ground
-    // I COULD turn this whole thing into a giant one-liner, but for the sake of readability I'll leave it as is
-    private void ApplyDrag(RaycastHit slopeHit)
-    {
-        // Use ground or air drag based on if player is in the air or not
-        float dragIntensity = isGrounded ? groundDrag : airDrag;
+    //// Check if the player is currently on a floor/ramp, update values accodingly
+    //private bool CheckGroundedAndSlope(out RaycastHit hit, out bool isSlopeWall)
+    //{
+    //    // Don't run this method if the player just jumped
+    //    if (jumpTime > 0)
+    //    {
+    //        isSlopeWall = false;
+    //        hit = new();
+    //        return false;
+    //    }
 
-        // Get velocity of player projected onto the surface walked on (or the XZ plane if airborne)
-        Vector3 velProjected = isGrounded ? Vector3.ProjectOnPlane(body.velocity, slopeHit.normal) : new(body.velocity.x, 0, body.velocity.z);
-
-        // Apply the drag force (also compensate for jittering around when velocity is too low)
-        //body.AddForce(-dragIntensity * (velProjected.sqrMagnitude >= 0.25f ? velProjected.normalized : velProjected));
-        body.AddForce(-dragIntensity * velProjected);
-    }
-
-    // Helper function to clamp horizontal speed
-    private void ClampHorizSpeed(RaycastHit hit, bool isSlopeWall)
-    {
-        Vector3 velFlat = new(body.velocity.x, 0, body.velocity.z);
-        velFlat = Mathf.Clamp(velFlat.magnitude, 0, maxWalkSpeed) * velFlat.normalized;
-        velFlat.y = body.velocity.y;
-        body.velocity = velFlat;
-        // Keep player from bouncing on a ramp when going up
-        //if (isGrounded && !isSlopeWall)
-        //    body.AddForce(-hit.normal * 10);
-    }
+    //    // Check if the player is in the air or in an incline that is too steep
+    //    if (Physics.Raycast(
+    //        transform.position,                              // start at center of player
+    //        Vector3.down,                                    // Trace down
+    //        out hit,                                         // Store the hit info temporarily
+    //        GetComponent<CapsuleCollider>().height * 0.6f)) // Trace down by slightly over half player height
+    //    {
+    //        // Is the angle between the player and surface greater than maxIncline?
+    //        if (Vector3.Dot(Vector3.down, hit.normal) <= -Mathf.Cos(maxIncline * Mathf.Deg2Rad))
+    //        {
+    //            isSlopeWall = false;
+    //            return true;
+    //        }
+    //        else isSlopeWall = true; // Too steep, so this ramp should be considered a wall
+    //        return false;
+    //    }
+    //    isSlopeWall = false;
+    //    return false;
+    //}
 }
