@@ -7,8 +7,9 @@ using UnityEngine;
 
 public enum Modes //Will be used later to differentiate firing modes
 {
-    Water = 0,
-    Steam = 1,
+    
+    Steam = 0,
+    Water = 1,
     Ice = 2
 }
 
@@ -74,10 +75,23 @@ public class Weapon : MonoBehaviour
 
             if((int)currentMode > 2)
             {
-                currentMode = Modes.Water;
+                currentMode = Modes.Steam;
                 
             }
             Debug.Log(currentMode.ToString());
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            currentMode = Modes.Steam;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            currentMode = Modes.Water;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            currentMode = Modes.Ice;
         }
     }
 
