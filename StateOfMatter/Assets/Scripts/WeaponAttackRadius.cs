@@ -12,9 +12,9 @@ public class WeaponAttackRadius : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
        //This function will handle collison with various objects.
-       //if (other.TryGetComponenet<Enemy>(out Enemy enemy){
-       //
-       //
-       //}
+       if (other.TryGetComponent<Enemy>(out Enemy enemy)){
+       
+       
+       }
     }
 }
