@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-enum PlayerMoveState
+public enum PlayerMoveState
 {
     Idle,
     IdleCrouched,
