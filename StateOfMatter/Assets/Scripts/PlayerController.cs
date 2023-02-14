@@ -2,25 +2,79 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+enum PlayerMoveState
+{
+    Idle,
+    IdleCrouched,
+    Moving,
+    MovingCrouched,
+    Jumping,
+    Airborne
+}
+
 public class PlayerController : MonoBehaviour
 {
+    private PlayerMoveState moveState;
+
+    // Instance Editable variables
     public float maxWalkSpeed = 5.0f;
-    public float movementAccel = 1000.0f;
-    public float jumpHeight = 200.0f;
-    public float sensitivity = 10.0f;
+    public float movementAccelGround = 50.0f;
+    public float crouchSpeedMultiplier = 0.5f;
+    public float movementAccelAir = 2.0f;
+    public float groundDrag = 10.0f;
+
+    // jumping variables
+    public float airDrag = 2.0f;
+    public float jumpHeight = 300.0f;
+    public float jumpCooldown = 0.25f;
+
+    // dashing variables
+    public float dashCooldown = 0.5f;
+    public float dashDistance = 5.0f;
+    public float dashTime = 0.33f;
+    private float dashCoolCountdown, dashEventCountdown;
+    private bool tryDash;
+    private Vector3 dashDirection;
+
+    public float lookSensitivity = 2.5f;
+    [Tooltip("Set the max incline angle the player can walk up, in degrees")]
+    public float maxIncline = 47.5f;
+
+    // Reference to player rigid body
+    private Rigidbody body;
+
+    // Camera variables
+    private Transform camTransform;
+    private float camPitch = 0, camYaw = 0;
     private Quaternion camRotQuat;
 
-    public float movementDrag = 0.5f;
+    [SerializeField]
+    private bool isGrounded;
+    private bool isSlopeWall;
+    private Vector3 groundNormal; // Surface normal of where player is stepping
+    [SerializeField]
+    private bool isCrouched;
+    private float jumpTime;
 
-    private Transform camTransform;
-    private Rigidbody body;
-    private float camPitch = 0, camYaw = 0;
+    private Dictionary<GameObject, List<ContactPoint>> collisionMap;
 
     // Start is called before the first frame update
     void Start()
     {
+        moveState = PlayerMoveState.Idle;
         camTransform = transform.GetChild(0);
         body = GetComponent<Rigidbody>();
+
+        isGrounded = false;
+        isCrouched = false;
+
+        jumpTime = 0.0f;
+        dashCoolCountdown = 0.0f;
+        tryDash = false;
+        dashDirection = Vector3.zero;
+
+        groundNormal = Vector3.zero;
+        collisionMap = new();
 
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
     }
@@ -28,52 +82,180 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 movementForce = Vector3.zero;
-
         // -- CAMERA CONTROL -- \\
 
-        camPitch += Input.GetAxisRaw("Mouse X") * sensitivity;
+        camPitch += Input.GetAxisRaw("Mouse X") * lookSensitivity;
+        camYaw = Mathf.Clamp(camYaw + (Input.GetAxisRaw("Mouse Y") * lookSensitivity), -90, 90);
         camRotQuat.eulerAngles = new(0, camPitch, 0);
         body.MoveRotation(camRotQuat.normalized); // camera pitch (also character transform pitch)
-        camTransform.Rotate(camTransform.right, -Input.GetAxisRaw("Mouse Y") * sensitivity, Space.World); // camera yaw
+        camTransform.localRotation = Quaternion.Euler(-camYaw, 0, 0); // camera yaw
+
+        // -- GROUND-ONLY MOVEMENT CONTROLS -- \\
+
+        if (isGrounded && jumpTime <= 0.0f)
+        {            
+            // -- CROUCH/UNCROUCH -- \\
+            if (Input.GetKey(KeyCode.LeftControl))
+                TryCrouch();
+            else
+                TryUncrouch();
+
+            // -- JUMP -- \\
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                jumpTime = jumpCooldown;
+                isGrounded = false;
+                // Reset vertical vel
+                body.velocity = new(body.velocity.x, 0, body.velocity.z);
+                body.AddForce(transform.up * jumpHeight);
+                TryUncrouch(); // uncrouch the player if they're crouching
+            }
+        }
+
+        // -- ACTIVATE DASH ABILITY -- \\
+        if (dashCoolCountdown <= 0 && Input.GetKeyDown(KeyCode.LeftShift)) tryDash = true;
+
+        // -- COOLDOWN REDUCTIONS -- \\
+        dashCoolCountdown -= Time.deltaTime;
+        jumpTime -= Time.deltaTime;
+    }
+
+    private void FixedUpdate()
+    {
+        CheckAirborne(); // Updates isGrounded and isSlopeWall bools
+        body.useGravity = !isGrounded; // so player isn't sliding down a slope
 
         // -- BASIC MOVEMENT HANDLING -- \\
 
+        Vector3 movementForce = Vector3.zero;
         if (Input.GetKey(KeyCode.W)) movementForce += transform.forward;
         if (Input.GetKey(KeyCode.S)) movementForce -= transform.forward;
         if (Input.GetKey(KeyCode.A)) movementForce -= transform.right;
         if (Input.GetKey(KeyCode.D)) movementForce += transform.right;
-        movementForce.Normalize(); // Fix the diagonal speed thing
+        if (!isSlopeWall) movementForce = Vector3.ProjectOnPlane(movementForce, groundNormal).normalized;
 
-        // Artificial drag that only acts on X and Z (so gravity is not affected)
+        // Accelerate the player in their movement direction and apply ground drag force
+        body.AddForce((isGrounded ? 
+            isCrouched ? crouchSpeedMultiplier * movementAccelGround : movementAccelGround : 
+            movementAccelAir) * movementForce);
 
-        Vector3 velOnXZ = body.velocity;
-        velOnXZ.y = 0;
-        // this goes in opposite direction of velocity
-        Vector3 dragForce = -movementDrag * velOnXZ.normalized;
-        if (velOnXZ.sqrMagnitude >= 0.25f)
-            body.AddForce(dragForce);
-        else
-            body.AddForce(-velOnXZ * movementDrag);
+            // APPLY WALKING DRAG FORCE \\
 
-        // -- JUMP -- \\
+        // Get velocity of player projected onto the surface walked on (or the XZ plane if airborne)
+        Vector3 velProjected = isGrounded ? Vector3.ProjectOnPlane(body.velocity, groundNormal) : 
+            new(body.velocity.x, 0, body.velocity.z);
+        body.AddForce(-(isGrounded ? groundDrag : airDrag) * velProjected);
 
-        if (Input.GetKeyDown(KeyCode.Space))
+            // CLAMP WALK SPEED \\
+
+        Vector3 velFlat = new(body.velocity.x, 0, body.velocity.z);
+        velFlat = Mathf.Clamp(velFlat.magnitude, 0, maxWalkSpeed) * velFlat.normalized;
+        body.velocity = new(velFlat.x, body.velocity.y, velFlat.z);
+
+        // -- DASH ABILITY -- \\
+
+        if (tryDash)
         {
-            // Reset vertical vel
-            body.velocity = new(body.velocity.x, 0, body.velocity.z);
-            body.AddForce(transform.up * jumpHeight);
+            // For the first dash frame, set the dash direction and turn off gravity
+            if (dashCoolCountdown <= 0)
+            {
+                dashCoolCountdown = dashCooldown;
+                dashDirection = movementForce.sqrMagnitude > 0 ? movementForce : transform.forward;
+                body.useGravity = false;
+            }
+            // Every subsequent frame, do the dash thing
+            if (dashEventCountdown > 0)
+            {
+                dashEventCountdown -= Time.fixedDeltaTime;
+                body.velocity = dashDirection * (dashDistance / dashTime);
+            }
+            else // Once dash time is out, stop dashing
+            {
+                tryDash = false;
+                body.useGravity = true;
+                dashEventCountdown = dashTime;
+            }
+        }
+    }
+
+    // Returns the current movement state of the player.
+    PlayerMoveState MoveState { get; }
+
+    // Attempt a crouch
+    void TryCrouch()
+    {
+        if (!isCrouched)
+        {
+            isCrouched = true;
+            GetComponent<CapsuleCollider>().height /= 2;
+            Debug.Log("asd");
+            body.AddForce(new(0, -250)); // push the player down so they aren't floating for a second
+        }
+    }
+
+    // Uncrouch, if currently crouched
+    void TryUncrouch()
+    {
+        if (isCrouched)
+        {
+            // If there's nothing above the player, uncrouch
+            if (!Physics.SphereCast(new(transform.position, Vector3.up), GetComponent<CapsuleCollider>().radius, GetComponent<CapsuleCollider>().height))
+            {
+                isCrouched = false;
+                GetComponent<CapsuleCollider>().height *= 2;
+            }
+        }
+    }
+
+    // Check all contact points to see if any of them are ground points
+    // If there are ground points, the player is grounded.
+    void CheckAirborne()
+    {
+        Queue<ContactPoint> totalContacts = new();
+        bool possibleGround = false;
+        bool possibleSlopeWall = false;
+        Vector3 avgNormal = Vector3.zero;
+
+        // Add all contact points to the list
+        foreach (GameObject key in collisionMap.Keys)
+        {
+            foreach (ContactPoint pt in collisionMap[key])
+                totalContacts.Enqueue(pt);
         }
 
-        // Clamp horizontal speed
-        Vector3 horizVel = body.velocity;
-        float tempY = horizVel.y;
-        horizVel.y = 0;
-        horizVel = Mathf.Clamp(horizVel.magnitude, 0, maxWalkSpeed) * horizVel.normalized;
-        horizVel.y = tempY;
-        body.velocity = horizVel;
+        if (totalContacts.Count > 0)
+        {
+            ContactPoint c;
+            while (totalContacts.TryDequeue(out c))
+            {
+                if (transform.position.y - (c.point.y + c.separation) > GetComponent<CapsuleCollider>().height * 0.3f)
+                {
+                    possibleGround = true;
+                    avgNormal += c.normal;
+                }
+            }
+            avgNormal.Normalize();
 
-        // Accelerate the player in their movement direction
-        body.AddForce(movementAccel * movementForce);
+            if (possibleGround && Vector3.Dot(Vector3.down, avgNormal) > -Mathf.Cos(maxIncline * Mathf.Deg2Rad))
+            {
+                possibleSlopeWall = true;
+                possibleGround = false;
+            }
+        }
+        groundNormal = avgNormal;
+        isGrounded = possibleGround;
+        isSlopeWall = possibleSlopeWall;
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        List<ContactPoint> pts = new();
+        int ptCount = collision.GetContacts(pts);
+
+        collisionMap[collision.gameObject] = pts.GetRange(0, ptCount);
+    }
+    private void OnCollisionExit(Collision collision)
+    {
+        collisionMap.Remove(collision.gameObject);
     }
 }

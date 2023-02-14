@@ -57,7 +57,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 54.41891
+  field of view: 61.59699
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -204,8 +204,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29429876c237bad4d8c341b2fbb50160, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxWalkSpeed: 8
-  movementAccel: 50
-  jumpHeight: 200
-  sensitivity: 2.5
-  movementDrag: 50
+  maxWalkSpeed: 6
+  movementAccelGround: 50
+  crouchSpeedMultiplier: 0.35
+  movementAccelAir: 5
+  groundDrag: 12
+  airDrag: 1
+  jumpHeight: 300
+  jumpCooldown: 0.25
+  lookSensitivity: 2.5
+  maxIncline: 47.5
+  isGrounded: 0
+  isCrouched: 0
