@@ -18,7 +18,7 @@ public class test : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == GameObject.FindGameObjectWithTag("EditorOnly"))
+        if (other.gameObject == GameObject.Find("Player"))
         {
             Rigidbody t = GameObject.Find("Player").GetComponent<Rigidbody>();
             Debug.Log("asd");

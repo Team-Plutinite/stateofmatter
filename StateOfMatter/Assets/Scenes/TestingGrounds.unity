@@ -213,14 +213,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 62770358}
-  m_LocalRotation: {x: 0.51621723, y: -0.4836265, z: -0.49089175, w: 0.50857687}
-  m_LocalPosition: {x: -3.9600003, y: 5.08, z: -2.84}
-  m_LocalScale: {x: 0.19484325, y: 4.3303685, z: 2.5875003}
+  m_LocalRotation: {x: 0.50390565, y: -0.49644166, z: -0.5035276, w: 0.49606925}
+  m_LocalPosition: {x: 2.3, y: 5.47, z: -2.83}
+  m_LocalScale: {x: 1.402131, y: 4.3303685, z: 2.5875003}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 16
-  m_LocalEulerAnglesHint: {x: 2.881, y: -90.043, z: -90.855}
+  m_LocalEulerAnglesHint: {x: 0, y: -90.043, z: -90.855}
 --- !u!114 &62770363
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1924,7 +1924,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: jumpHeight
-      value: 350
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: dashCooldown
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: dashDistance

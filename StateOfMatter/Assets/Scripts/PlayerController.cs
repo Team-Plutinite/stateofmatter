@@ -131,7 +131,6 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.A)) movementForce -= transform.right;
         if (Input.GetKey(KeyCode.D)) movementForce += transform.right;
         movementForce = Vector3.ProjectOnPlane(movementForce, groundNormal).normalized;
-        Debug.Log(groundNormal.ToString());
 
         // Accelerate the player in their movement direction and apply ground drag force
         body.AddForce((isGrounded ? 
@@ -159,7 +158,8 @@ public class PlayerController : MonoBehaviour
             if (dashCoolCountdown <= 0)
             {
                 dashCoolCountdown = dashCooldown;
-                dashDirection = movementForce.sqrMagnitude > 0 ? movementForce : transform.forward;
+                dashDirection = movementForce.sqrMagnitude > 0 ? movementForce : 
+                    Vector3.ProjectOnPlane(transform.forward, groundNormal);
                 body.useGravity = false;
             }
             // Every subsequent frame, do the dash thing
@@ -170,7 +170,7 @@ public class PlayerController : MonoBehaviour
             }
             else // Once dash time is out, stop dashing
             {
-                body.velocity = new(body.velocity.x, body.velocity.y / 3, body.velocity.z);
+                body.velocity = new(body.velocity.x, body.velocity.y / 4, body.velocity.z);
                 tryDash = false;
                 body.useGravity = true;
                 dashEventCountdown = dashTime;
@@ -188,7 +188,6 @@ public class PlayerController : MonoBehaviour
         {
             isCrouched = true;
             GetComponent<CapsuleCollider>().height /= 2;
-            Debug.Log("asd");
             body.AddForce(new(0, -250)); // push the player down so they aren't floating for a second
         }
     }
