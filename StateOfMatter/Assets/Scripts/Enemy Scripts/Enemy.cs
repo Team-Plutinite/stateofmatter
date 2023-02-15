@@ -143,7 +143,7 @@ public class Enemy : MonoBehaviour
         yield return new WaitForSeconds(wait);
         if (navigator.distanceToGoal <= minAttackDistance)
         {
-            player.GetComponent<PlayerStats>().hp = player.GetComponent<PlayerStats>().hp - 1;
+            player.GetComponent<PlayerStats>().hp -= 1;
         }
         
         // testing purposes only

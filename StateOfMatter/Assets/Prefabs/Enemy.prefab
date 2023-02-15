@@ -112,7 +112,7 @@ GameObject:
   - component: {fileID: 8399596066868568435}
   - component: {fileID: 8942749656752355091}
   - component: {fileID: 4948957393268283637}
-  - component: {fileID: 2984955881314059145}
+  - component: {fileID: -2377345748439545199}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -259,7 +259,7 @@ MonoBehaviour:
   activateOnSight: 1
   distanceToGoal: 0
   agent: {fileID: 0}
---- !u!114 &2984955881314059145
+--- !u!114 &-2377345748439545199
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

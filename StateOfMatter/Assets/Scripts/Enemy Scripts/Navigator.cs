@@ -53,6 +53,8 @@ public class Navigator : MonoBehaviour
         // If the object requires line of sight with the goal to activate, it will be inactive until it has LOS
         if (activateOnSight && movementEnabled == false)
         {
+           // Currently, this does not actually use what direction the object is facing. It just draws a ray from object-goal and if it's unobstructed it's good.
+           // Down the line once there's art/models/a level/etc. and not just a red cylinder this can be switched to physics raycasting in a certain direction(s)
            if (!agent.Raycast(goal.position, out hit))
            {
                 movementEnabled = true;
