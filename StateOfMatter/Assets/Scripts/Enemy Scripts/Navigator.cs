@@ -6,7 +6,7 @@ using UnityEngine.AI;
 using UnityEditor;
 using UnityEditor.UIElements;
 
-public class Navigate : MonoBehaviour
+public class Navigator : MonoBehaviour
 {
     [Tooltip("Goal object (transform) to travel to")]
     public Transform goal;
@@ -27,8 +27,11 @@ public class Navigate : MonoBehaviour
     [Tooltip("Enable if movement should be enabled on line of sight with the goal. Only use if movement is disabled by default")]
     public bool activateOnSight = true;
 
-    private NavMeshAgent agent;
-    private float distanceToGoal;
+    [HideInInspector]
+    public float distanceToGoal;
+    [HideInInspector]
+    public NavMeshAgent agent;
+    
     private NavMeshHit hit;
 
     // Start is called before the first frame update
@@ -45,13 +48,15 @@ public class Navigate : MonoBehaviour
 
     void Update()
     {
+        distanceToGoal = Vector3.Distance(goal.position, transform.position);
+
         // If the object requires line of sight with the goal to activate, it will be inactive until it has LOS
         if (activateOnSight && movementEnabled == false)
         {
            if (!agent.Raycast(goal.position, out hit))
-            {
+           {
                 movementEnabled = true;
-            }
+           }
         } else if (activateOnSight == false && movementEnabled == false)
         {
             movementEnabled = true;
@@ -59,7 +64,6 @@ public class Navigate : MonoBehaviour
 
         if (movementEnabled)
         {
-            distanceToGoal = Vector3.Distance(goal.position, transform.position);
 
             // If the pathfinding object requires detection it checks if the goal is within range, and if so, moves to it.
             // If it has a home set, it will return to that home when the goal leaves its range

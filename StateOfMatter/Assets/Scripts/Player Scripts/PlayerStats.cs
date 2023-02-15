@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerStats : MonoBehaviour
 {
     public float maxHP;
-    private float hp;
+    public float hp;
 
     // Start is called before the first frame update
     void Start()
