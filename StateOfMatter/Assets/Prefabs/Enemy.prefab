@@ -152,3 +152,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   goal: {fileID: 0}
+  home: {fileID: 0}
+  detectionDistance: 10
+  requiresDetection: 1
