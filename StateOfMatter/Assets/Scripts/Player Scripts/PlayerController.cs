@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-enum PlayerMoveState
+public enum PlayerMoveState
 {
     Idle,
     IdleCrouched,
@@ -50,13 +50,10 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private bool isGrounded;
-    private bool isSlopeWall;
     private Vector3 groundNormal; // Surface normal of where player is stepping
     [SerializeField]
     private bool isCrouched;
     private float jumpTime;
-
-    private Dictionary<GameObject, List<ContactPoint>> collisionMap;
 
     // Start is called before the first frame update
     void Start()
@@ -74,7 +71,6 @@ public class PlayerController : MonoBehaviour
         dashDirection = Vector3.zero;
 
         groundNormal = Vector3.zero;
-        collisionMap = new();
 
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
     }
@@ -122,7 +118,9 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        CheckAirborne(); // Updates isGrounded and isSlopeWall bools
+        //CheckAirborne();
+        isGrounded = CheckAirborne(); // Updates isGrounded and isSlopeWall bools
+        
         body.useGravity = !isGrounded; // so player isn't sliding down a slope
 
         // -- BASIC MOVEMENT HANDLING -- \\
@@ -132,7 +130,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.S)) movementForce -= transform.forward;
         if (Input.GetKey(KeyCode.A)) movementForce -= transform.right;
         if (Input.GetKey(KeyCode.D)) movementForce += transform.right;
-        if (!isSlopeWall) movementForce = Vector3.ProjectOnPlane(movementForce, groundNormal).normalized;
+        movementForce = Vector3.ProjectOnPlane(movementForce, groundNormal).normalized;
 
         // Accelerate the player in their movement direction and apply ground drag force
         body.AddForce((isGrounded ? 
@@ -160,17 +158,19 @@ public class PlayerController : MonoBehaviour
             if (dashCoolCountdown <= 0)
             {
                 dashCoolCountdown = dashCooldown;
-                dashDirection = movementForce.sqrMagnitude > 0 ? movementForce : transform.forward;
+                dashDirection = movementForce.sqrMagnitude > 0 ? movementForce : 
+                    Vector3.ProjectOnPlane(transform.forward, groundNormal);
                 body.useGravity = false;
             }
             // Every subsequent frame, do the dash thing
             if (dashEventCountdown > 0)
             {
                 dashEventCountdown -= Time.fixedDeltaTime;
-                body.velocity = dashDirection * (dashDistance / dashTime);
+                body.velocity = dashDirection.normalized * (dashDistance / dashTime);
             }
             else // Once dash time is out, stop dashing
             {
+                body.velocity = new(body.velocity.x, body.velocity.y / 4, body.velocity.z);
                 tryDash = false;
                 body.useGravity = true;
                 dashEventCountdown = dashTime;
@@ -188,7 +188,6 @@ public class PlayerController : MonoBehaviour
         {
             isCrouched = true;
             GetComponent<CapsuleCollider>().height /= 2;
-            Debug.Log("asd");
             body.AddForce(new(0, -250)); // push the player down so they aren't floating for a second
         }
     }
@@ -207,55 +206,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Check all contact points to see if any of them are ground points
-    // If there are ground points, the player is grounded.
-    void CheckAirborne()
+    // Check if the player is airborne with a sphere cast down
+    bool CheckAirborne()
     {
-        Queue<ContactPoint> totalContacts = new();
-        bool possibleGround = false;
-        bool possibleSlopeWall = false;
-        Vector3 avgNormal = Vector3.zero;
-
-        // Add all contact points to the list
-        foreach (GameObject key in collisionMap.Keys)
+        if (Physics.SphereCast(transform.position, GetComponent<CapsuleCollider>().radius,
+            Vector3.down, out RaycastHit hit, GetComponent<CapsuleCollider>().height * 0.51f - GetComponent<CapsuleCollider>().radius))
         {
-            foreach (ContactPoint pt in collisionMap[key])
-                totalContacts.Enqueue(pt);
-        }
-
-        if (totalContacts.Count > 0)
-        {
-            ContactPoint c;
-            while (totalContacts.TryDequeue(out c))
+            groundNormal = hit.normal;
+            if (Vector3.Dot(Vector3.down, groundNormal) <= -Mathf.Cos(maxIncline * Mathf.Deg2Rad))
             {
-                if (transform.position.y - (c.point.y + c.separation) > GetComponent<CapsuleCollider>().height * 0.3f)
-                {
-                    possibleGround = true;
-                    avgNormal += c.normal;
-                }
-            }
-            avgNormal.Normalize();
-
-            if (possibleGround && Vector3.Dot(Vector3.down, avgNormal) > -Mathf.Cos(maxIncline * Mathf.Deg2Rad))
-            {
-                possibleSlopeWall = true;
-                possibleGround = false;
+                return true;
             }
         }
-        groundNormal = avgNormal;
-        isGrounded = possibleGround;
-        isSlopeWall = possibleSlopeWall;
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        List<ContactPoint> pts = new();
-        int ptCount = collision.GetContacts(pts);
-
-        collisionMap[collision.gameObject] = pts.GetRange(0, ptCount);
-    }
-    private void OnCollisionExit(Collision collision)
-    {
-        collisionMap.Remove(collision.gameObject);
+        groundNormal = transform.up;
+        return false;
     }
 }
