@@ -12,18 +12,8 @@ public enum MatterState
 
 public class Enemy : MonoBehaviour
 {
-    public float maxHP;
-    public float attackDmg;
-    [Tooltip("Enemy's attack cooldown, in seconds")]
-    public float attackCD;
-    [Tooltip("Enemy movement speed")]
-    public float speed;
-
     [SerializeField]
     private MatterState debuffState;
-
-    private float hp;
-    private float attackCountdown;
 
     private GameObject player;
 
@@ -31,27 +21,11 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         player = GameObject.FindWithTag("Player");
-        hp = maxHP;
-        attackCountdown = 0f;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (hp <= 0f) Die();
-        if (attackCountdown <= 0f) TryAttack();
-
-        attackCountdown -= Time.deltaTime;
-    }
-
-    void Die()
-    {
-        // Nothing yet
-    }
-
-    void TryAttack()
-    {
-        // Nothing yet
     }
 
     // Afflict this enemy with a specific Matter debuff: Ice, Water, or Steam
