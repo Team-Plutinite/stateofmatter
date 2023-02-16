@@ -100,12 +100,12 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    private void DamageEnemy(Enemy enemy)
+    private void DamageEnemy(EnemyStats enemy)
     {
         enemy.Afflict((MatterState)(GetMode()));
     }
 
-    private void StopDamage(Enemy enemy)
+    private void StopDamage(EnemyStats enemy)
     {
         enemy.NeutralizeDebuffs();
     }
