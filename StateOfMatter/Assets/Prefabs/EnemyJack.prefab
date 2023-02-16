@@ -113,8 +113,9 @@ GameObject:
   - component: {fileID: 8942749656752355091}
   - component: {fileID: 4948957393268283637}
   - component: {fileID: -2377345748439545199}
+  - component: {fileID: 2148574808466133939}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: EnemyJack
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -277,3 +278,15 @@ MonoBehaviour:
   speed: 0
   minAttackDistance: 1.5
   debuffState: 0
+--- !u!114 &2148574808466133939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7370248711260464510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 099484e1cf16587489177871b806792d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
