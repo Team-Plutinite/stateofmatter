@@ -11,7 +11,7 @@ public enum MatterState
     None = 3
 }
 
-public class Enemy : MonoBehaviour
+public class EnemyStats : MonoBehaviour
 {
     public float maxHP;
     public float attackDmg;
