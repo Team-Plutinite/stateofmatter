@@ -29,7 +29,6 @@ public class EnemyAttack : MonoBehaviour
     {
         player = GameObject.FindWithTag("Player");
         stick = GameObject.Find("Stick");
-        hp = maxHP;
         attackCountdown = 0f;
         navigator = GetComponent<Navigator>();
     }

@@ -36,9 +36,6 @@ public class EnemyStats : MonoBehaviour
     void Update()
     {
         if (hp <= 0f) Die();
-        if (attackCountdown <= 0f && navigator.distanceToGoal <= minAttackDistance) TryAttack();
-
-        attackCountdown -= Time.deltaTime;
     }
 
     void Die()
