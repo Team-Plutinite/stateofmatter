@@ -7,15 +7,17 @@ using UnityEngine;
 
 public enum Modes //Will be used later to differentiate firing modes
 {
-    Water = 0,
-    Steam = 1,
-    Ice = 2
+    
+    Ice = 0,
+    Water = 1,
+    Steam = 2,
+    None = 3
 }
 
 
 public class Weapon : MonoBehaviour
 {
-    Modes currentMode = Modes.Steam;
+    Modes currentMode = Modes.Ice;
     //Handles the particles that come out when firing.
     [SerializeField]
     private ParticleSystem steamSystem;
@@ -30,7 +32,8 @@ public class Weapon : MonoBehaviour
 
     [SerializeField]
     private WeaponAttackRadius AttackRadius;
-    
+
+    private float debuffTimer;
     
 
     [Space]
@@ -43,7 +46,10 @@ public class Weapon : MonoBehaviour
 
     private void Awake()
     {
-        FiringSystem = new ParticleSystem[3] { waterSystem, steamSystem, iceSystem };
+        FiringSystem = new ParticleSystem[3] { iceSystem, waterSystem, steamSystem  };
+        AttackRadius.OnEnter += DamageEnemy;
+        AttackRadius.OnExit += StopDamage;
+        debuffTimer = 0f;
     }
 
     public Modes GetMode()
@@ -74,13 +80,35 @@ public class Weapon : MonoBehaviour
 
             if((int)currentMode > 2)
             {
-                currentMode = Modes.Water;
+                currentMode = Modes.Ice;
                 
             }
             Debug.Log(currentMode.ToString());
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            currentMode = Modes.Ice;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            currentMode = Modes.Water;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            currentMode = Modes.Steam;
+        }
     }
 
+    private void DamageEnemy(Enemy enemy)
+    {
+        enemy.Afflict((MatterState)(GetMode()));
+    }
+
+    private void StopDamage(Enemy enemy)
+    {
+        enemy.NeutralizeDebuffs();
+    }
 
     //Sets particle system and hitbox to turn on and off respectively 
     private void Fire()

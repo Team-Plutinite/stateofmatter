@@ -5,10 +5,10 @@ using UnityEngine.AI;
 
 public enum MatterState
 {
-    Ice,
-    Water,
-    Steam,
-    None
+    Ice = 0,
+    Water = 1,
+    Steam = 2,
+    None = 3
 }
 
 public class Enemy : MonoBehaviour
@@ -98,6 +98,8 @@ public class Enemy : MonoBehaviour
                 break;
             default: break; // state.None does nothing
         }
+
+        Debug.Log(state.ToString());
     }
 
     // Freezes the enemy, leaving them unresponsive
