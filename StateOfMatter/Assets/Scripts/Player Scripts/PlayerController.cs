@@ -179,7 +179,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // Returns the current movement state of the player.
-    PlayerMoveState MoveState { get; }
+    PlayerMoveState MoveState { get { return moveState; } }
 
     // Attempt a crouch
     void TryCrouch()
