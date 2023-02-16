@@ -7,7 +7,7 @@ public enum MatterState
 {
     Ice = 0,
     Water = 1,
-    Steam = 2,
+    Gas = 2,
     None = 3
 }
 
@@ -58,10 +58,10 @@ public class EnemyStats : MonoBehaviour
                 if (debuffState == MatterState.None) 
                     debuffState = MatterState.Water;
                 break;
-            case MatterState.Steam:
+            case MatterState.Gas:
                 // Boil the enemy if they are wet
                 if (debuffState == MatterState.Water) 
-                    Boil();
+                    Burst();
                 break;
             default: break; // state.None does nothing
         }
@@ -77,9 +77,9 @@ public class EnemyStats : MonoBehaviour
     }
 
     // Boil the enemy, adding a DOT effect
-    public void Boil()
+    public void Burst()
     {
-        debuffState = MatterState.Steam;
+        debuffState = MatterState.Gas;
         // Nothing yet
     }
 
