@@ -4,20 +4,9 @@ using UnityEngine;
 
 
 
-
-public enum Modes //Will be used later to differentiate firing modes
-{
-    
-    Ice = 0,
-    Water = 1,
-    Steam = 2,
-    None = 3
-}
-
-
 public class Weapon : MonoBehaviour
 {
-    Modes currentMode = Modes.Ice;
+    MatterState currentMode = MatterState.Ice;
     //Handles the particles that come out when firing.
     [SerializeField]
     private ParticleSystem steamSystem;
@@ -52,14 +41,15 @@ public class Weapon : MonoBehaviour
         debuffTimer = 0f;
     }
 
-    public Modes GetMode()
+    public MatterState GetMatterState()
     {
         return currentMode;
     }
 
-    public void SetMode(Modes t)
+    public void SetMode(MatterState t)
     {
         currentMode = t;
+        
     }
 
     private void Update()
@@ -73,38 +63,44 @@ public class Weapon : MonoBehaviour
             StopFiring();
         }
 
-        //Press the r key to cycle through modes
+        //Press the r key to cycle through MatterState
         if (Input.GetKeyDown(KeyCode.R))
         {
             currentMode++;
 
             if((int)currentMode > 2)
             {
-                currentMode = Modes.Ice;
+                currentMode = MatterState.Ice;
                 
             }
             Debug.Log(currentMode.ToString());
         }
 
+        //Use the number keys to switch weapons.
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            currentMode = Modes.Ice;
+            StopFiring(); //Resets hitbox and particles
+            currentMode = MatterState.Ice;  
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            currentMode = Modes.Water;
+            StopFiring();
+            currentMode = MatterState.Water;
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            currentMode = Modes.Steam;
+            StopFiring();
+            currentMode = MatterState.Gas;         
         }
     }
 
+    //Call Afflict when the enemy gets into the attack radius
     private void DamageEnemy(EnemyStats enemy)
     {
-        enemy.Afflict((MatterState)(GetMode()));
+        enemy.Afflict(GetMatterState());
     }
 
+    //Stop Damage After Leaving Radius
     private void StopDamage(EnemyStats enemy)
     {
         enemy.NeutralizeDebuffs();
