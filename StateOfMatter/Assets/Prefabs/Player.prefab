@@ -213,7 +213,7 @@ MonoBehaviour:
   airDrag: 1
   jumpHeight: 300
   jumpCooldown: 0.25
-  dashCooldown: 4
+  dashCooldown: 0.67
   dashDistance: 4
   dashTime: 0.15
   lookSensitivity: 2.5
@@ -233,3 +233,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 0
+  hp: 0
