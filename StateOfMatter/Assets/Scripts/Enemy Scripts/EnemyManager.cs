@@ -7,7 +7,7 @@ public delegate void EnemyAction(GameObject e);
 
 public class EnemyManager : MonoBehaviour
 {
-    private List<GameObject> activeEnemies;
+    private Dictionary<int, GameObject> activeEnemies;
     private Queue<GameObject> inactiveEnemies;
 
     [Tooltip("The size of the enemy object pool.")]
@@ -20,7 +20,7 @@ public class EnemyManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        activeEnemies = new List<GameObject>();
+        activeEnemies = new Dictionary<int, GameObject>();
         inactiveEnemies = new Queue<GameObject>();
 
         // Create the enemy pool
@@ -46,11 +46,18 @@ public class EnemyManager : MonoBehaviour
     /// <param name="action">The function to perform on each enemy in the AoE</param>
     public void CreateAOE(Vector3 position, float radius, EnemyAction action)
     {
-        foreach (GameObject e in activeEnemies)
+        List<GameObject> inRange = new List<GameObject>();
+
+        // Fill a list of all objects in range (doing this so we aren't directly modifying activeEnemies
+        foreach (GameObject e in activeEnemies.Values)
         {
             if ((e.transform.position - position).sqrMagnitude < radius * radius)
-                action(e);
+                inRange.Add(e);
         }
+
+        // Invoke action on objects in range (start at end because some may be removed in this process)
+        for (int i = inRange.Count - 1; i >= 0; i--)
+            action(inRange[i]);
     }
 
     /// <summary>
@@ -66,10 +73,10 @@ public class EnemyManager : MonoBehaviour
             return false;
 
         // Add it to the active pool
-        activeEnemies.Add(enemy);
+        activeEnemies.Add(enemy.GetInstanceID(), enemy);
 
         // Initialize the enemy (spawning it). Also store its pool index
-        enemy.GetComponent<EnemyStats>().Init(hp, position, pitchYawRoll, activeEnemies.Count - 1);
+        enemy.GetComponent<EnemyStats>().Init(hp, position, pitchYawRoll);
         // Init everything in the EnemyAttack compoenent
         //enemy.GetComponent<EnemyAttack>().Init();
         // Init everything in the Navigator component
@@ -83,25 +90,23 @@ public class EnemyManager : MonoBehaviour
     /// </summary>
     /// <param name="index">The enemy's index within the active enemy pool</param>
     /// <returns>Whether killing the enemy was successful or not</returns>
-    public bool KillEnemy(int index)
+    public bool KillEnemy(int instanceID)
     {
+        Debug.Log(activeEnemies.ContainsKey(instanceID));
         // Make sure we aren't OOBing.
-        if (index < 0 || index >= activeEnemies.Count) 
+        if (!activeEnemies.ContainsKey(instanceID)) 
             return false;
 
-        // Remove the enemy from active pool
-        GameObject enemy = activeEnemies[index];
-        activeEnemies.RemoveAt(index);
-
-        // Deactivate it and enqueue it in the inactive pool
+        // Move enemy from active to inactive, deactivate it
+        GameObject enemy = activeEnemies[instanceID];
+        activeEnemies.Remove(instanceID);
         enemy.SetActive(false);
         inactiveEnemies.Enqueue(enemy);
-
         return true;
     }
 
     /// <summary>
     /// Returns the pool of all active (alive) enemies in the game world.
     /// </summary>
-    public List<GameObject> Enemies { get { return activeEnemies; } }
+    public Dictionary<int, GameObject> Enemies { get { return activeEnemies; } }
 }

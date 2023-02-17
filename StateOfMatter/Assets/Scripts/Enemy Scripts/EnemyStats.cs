@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public enum MatterState
@@ -13,7 +14,6 @@ public enum MatterState
 public class EnemyStats : MonoBehaviour
 {
     public EnemyManager manager;
-    private int poolIndex;
 
     private float maxHP;
     private MatterState debuffState;
@@ -31,7 +31,7 @@ public class EnemyStats : MonoBehaviour
     /// called from EnemyManager for spawning purposes
     /// </summary>
     /// <param name="hp">The HP of the spawned enemy</param>
-    public void Init(float hp, Vector3 position, Vector3 pitchYawRoll, int index)
+    public void Init(float hp, Vector3 position, Vector3 pitchYawRoll)
     {
         // Set transform data
         transform.SetPositionAndRotation(position, Quaternion.Euler(pitchYawRoll));
@@ -42,7 +42,6 @@ public class EnemyStats : MonoBehaviour
         dotTime = 0.0f;
         dotDmg = 0.0f;
         gameObject.SetActive(true);
-        poolIndex = index;
     }
 
     // Update is called once per frame
@@ -106,8 +105,9 @@ public class EnemyStats : MonoBehaviour
     public void TakeDamage(float dmgAmt)
     {
         hp -= dmgAmt;
-        Debug.Log($"{hp} HP remaining on {name}");
-        if (hp <= 0) manager.KillEnemy(poolIndex);
+        transform.GetComponentInChildren<TextMeshPro>().text = hp.ToString();
+
+        if (hp <= 0) manager.KillEnemy(gameObject.GetInstanceID());
     }
 
     /// <summary>

@@ -118,9 +118,17 @@ public class PlayerController : MonoBehaviour
 
         // fucking around
         if (Input.GetKeyDown(KeyCode.P))
-            GameObject.Find("EnemyManager").GetComponent<EnemyManager>().SpawnEnemy(100, new Vector3(1f, 2f, 8f), Vector3.zero);
+        {
+            if (Physics.Raycast(transform.position, camTransform.forward, out RaycastHit hit, 100))
+                GameObject.Find("EnemyManager").GetComponent<EnemyManager>().SpawnEnemy(100, hit.point, Vector3.zero);
+        }
+            
         if (Input.GetKeyDown(KeyCode.X))
-            GameObject.Find("EnemyManager").GetComponent<EnemyManager>().Enemies[0].GetComponent<EnemyStats>().Burst();
+        {
+            if (Physics.Raycast(transform.position, camTransform.forward, out RaycastHit hit, 100))
+                if (hit.collider.gameObject.GetComponent<EnemyStats>() != null)
+                    hit.collider.gameObject.GetComponent<EnemyStats>().Burst();
+        }
     }
 
     private void FixedUpdate()
