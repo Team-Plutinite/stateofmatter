@@ -9756,9 +9756,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 12
-  attackDmg: 3
-  attackCD: 90
-  speed: 0
+  managerObject: {fileID: 0}
   debuffState: 3
 --- !u!1 &9072653324062220282
 GameObject:

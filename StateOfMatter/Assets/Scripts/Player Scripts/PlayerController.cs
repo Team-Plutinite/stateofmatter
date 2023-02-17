@@ -67,6 +67,7 @@ public class PlayerController : MonoBehaviour
 
         jumpTime = 0.0f;
         dashCoolCountdown = 0.0f;
+        dashEventCountdown = dashTime;
         tryDash = false;
         dashDirection = Vector3.zero;
 
@@ -114,6 +115,12 @@ public class PlayerController : MonoBehaviour
         // -- COOLDOWN REDUCTIONS -- \\
         dashCoolCountdown -= Time.deltaTime;
         jumpTime -= Time.deltaTime;
+
+        // fucking around
+        if (Input.GetKeyDown(KeyCode.P))
+            GameObject.Find("EnemyManager").GetComponent<EnemyManager>().SpawnEnemy(100, new Vector3(1f, 2f, 8f), Vector3.zero);
+        if (Input.GetKeyDown(KeyCode.X))
+            GameObject.Find("EnemyManager").GetComponent<EnemyManager>().Enemies[0].GetComponent<EnemyStats>().Burst();
     }
 
     private void FixedUpdate()
@@ -159,9 +166,8 @@ public class PlayerController : MonoBehaviour
             {
                 dashCoolCountdown = dashCooldown;
                 dashDirection = movementForce.sqrMagnitude > 0 ? movementForce : 
-                    Vector3.ProjectOnPlane(transform.forward, groundNormal);
-                body.useGravity = false;
-            }
+                    Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized;
+                body.useGravity = false;            }
             // Every subsequent frame, do the dash thing
             if (dashEventCountdown > 0)
             {
