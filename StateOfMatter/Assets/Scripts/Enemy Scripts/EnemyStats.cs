@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using TMPro;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ public class EnemyStats : MonoBehaviour
 
     private float maxHP;
     private MatterState debuffState;
+    private float debuffTime;
     private float hp;
     private float dotTime;
     private float dotDmg;
@@ -37,6 +39,7 @@ public class EnemyStats : MonoBehaviour
         transform.SetPositionAndRotation(position, Quaternion.Euler(pitchYawRoll));
 
         debuffState = MatterState.None;
+        debuffTime = 0.0f;
         this.hp = hp;
         maxHP = hp;
         dotTime = 0.0f;
@@ -48,34 +51,68 @@ public class EnemyStats : MonoBehaviour
     void Update()
     {
         dotTime -= Time.deltaTime;
-        if (dotTime > 0)
+        if (dotTime > 0f)
             TakeDamage(dotDmg * Time.deltaTime);
+
+        debuffTime -= Time.deltaTime;
+        // If debuff timer runs out, neutralize debuffs
+        if (debuffTime <= 0.0f && debuffState != MatterState.None)
+            NeutralizeDebuffs();
+
+        Material mat = GetComponent<Renderer>().material;
+        // Visually show debuff state on enemy
+        switch (debuffState)
+        {
+            case MatterState.Ice:
+                mat.SetColor("_Color", Color.cyan);
+                break;
+            case MatterState.Water:
+                mat.SetColor("_Color", Color.blue);
+                break;
+            case MatterState.Gas:
+                mat.SetColor("_Color", Color.red);
+                break;
+            default:
+                mat.SetColor("_Color", Color.white);
+                break;
+        }
     }
 
-    // Afflict this enemy with a specific Matter debuff: Ice, Water, or Steam
-    public void Afflict(MatterState state)
+    /// <summary>
+    /// Afflict this enemy with a specific Matter debuff: Ice, Water, or Gas
+    /// </summary>
+    /// <param name="state">The Matter State to apply</param>
+    /// <param name="seconds">How long this debuff should last</param>
+    public void Afflict(MatterState state, float seconds)
     {
+        if (debuffState == MatterState.Water && state != MatterState.None)
+            debuffTime = seconds;
+
         switch (state)
         {
             case MatterState.Ice:
                 // Freeze the enemy if they are currently wet
-                if (debuffState == MatterState.Water) 
+                if (debuffState == MatterState.Water)
                     Freeze();
                 break;
+
             case MatterState.Water:
                 // Debuff the enemy with Wet, but only if they are not already debuffed
-                if (debuffState == MatterState.None) 
+                if (debuffState == MatterState.None)
+                {
                     debuffState = MatterState.Water;
+                    debuffTime = seconds;
+                }
                 break;
+
             case MatterState.Gas:
-                // Boil the enemy if they are wet
-                if (debuffState == MatterState.Water) 
-                    Burst();
+                // Burst the enemy if they are wet
+                if (debuffState == MatterState.Water)
+                    Burst(seconds);
                 break;
+
             default: break; // state.None does nothing
         }
-
-        Debug.Log(state.ToString());
     }
 
     // Freezes the enemy, leaving them unresponsive
@@ -86,14 +123,14 @@ public class EnemyStats : MonoBehaviour
     }
 
     // Burst the enemy, doing single-shot AOE then adding individual DOT effect
-    public void Burst()
+    public void Burst(float seconds)
     {
         debuffState = MatterState.Gas;
 
         manager.CreateAOE(transform.position, 4.0f, a => 
             a.GetComponent<EnemyStats>().TakeDamage(35.0f));
 
-        ApplyDOT(50, 4);
+        ApplyDOT(50, seconds);
     }
 
     // Eliminate enemy debuffs
