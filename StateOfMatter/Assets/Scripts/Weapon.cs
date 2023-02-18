@@ -97,13 +97,13 @@ public class Weapon : MonoBehaviour
     //Call Afflict when the enemy gets into the attack radius
     private void DamageEnemy(EnemyStats enemy)
     {
-        enemy.Afflict(GetMatterState());
+        enemy.Afflict(GetMatterState(), 5f);
     }
 
     //Stop Damage After Leaving Radius
     private void StopDamage(EnemyStats enemy)
     {
-        enemy.NeutralizeDebuffs();
+        //enemy.NeutralizeDebuffs();
     }
 
     //Sets particle system and hitbox to turn on and off respectively 
