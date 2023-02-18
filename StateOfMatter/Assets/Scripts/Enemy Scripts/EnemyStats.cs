@@ -126,9 +126,13 @@ public class EnemyStats : MonoBehaviour
     public void Burst(float seconds)
     {
         debuffState = MatterState.Gas;
+        
 
-        manager.CreateAOE(transform.position, 4.0f, a => 
-            a.GetComponent<EnemyStats>().TakeDamage(35.0f));
+        manager.CreateAOE(transform.position, 4.0f, a =>
+        {
+            a.GetComponent<Rigidbody>().AddExplosionForce(1500f, transform.position, 4f);
+            a.GetComponent<EnemyStats>().TakeDamage(35.0f);
+        });
 
         ApplyDOT(50, seconds);
     }
