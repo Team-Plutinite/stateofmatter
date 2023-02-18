@@ -1444,10 +1444,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2148574808466133939, guid: 2a8ab4523a44fbd47a7a0136ab8e2422, type: 3}
+      propertyPath: attackCooldown
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 4948957393268283637, guid: 2a8ab4523a44fbd47a7a0136ab8e2422, type: 3}
       propertyPath: goal
       value: 
       objectReference: {fileID: 183252725}
+    - target: {fileID: 4948957393268283637, guid: 2a8ab4523a44fbd47a7a0136ab8e2422, type: 3}
+      propertyPath: home
+      value: 
+      objectReference: {fileID: 1594254994}
+    - target: {fileID: 4948957393268283637, guid: 2a8ab4523a44fbd47a7a0136ab8e2422, type: 3}
+      propertyPath: movementEnabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7370248711260464510, guid: 2a8ab4523a44fbd47a7a0136ab8e2422, type: 3}
       propertyPath: m_Name
       value: EnemyJack

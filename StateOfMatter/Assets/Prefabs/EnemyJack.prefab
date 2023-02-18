@@ -112,8 +112,8 @@ GameObject:
   - component: {fileID: 8399596066868568435}
   - component: {fileID: 8942749656752355091}
   - component: {fileID: 4948957393268283637}
-  - component: {fileID: -2377345748439545199}
   - component: {fileID: 2148574808466133939}
+  - component: {fileID: -2377345748439545199}
   m_Layer: 0
   m_Name: EnemyJack
   m_TagString: Enemy
@@ -260,24 +260,6 @@ MonoBehaviour:
   activateOnSight: 1
   distanceToGoal: 0
   agent: {fileID: 0}
---- !u!114 &-2377345748439545199
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7370248711260464510}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d7dac098dd9c5e4c8371c87e3482e4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHP: 0
-  attackDmg: 0
-  attackCD: 0
-  speed: 0
-  minAttackDistance: 1.5
-  debuffState: 0
 --- !u!114 &2148574808466133939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -290,3 +272,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 099484e1cf16587489177871b806792d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackDmg: 0
+  attackCooldown: 3
+  minAttackDistance: 1.5
+--- !u!114 &-2377345748439545199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7370248711260464510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d7dac098dd9c5e4c8371c87e3482e4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  manager: {fileID: 0}

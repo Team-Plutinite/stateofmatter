@@ -59,11 +59,16 @@ public class EnemyManager : MonoBehaviour
     /// <param name="hp">The HP of the enemy</param>
     /// <param name="transform">The enemy's transform</param>
     /// <returns>If spawning was successful</returns>
-    public bool SpawnEnemy(float hp, Vector3 position, Vector3 pitchYawRoll, Transform goal = null, Transform home = null)
+    public bool SpawnEnemy(float hp, Vector3 position, Vector3 pitchYawRoll, GameObject goal = null, Transform home = null)
     {
         // Attempt to dequeue from inactive pool; if pool is empty, return false
         if (!inactiveEnemies.TryDequeue(out GameObject enemy))
             return false;
+
+        if (goal == null)
+        {
+            goal = player;
+        }
 
         // Add it to the active pool
         activeEnemies.Add(enemy);

@@ -5,11 +5,10 @@ using UnityEngine.AI;
 
 public class EnemyAttack : MonoBehaviour
 {
+    [Tooltip("Enemy's attack damage")]
     public float attackDmg;
     [Tooltip("Enemy's attack cooldown, in seconds")]
-    public float attackCD;
-    [Tooltip("Enemy movement speed")]
-    public float speed;
+    public float attackCooldown;
     [Tooltip("Minimum attack distance between enemy and player")]
     public float minAttackDistance = 1.5f;
 
@@ -31,20 +30,27 @@ public class EnemyAttack : MonoBehaviour
         stick = GameObject.Find("Stick");
         attackCountdown = 0f;
         navigator = GetComponent<Navigator>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (attackCountdown <= 0f && navigator.distanceToGoal <= minAttackDistance) TryAttack();
+        if (attackCountdown <= 0f && navigator.distanceToGoal <= minAttackDistance)
+        {
+            TryAttack();
+        }
 
         attackCountdown -= Time.deltaTime;
     }
-
+    /// <summary>
+    /// Attempts an enemy attack on its goal object (the player)
+    /// </summary>
     void TryAttack()
     {
         // This stops the enemy's movement and restarts it after the time passed into RestartMovement
         navigator.agent.isStopped = true;
+
         coroutine = RestartMovement(2.0f);
         StartCoroutine(coroutine);
 
@@ -52,7 +58,7 @@ public class EnemyAttack : MonoBehaviour
         StartCoroutine(coroutine);
 
 
-        attackCountdown = 3f;
+        attackCountdown = attackCooldown;
     }
 
     // Stops enemy movement after given wait time

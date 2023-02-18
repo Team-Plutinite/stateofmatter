@@ -8,8 +8,8 @@ using UnityEditor.UIElements;
 
 public class Navigator : MonoBehaviour
 {
-    [Tooltip("Goal object (transform) to travel to")]
-    public Transform goal;
+    [Tooltip("Goal object to travel to")]
+    public GameObject goal;
     [Tooltip("Enable or disable movement")]
     public bool movementEnabled = false;
     [Header("Detection Settings")]
@@ -45,7 +45,7 @@ public class Navigator : MonoBehaviour
     }
 
     // Called by EnemyStats.Init() when enemy is spawned
-    public void Init(Transform goal, Transform home, bool movementEnabled = false, bool requiresDetection = false, float maxCloseness = 1, bool activateOnSight = true)
+    public void Init(GameObject goal, Transform home, bool movementEnabled = false, bool requiresDetection = false, float maxCloseness = 1, bool activateOnSight = true)
     {
         this.goal = goal;
         this.movementEnabled = movementEnabled;
@@ -61,14 +61,14 @@ public class Navigator : MonoBehaviour
     {
         if (goal != null)
         {
-            distanceToGoal = Vector3.Distance(goal.position, transform.position);
+            distanceToGoal = Vector3.Distance(goal.transform.position, transform.position);
 
             // If the object requires line of sight with the goal to activate, it will be inactive until it has LOS
             if (activateOnSight && movementEnabled == false)
             {
                 // Currently, this does not actually use what direction the object is facing. It just draws a ray from object-goal and if it's unobstructed it's good.
                 // Down the line once there's art/models/a level/etc. and not just a red cylinder this can be switched to physics raycasting in a certain direction(s)
-                if (!agent.Raycast(goal.position, out hit))
+                if (!agent.Raycast(goal.transform.position, out hit))
                 {
                     movementEnabled = true;
                 }
@@ -85,11 +85,16 @@ public class Navigator : MonoBehaviour
                 // If it has a home set, it will return to that home when the goal leaves its range
                 // If it doesn't require detection it will continue pathfinding to the goal forever
                 // Will we actually use the home for enemies? Unknown but I know Mario 64 has it so it might be useful down the line.
-                if (requiresDetection)
+
+                if (distanceToGoal <= maxCloseness)
+                {
+                    agent.destination = transform.position;
+                }
+                else if (requiresDetection)
                 {
                     if (distanceToGoal <= detectionDistance)
                     {
-                        agent.destination = goal.position;
+                        agent.destination = goal.transform.position;
                     }
                     else if (home != null && transform.position != home.position)
                     {
@@ -98,13 +103,10 @@ public class Navigator : MonoBehaviour
                 }
                 else
                 {
-                    agent.destination = goal.position;
+                    agent.destination = goal.transform.position;
                 }
 
-                if (distanceToGoal <= maxCloseness)
-                {
-                    agent.destination = transform.position;
-                }
+                
             }
         }
     }
