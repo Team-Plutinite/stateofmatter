@@ -122,8 +122,6 @@ public class PlayerController : MonoBehaviour
             if (Physics.Raycast(transform.position, camTransform.forward, out RaycastHit hit, 100))
                 GameObject.Find("EnemyManager").GetComponent<EnemyManager>().SpawnEnemy(100, hit.point, Vector3.zero);
         }
-
-        if (Input.GetKeyDown(KeyCode.V)) body.AddForce(transform.forward * 3000);
     }
 
     private void FixedUpdate()
