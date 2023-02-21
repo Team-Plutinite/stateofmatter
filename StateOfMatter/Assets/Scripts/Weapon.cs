@@ -33,12 +33,27 @@ public class Weapon : MonoBehaviour
     [SerializeField]
     private float effectDur = 3f;
 
+    // audio
+    [SerializeField]
+    public AudioSource source;
+    private float fireSoundTimer;
+    private float fireSoundCooldown;
+    [SerializeField]
+    public AudioClip steamFireSound;
+
     private void Awake()
     {
         FiringSystem = new ParticleSystem[3] { iceSystem, waterSystem, steamSystem  };
         AttackRadius.OnEnter += DamageEnemy;
         AttackRadius.OnExit += StopDamage;
         debuffTimer = 0f;
+
+        //FiringSystem = new ParticleSystem[3] { waterSystem, steamSystem, iceSystem };
+        source = gameObject.AddComponent<AudioSource>();
+        source.volume = 0.1f;
+        fireSoundTimer = 0.0f;
+        fireSoundCooldown = 0.52f;
+        
     }
 
     public MatterState GetMatterState()
@@ -92,6 +107,7 @@ public class Weapon : MonoBehaviour
             StopFiring();
             currentMode = MatterState.Gas;         
         }
+        fireSoundTimer -= Time.deltaTime;
     }
 
     //Call Afflict when the enemy gets into the attack radius
@@ -111,11 +127,23 @@ public class Weapon : MonoBehaviour
     {
         FiringSystem[(int)currentMode].gameObject.SetActive(true);
         AttackRadius.gameObject.SetActive(true);
+        source.loop = true;
+        if (currentMode == MatterState.Gas)
+        {
+            fireSoundCooldown = 0.52f; //setting cooldown to length of audio clip
+            if (fireSoundTimer <= 0.0f)
+            {
+                source.PlayOneShot(steamFireSound); //playing audio
+                fireSoundTimer = fireSoundCooldown; //reset timer
+            }
+        }
     }
 
     private void StopFiring()
     {
         FiringSystem[(int)currentMode].gameObject.SetActive(false);
         AttackRadius.gameObject.SetActive(false);
+        source.loop = false;
+        source.Stop();
     }
 }
