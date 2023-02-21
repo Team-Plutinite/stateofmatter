@@ -125,7 +125,6 @@ public class PlayerController : MonoBehaviour
         if (dashCoolCountdown <= 0 && Input.GetKeyDown(KeyCode.LeftShift))
         {
             tryDash = true;
-            source.PlayOneShot(dashSound);
         }
 
         // -- COOLDOWN REDUCTIONS -- \\
@@ -178,13 +177,15 @@ public class PlayerController : MonoBehaviour
 
         if (tryDash)
         {
-            // For the first dash frame, set the dash direction and turn off gravity
+            // For the first dash frame, set the dash direction and turn off gravity (and play sound)
             if (dashCoolCountdown <= 0)
             {
                 dashCoolCountdown = dashCooldown;
                 dashDirection = movementForce.sqrMagnitude > 0 ? movementForce : 
                     Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized;
-                body.useGravity = false;            }
+                body.useGravity = false;
+                source.PlayOneShot(dashSound);
+            }
             // Every subsequent frame, do the dash thing
             if (dashEventCountdown > 0)
             {
