@@ -58,6 +58,12 @@ public class PlayerController : MonoBehaviour
 
     private Dictionary<GameObject, List<ContactPoint>> collisionMap;
 
+    // audio
+    public AudioSource source;
+    public AudioClip moveSound;
+    public AudioClip dashSound;
+    public AudioClip jumpSound;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -77,6 +83,9 @@ public class PlayerController : MonoBehaviour
         collisionMap = new();
 
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
+
+        source = gameObject.AddComponent<AudioSource>();
+        source.volume = 0.2f;
     }
 
     // Update is called once per frame
@@ -109,11 +118,16 @@ public class PlayerController : MonoBehaviour
                 body.velocity = new(body.velocity.x, 0, body.velocity.z);
                 body.AddForce(transform.up * jumpHeight);
                 TryUncrouch(); // uncrouch the player if they're crouching
+                source.PlayOneShot(jumpSound);
             }
         }
 
         // -- ACTIVATE DASH ABILITY -- \\
-        if (dashCoolCountdown <= 0 && Input.GetKeyDown(KeyCode.LeftShift)) tryDash = true;
+        if (dashCoolCountdown <= 0 && Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            tryDash = true;
+            source.PlayOneShot(dashSound);
+        }
 
         // -- COOLDOWN REDUCTIONS -- \\
         dashCoolCountdown -= Time.deltaTime;
