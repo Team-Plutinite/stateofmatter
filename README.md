@@ -7,3 +7,5 @@ Common issues and fixes:
 	 - 2. Run the command ```git clone https://github.com/JackKalina/stateofmatter.git -c core.longpaths=true```
 		 - 2a. It'll probably prompt you to log into github. Do so 
 	- 3. Once the clone is done open up GitHub Desktop (since we all seem to be using that) and do File -> Add local repository... and direct it to whatever folder you cloned into
+
+Other stuff please refer to documentation docs in google drive
