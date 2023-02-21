@@ -46,6 +46,8 @@ public class Weapon : MonoBehaviour
         FiringSystem = new ParticleSystem[3] { iceSystem, waterSystem, steamSystem  };
         AttackRadius.OnEnter += DamageEnemy;
         AttackRadius.OnExit += StopDamage;
+
+        AttackRadius.MeltEnter += DamageMeltable;
         debuffTimer = 0f;
 
         //FiringSystem = new ParticleSystem[3] { waterSystem, steamSystem, iceSystem };
@@ -120,6 +122,20 @@ public class Weapon : MonoBehaviour
     private void StopDamage(EnemyStats enemy)
     {
         //enemy.NeutralizeDebuffs();
+    }
+
+    //Begin Damaging ice when it enters the radius.
+    private void DamageMeltable(Meltable melt)
+    {
+        //If the cube is fully melted, do nothing.
+        if (melt.transform.localScale == new Vector3(0f, 0f, 0f))
+        {
+            return;
+        }
+        else 
+        { 
+            melt.Melt(GetMatterState());
+        }
     }
 
     //Sets particle system and hitbox to turn on and off respectively 
