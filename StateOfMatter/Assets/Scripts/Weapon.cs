@@ -47,8 +47,8 @@ public class Weapon : MonoBehaviour
         AttackRadius.OnEnter += DamageEnemy;
         AttackRadius.OnExit += StopDamage;
         debuffTimer = 0f;
-        
-        FiringSystem = new ParticleSystem[3] { waterSystem, steamSystem, iceSystem };
+
+        //FiringSystem = new ParticleSystem[3] { waterSystem, steamSystem, iceSystem };
         source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.1f;
         fireSoundTimer = 0.0f;
@@ -128,7 +128,7 @@ public class Weapon : MonoBehaviour
         FiringSystem[(int)currentMode].gameObject.SetActive(true);
         AttackRadius.gameObject.SetActive(true);
         source.loop = true;
-        if (currentMode == Modes.Steam)
+        if (currentMode == MatterState.Gas)
         {
             fireSoundCooldown = 0.52f; //setting cooldown to length of audio clip
             if (fireSoundTimer <= 0.0f)
