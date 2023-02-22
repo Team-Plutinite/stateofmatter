@@ -1116,6 +1116,10 @@ PrefabInstance:
       propertyPath: steamFireSound
       value: 
       objectReference: {fileID: 8300000, guid: bbf1c6d3754b89d4b8a1c91aaaf0b6b5, type: 3}
+    - target: {fileID: 4392416035943461475, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
+      propertyPath: freezeFireSound
+      value: 
+      objectReference: {fileID: 8300000, guid: c76990b4719b04f47acf3a014b8b47aa, type: 3}
     - target: {fileID: 4392416035943590117, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -2122,7 +2126,7 @@ PrefabInstance:
     - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: dashSound
       value: 
-      objectReference: {fileID: 8300000, guid: d214c856f274f3944b5f4c47a89d380a, type: 3}
+      objectReference: {fileID: 8300000, guid: 4bdc89b14cbbbdd49844e8e035891082, type: 3}
     - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: jumpSound
       value: 
