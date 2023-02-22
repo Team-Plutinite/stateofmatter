@@ -222,8 +222,8 @@ MonoBehaviour:
   isCrouched: 0
   source: {fileID: 0}
   moveSound: {fileID: 0}
-  dashSound: {fileID: 0}
-  jumpSound: {fileID: 0}
+  dashSound: {fileID: 8300000, guid: d214c856f274f3944b5f4c47a89d380a, type: 3}
+  jumpSound: {fileID: 8300000, guid: 280ddb6a9a2640a4bbaed5b1d588edab, type: 3}
 --- !u!114 &-6030132350112573881
 MonoBehaviour:
   m_ObjectHideFlags: 0
