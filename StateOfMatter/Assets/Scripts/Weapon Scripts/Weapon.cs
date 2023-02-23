@@ -40,13 +40,11 @@ public class Weapon : MonoBehaviour
     private float fireSoundCooldown;
     [SerializeField]
     public AudioClip steamFireSound;
-    [SerializeField]
-    public AudioClip freezeFireSound;
 
     private void Awake()
     {
         FiringSystem = new ParticleSystem[3] { iceSystem, waterSystem, steamSystem  };
-        AttackRadius.OnStay += DamageEnemy;
+        AttackRadius.OnEnter += DamageEnemy;
         AttackRadius.OnExit += StopDamage;
 
         AttackRadius.MeltEnter += DamageMeltable;
@@ -54,7 +52,7 @@ public class Weapon : MonoBehaviour
 
         //FiringSystem = new ParticleSystem[3] { waterSystem, steamSystem, iceSystem };
         source = gameObject.AddComponent<AudioSource>();
-        source.volume = 0.2f;
+        source.volume = 0.1f;
         fireSoundTimer = 0.0f;
         fireSoundCooldown = 0.52f;
         
@@ -146,22 +144,13 @@ public class Weapon : MonoBehaviour
         FiringSystem[(int)currentMode].gameObject.SetActive(true);
         AttackRadius.gameObject.SetActive(true);
         source.loop = true;
-        if (currentMode == MatterState.Gas) //gas
+        if (currentMode == MatterState.Gas)
         {
             fireSoundCooldown = 0.52f; //setting cooldown to length of audio clip
             if (fireSoundTimer <= 0.0f)
             {
                 source.PlayOneShot(steamFireSound); //playing audio
                 fireSoundTimer = fireSoundCooldown; //reset timer
-            }
-        }
-        if (currentMode == MatterState.Ice) //ice
-        {
-            fireSoundCooldown = 0.83f;
-            if (fireSoundTimer <= 0.0f)
-            {
-                source.PlayOneShot(freezeFireSound);
-                fireSoundTimer = fireSoundCooldown;
             }
         }
     }

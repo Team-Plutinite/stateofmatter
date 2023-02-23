@@ -125,13 +125,14 @@ public class PlayerController : MonoBehaviour
         if (dashCoolCountdown <= 0 && Input.GetKeyDown(KeyCode.LeftShift))
         {
             tryDash = true;
+            source.PlayOneShot(dashSound);
         }
 
         // -- COOLDOWN REDUCTIONS -- \\
         dashCoolCountdown -= Time.deltaTime;
         jumpTime -= Time.deltaTime;
 
-        // for testing; spawn an enemy
+        // fucking around
         if (Input.GetKeyDown(KeyCode.P))
         {
             if (Physics.Raycast(transform.position, camTransform.forward, out RaycastHit hit, 100))
@@ -141,6 +142,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        //CheckAirborne();
         isGrounded = CheckAirborne(); // Updates isGrounded and isSlopeWall bools
         
         body.useGravity = !isGrounded; // so player isn't sliding down a slope
@@ -166,27 +168,32 @@ public class PlayerController : MonoBehaviour
             new(body.velocity.x, 0, body.velocity.z);
         body.AddForce(-(isGrounded ? groundDrag : airDrag) * velProjected);
 
+            // CLAMP WALK SPEED \\
+
+        Vector3 velFlat = new(body.velocity.x, 0, body.velocity.z);
+        velFlat = Mathf.Clamp(velFlat.magnitude, 0, maxWalkSpeed) * velFlat.normalized;
+        body.velocity = new(velFlat.x, body.velocity.y, velFlat.z);
+
         // -- DASH ABILITY -- \\
 
         if (tryDash)
         {
-            // For the first dash frame, set the dash direction and turn off gravity (and play sound)
+            // For the first dash frame, set the dash direction and turn off gravity
             if (dashCoolCountdown <= 0)
             {
                 dashCoolCountdown = dashCooldown;
-                dashDirection = (movementForce.sqrMagnitude > 0 ? movementForce : 
-                    Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized) * maxWalkSpeed;
-                body.useGravity = false;   
-                source.PlayOneShot(dashSound);
-            }
-            if (dashEventCountdown > 0) // Every subsequent frame, do the dash thing
+                dashDirection = movementForce.sqrMagnitude > 0 ? movementForce : 
+                    Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized;
+                body.useGravity = false;            }
+            // Every subsequent frame, do the dash thing
+            if (dashEventCountdown > 0)
             {
                 dashEventCountdown -= Time.fixedDeltaTime;
                 body.velocity = dashDirection.normalized * (dashDistance / dashTime);
             }
             else // Once dash time is out, stop dashing
             {
-                body.velocity = dashDirection;
+                body.velocity = new(body.velocity.x, body.velocity.y / 4, body.velocity.z);
                 tryDash = false;
                 body.useGravity = true;
                 dashEventCountdown = dashTime;

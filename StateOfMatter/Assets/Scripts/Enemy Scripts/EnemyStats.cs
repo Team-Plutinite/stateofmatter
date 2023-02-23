@@ -22,10 +22,6 @@ public class EnemyStats : MonoBehaviour
     private float hp;
     private float dotTime;
     private float dotDmg;
-    private float debuffAmt;
-    private float debuffMax;
-
-    private float moveSpeed;
 
     // Start is called before the first frame update
     void Start()
@@ -49,10 +45,6 @@ public class EnemyStats : MonoBehaviour
         dotTime = 0.0f;
         dotDmg = 0.0f;
         gameObject.SetActive(true);
-        debuffAmt = 0;
-        debuffMax = 1.5f;
-
-        moveSpeed = GetComponent<Navigator>().agent.speed;
     }
 
     // Update is called once per frame
@@ -67,8 +59,6 @@ public class EnemyStats : MonoBehaviour
         if (debuffTime <= 0.0f && debuffState != MatterState.None)
             NeutralizeDebuffs();
 
-        if (debuffAmt > 0) debuffAmt -= Time.deltaTime / 2;
-
         Material mat = GetComponent<Renderer>().material;
         // Visually show debuff state on enemy
         switch (debuffState)
@@ -77,7 +67,7 @@ public class EnemyStats : MonoBehaviour
                 mat.SetColor("_Color", Color.cyan);
                 break;
             case MatterState.Water:
-                mat.SetColor("_Color", Color.blue + new Color(debuffAmt / debuffMax, 0, 0, 1));
+                mat.SetColor("_Color", Color.blue);
                 break;
             case MatterState.Gas:
                 mat.SetColor("_Color", Color.red);
@@ -103,15 +93,7 @@ public class EnemyStats : MonoBehaviour
             case MatterState.Ice:
                 // Freeze the enemy if they are currently wet
                 if (debuffState == MatterState.Water)
-                {
-                    debuffAmt += Time.deltaTime * 2;
-                    GetComponent<Navigator>().agent.speed = moveSpeed * (debuffAmt / debuffMax);
-                    if (debuffAmt >= debuffMax)
-                    {
-                        Freeze();
-                        debuffAmt = 0;
-                    }
-                }  
+                    Freeze();
                 break;
 
             case MatterState.Water:
@@ -126,14 +108,7 @@ public class EnemyStats : MonoBehaviour
             case MatterState.Gas:
                 // Burst the enemy if they are wet
                 if (debuffState == MatterState.Water)
-                {
-                    debuffAmt += Time.deltaTime * 2;
-                    if (debuffAmt >= debuffMax)
-                    {
-                        Burst(seconds);
-                        debuffAmt = 0;
-                    }
-                }
+                    Burst(seconds);
                 break;
 
             default: break; // state.None does nothing
@@ -151,13 +126,9 @@ public class EnemyStats : MonoBehaviour
     public void Burst(float seconds)
     {
         debuffState = MatterState.Gas;
-        
 
-        manager.CreateAOE(transform.position, 4.0f, a =>
-        {
-            a.GetComponent<Rigidbody>().AddExplosionForce(1500f, transform.position, 4f);
-            a.GetComponent<EnemyStats>().TakeDamage(35.0f);
-        });
+        manager.CreateAOE(transform.position, 4.0f, a => 
+            a.GetComponent<EnemyStats>().TakeDamage(35.0f));
 
         ApplyDOT(50, seconds);
     }
