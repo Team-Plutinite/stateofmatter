@@ -9,6 +9,12 @@ using UnityEngine;
 public class WeaponAttackRadius : MonoBehaviour
 {
 
+    public delegate void MeltableEnteredEvent(Meltable melting);
+    public delegate void MeltableExitedEvent(Meltable melting);
+
+    public MeltableEnteredEvent MeltEnter;
+    public MeltableExitedEvent MeltExit;
+
     public delegate void EnemyEnteredEvent(EnemyStats enemy);
     public delegate void EnemyExitedEvent(EnemyStats enemy);
 
@@ -16,6 +22,7 @@ public class WeaponAttackRadius : MonoBehaviour
     public EnemyEnteredEvent OnExit;
 
     private List<EnemyStats> EnemiesInRadius = new List<EnemyStats>();
+    private List<Meltable> MeltablesInRadius = new List<Meltable>();
 
 
     private void OnTriggerStay(Collider other)
@@ -27,6 +34,14 @@ public class WeaponAttackRadius : MonoBehaviour
             OnStay?.Invoke(enemy);
         
        }
+
+
+        if (other.TryGetComponent<Meltable>(out Meltable ice))
+        {
+            MeltablesInRadius.Add(ice);
+            MeltEnter?.Invoke(ice);
+
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -35,6 +50,13 @@ public class WeaponAttackRadius : MonoBehaviour
         {
             EnemiesInRadius.Remove(enemy);
             OnExit?.Invoke(enemy);
+
+        }
+
+        if (other.TryGetComponent<Meltable>(out Meltable ice))
+        {
+            MeltablesInRadius.Remove(ice);
+            MeltExit?.Invoke(ice);
 
         }
     }
