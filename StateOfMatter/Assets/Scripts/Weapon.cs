@@ -46,7 +46,7 @@ public class Weapon : MonoBehaviour
     private void Awake()
     {
         FiringSystem = new ParticleSystem[3] { iceSystem, waterSystem, steamSystem  };
-        AttackRadius.OnEnter += DamageEnemy;
+        AttackRadius.OnStay += DamageEnemy;
         AttackRadius.OnExit += StopDamage;
         debuffTimer = 0f;
 

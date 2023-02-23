@@ -12,19 +12,19 @@ public class WeaponAttackRadius : MonoBehaviour
     public delegate void EnemyEnteredEvent(EnemyStats enemy);
     public delegate void EnemyExitedEvent(EnemyStats enemy);
 
-    public EnemyEnteredEvent OnEnter;
+    public EnemyEnteredEvent OnStay;
     public EnemyEnteredEvent OnExit;
 
     private List<EnemyStats> EnemiesInRadius = new List<EnemyStats>();
 
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
        //This function will handle collison with various objects.
        if (other.TryGetComponent<EnemyStats>(out EnemyStats enemy))
        {
             EnemiesInRadius.Add(enemy);
-            OnEnter?.Invoke(enemy);
+            OnStay?.Invoke(enemy);
         
        }
     }
