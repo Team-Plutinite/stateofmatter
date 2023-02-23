@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AI;
 
 public enum MatterState
 {
@@ -22,7 +23,7 @@ public class EnemyStats : MonoBehaviour
     private float hp;
     private float dotTime;
     private float dotDmg;
-    private float debuffAmt;
+    private float heatAmt, iceAmt;
     private float debuffMax;
 
     private float moveSpeed;
@@ -49,10 +50,10 @@ public class EnemyStats : MonoBehaviour
         dotTime = 0.0f;
         dotDmg = 0.0f;
         gameObject.SetActive(true);
-        debuffAmt = 0;
+        heatAmt = iceAmt = 0;
         debuffMax = 1.5f;
 
-        moveSpeed = GetComponent<Navigator>().agent.speed;
+        moveSpeed = GetComponent<NavMeshAgent>().speed;
     }
 
     // Update is called once per frame
@@ -67,7 +68,10 @@ public class EnemyStats : MonoBehaviour
         if (debuffTime <= 0.0f && debuffState != MatterState.None)
             NeutralizeDebuffs();
 
-        if (debuffAmt > 0) debuffAmt -= Time.deltaTime / 2;
+        // Decrease freeze and heat amounts
+        if (heatAmt > 0) heatAmt -= Time.deltaTime / 2;
+        if (iceAmt > 0) iceAmt -= Time.deltaTime / 2;
+        GetComponent<NavMeshAgent>().speed = moveSpeed * (1-(iceAmt / debuffMax));
 
         Material mat = GetComponent<Renderer>().material;
         // Visually show debuff state on enemy
@@ -77,7 +81,7 @@ public class EnemyStats : MonoBehaviour
                 mat.SetColor("_Color", Color.cyan);
                 break;
             case MatterState.Water:
-                mat.SetColor("_Color", Color.blue + new Color(debuffAmt / debuffMax, 0, 0, 1));
+                mat.SetColor("_Color", Color.blue + new Color(heatAmt / debuffMax, iceAmt / debuffMax, iceAmt / debuffMax, 1));
                 break;
             case MatterState.Gas:
                 mat.SetColor("_Color", Color.red);
@@ -104,12 +108,11 @@ public class EnemyStats : MonoBehaviour
                 // Freeze the enemy if they are currently wet
                 if (debuffState == MatterState.Water)
                 {
-                    debuffAmt += Time.deltaTime * 2;
-                    GetComponent<Navigator>().agent.speed = moveSpeed * (debuffAmt / debuffMax);
-                    if (debuffAmt >= debuffMax)
+                    iceAmt += Time.deltaTime * 2;
+                    if (iceAmt >= debuffMax)
                     {
                         Freeze();
-                        debuffAmt = 0;
+                        iceAmt = 0;
                     }
                 }  
                 break;
@@ -127,11 +130,11 @@ public class EnemyStats : MonoBehaviour
                 // Burst the enemy if they are wet
                 if (debuffState == MatterState.Water)
                 {
-                    debuffAmt += Time.deltaTime * 2;
-                    if (debuffAmt >= debuffMax)
+                    heatAmt += Time.deltaTime * 2;
+                    if (heatAmt >= debuffMax)
                     {
                         Burst(seconds);
-                        debuffAmt = 0;
+                        heatAmt = 0;
                     }
                 }
                 break;
@@ -144,6 +147,7 @@ public class EnemyStats : MonoBehaviour
     public void Freeze()
     {
         debuffState = MatterState.Ice;
+        GetComponent<NavMeshAgent>().isStopped = true;
         // Nothing yet
     }
 
@@ -155,7 +159,7 @@ public class EnemyStats : MonoBehaviour
 
         manager.CreateAOE(transform.position, 4.0f, a =>
         {
-            a.GetComponent<Rigidbody>().AddExplosionForce(1500f, transform.position, 4f);
+            a.GetComponent<Rigidbody>().AddExplosionForce(3000f, transform.position, 4f);
             a.GetComponent<EnemyStats>().TakeDamage(35.0f);
         });
 
@@ -166,6 +170,7 @@ public class EnemyStats : MonoBehaviour
     public void NeutralizeDebuffs()
     {
         debuffState = MatterState.None;
+        GetComponent<NavMeshAgent>().isStopped = false;
     }
 
     public void TakeDamage(float dmgAmt)
