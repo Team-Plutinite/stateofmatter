@@ -130,9 +130,21 @@ public class Weapon : MonoBehaviour
     private void DamageMeltable(Meltable melt)
     {
         //If the cube is fully melted, do nothing.
-        if (melt.transform.localScale == new Vector3(0f, 0f, 0f))
+        if (melt.transform.localScale.x <= 0f || melt.transform.localScale.y <= 0f || melt.transform.localScale.z <= 0f)
         {
-            return;
+            melt.GetWaterState().SetActive(true);
+            melt.GetMelter().GetComponent<MeshRenderer>().enabled = false;
+
+            if(GetMatterState() == MatterState.Ice)
+            {
+                melt.GetMelter().GetComponent<MeshRenderer>().enabled = true;
+                melt.Melt(GetMatterState());
+            }
+            else
+            {
+                return;
+            }
+            
         }
         else 
         { 
