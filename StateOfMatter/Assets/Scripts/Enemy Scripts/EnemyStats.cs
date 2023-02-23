@@ -31,9 +31,13 @@ public class EnemyStats : MonoBehaviour
 
     private float moveSpeed;
 
+    // component references
+    private NavMeshAgent agent;
+
     // Start is called before the first frame update
     void Start()
     {
+        agent = GetComponent<NavMeshAgent>();
     }
 
     /// <summary>
@@ -68,6 +72,9 @@ public class EnemyStats : MonoBehaviour
 
         // SPEED data
         moveSpeed = GetComponent<NavMeshAgent>().speed;
+
+        // Set active
+        gameObject.SetActive(true);
     }
 
     // Update is called once per frame
@@ -87,7 +94,7 @@ public class EnemyStats : MonoBehaviour
         if (iceAmt > 0) iceAmt -= Time.deltaTime / 2;
 
         stunTime -= Time.deltaTime;
-        GetComponent<NavMeshAgent>().speed = stunTime <= 0 ? moveSpeed * (1 - (iceAmt / debuffMax)) : 0;
+        agent.speed = stunTime <= 0 ? moveSpeed * (1 - (iceAmt / debuffMax)) : 0;
 
         Material mat = GetComponent<Renderer>().material;
         // Visually show debuff state on enemy
@@ -172,7 +179,7 @@ public class EnemyStats : MonoBehaviour
     public void Freeze()
     {
         debuffState = MatterState.Ice;
-        GetComponent<NavMeshAgent>().isStopped = true;
+        agent.isStopped = true;
         // Nothing yet
     }
 
@@ -184,9 +191,10 @@ public class EnemyStats : MonoBehaviour
 
         manager.CreateAOE(transform.position, 4.0f, a =>
         {
-            a.GetComponent<EnemyStats>().Stun(2);
-            a.GetComponent<Rigidbody>().AddExplosionForce(3000f, transform.position, 4f);
-            a.GetComponent<EnemyStats>().TakeDamage(35.0f);
+            EnemyStats e = a.GetComponent<EnemyStats>();
+            e.Stun(1f);
+            a.GetComponent<Rigidbody>().AddExplosionForce(5000f, transform.position, 4f);
+            e.TakeDamage(35.0f);
         });
 
         ApplyDOT(50, seconds);
@@ -196,7 +204,7 @@ public class EnemyStats : MonoBehaviour
     public void NeutralizeDebuffs()
     {
         debuffState = MatterState.None;
-        GetComponent<NavMeshAgent>().isStopped = false;
+        agent.isStopped = false;
     }
 
     public void TakeDamage(float dmgAmt)
