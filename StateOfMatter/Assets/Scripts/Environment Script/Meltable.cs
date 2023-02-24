@@ -19,8 +19,8 @@ public class Meltable : MonoBehaviour
     private GameObject melter;
     [SerializeField]
     private Vector3 deltaScaleAll = new Vector3(-0.01f, -0.01f, -0.01f);
-    [SerializeField]
-    private GameObject waterState;
+    //[SerializeField]
+    //private GameObject waterState;
     [SerializeField]
     private MeltDirection direction = MeltDirection.All;
 
@@ -42,14 +42,14 @@ public class Meltable : MonoBehaviour
     ///Get and set the water object.
     /// </summary>
     /// <returns></returns>
-    public GameObject GetWaterState()
-    {
-        return waterState;
-    }
-    public void SetWaterState(GameObject value)
-    {
-        waterState = value;
-    }
+   //public GameObject GetWaterState()
+   //{
+   //    return waterState;
+   //}
+   //public void SetWaterState(GameObject value)
+   //{
+   //    waterState = value;
+   //}
 
 
     public GameObject GetMelter()
@@ -80,7 +80,7 @@ public class Meltable : MonoBehaviour
             if (melter.transform.localScale.x <= 1f && melter.transform.localScale.y <= 1f && melter.transform.localScale.z <= 1f)
             {
                 melter.transform.localScale -= meltDirectionDic[direction];
-                waterState.SetActive(false);
+                //waterState.SetActive(false);
             }
             else
             {
