@@ -132,7 +132,10 @@ public class Weapon : MonoBehaviour
         //If the cube is fully melted, do nothing.
         if (melt.transform.localScale.x <= 0f || melt.transform.localScale.y <= 0f || melt.transform.localScale.z <= 0f)
         {
-            melt.GetWaterState().SetActive(true);
+            //melt.GetWaterState().SetActive(true);]
+
+            //Hide ice when it melts
+
             melt.GetMelter().GetComponent<MeshRenderer>().enabled = false;
 
             if(GetMatterState() == MatterState.Ice)
