@@ -68,6 +68,7 @@ public class EnemyManager : MonoBehaviour
     /// <returns>If spawning was successful</returns>
     public bool SpawnEnemy(float hp, Vector3 position, Vector3 pitchYawRoll, GameObject goal = null, Transform home = null)
     {
+        
         // Attempt to dequeue from inactive pool; if pool is empty, return false
         if (!inactiveEnemies.TryDequeue(out GameObject enemy))
             return false;

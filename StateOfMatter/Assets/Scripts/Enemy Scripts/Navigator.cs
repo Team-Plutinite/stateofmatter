@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.AI;
 using UnityEditor;
-using UnityEditor.UIElements;
 
 public class Navigator : MonoBehaviour
 {

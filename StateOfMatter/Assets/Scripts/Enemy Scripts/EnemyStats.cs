@@ -23,14 +23,21 @@ public class EnemyStats : MonoBehaviour
     private float hp;
     private float dotTime;
     private float dotDmg;
+
     private float heatAmt, iceAmt;
     private float debuffMax;
 
+    private float stunTime;
+
     private float moveSpeed;
+
+    // component references
+    private NavMeshAgent agent;
 
     // Start is called before the first frame update
     void Start()
     {
+        agent = GetComponent<NavMeshAgent>();
     }
 
     /// <summary>
@@ -40,20 +47,34 @@ public class EnemyStats : MonoBehaviour
     /// <param name="hp">The HP of the spawned enemy</param>
     public void Init(float hp, Vector3 position, Vector3 pitchYawRoll)
     {
-        // Set transform data
+        // TRANSFORM data
         transform.SetPositionAndRotation(position, Quaternion.Euler(pitchYawRoll));
 
+        // MATTER STATE data
         debuffState = MatterState.None;
         debuffTime = 0.0f;
+
+        // HP data
         this.hp = hp;
         maxHP = hp;
+        transform.GetComponentInChildren<TextMeshPro>().text = hp.ToString();
+
+        // DOT data
         dotTime = 0.0f;
         dotDmg = 0.0f;
-        gameObject.SetActive(true);
+
+        // DEBUFF data
         heatAmt = iceAmt = 0;
         debuffMax = 1.5f;
 
+        // STUN/ROOT data
+        stunTime = 0.0f;
+
+        // SPEED data
         moveSpeed = GetComponent<NavMeshAgent>().speed;
+
+        // Set active
+        gameObject.SetActive(true);
     }
 
     // Update is called once per frame
@@ -71,7 +92,9 @@ public class EnemyStats : MonoBehaviour
         // Decrease freeze and heat amounts
         if (heatAmt > 0) heatAmt -= Time.deltaTime / 2;
         if (iceAmt > 0) iceAmt -= Time.deltaTime / 2;
-        GetComponent<NavMeshAgent>().speed = moveSpeed * (1-(iceAmt / debuffMax));
+
+        stunTime -= Time.deltaTime;
+        agent.speed = stunTime <= 0 ? moveSpeed * (1 - (iceAmt / debuffMax)) : 0;
 
         Material mat = GetComponent<Renderer>().material;
         // Visually show debuff state on enemy
@@ -143,11 +166,20 @@ public class EnemyStats : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Stuns the enemy (cannot move) for the given amount of time
+    /// </summary>
+    /// <param name="seconds">How long to stun for</param>
+    public void Stun(float seconds)
+    {
+        stunTime = seconds;
+    }
+
     // Freezes the enemy, leaving them unresponsive
     public void Freeze()
     {
         debuffState = MatterState.Ice;
-        GetComponent<NavMeshAgent>().isStopped = true;
+        agent.isStopped = true;
         // Nothing yet
     }
 
@@ -159,8 +191,10 @@ public class EnemyStats : MonoBehaviour
 
         manager.CreateAOE(transform.position, 4.0f, a =>
         {
-            a.GetComponent<Rigidbody>().AddExplosionForce(3000f, transform.position, 4f);
-            a.GetComponent<EnemyStats>().TakeDamage(35.0f);
+            EnemyStats e = a.GetComponent<EnemyStats>();
+            e.Stun(1f);
+            a.GetComponent<Rigidbody>().AddExplosionForce(5000f, transform.position, 4f);
+            e.TakeDamage(35.0f);
         });
 
         ApplyDOT(50, seconds);
@@ -170,7 +204,7 @@ public class EnemyStats : MonoBehaviour
     public void NeutralizeDebuffs()
     {
         debuffState = MatterState.None;
-        GetComponent<NavMeshAgent>().isStopped = false;
+        agent.isStopped = false;
     }
 
     public void TakeDamage(float dmgAmt)
