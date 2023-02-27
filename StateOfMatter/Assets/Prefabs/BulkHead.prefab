@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4930932274813857428}
-  - component: {fileID: 5362177824824338964}
   m_Layer: 0
   m_Name: BulkHead
   m_TagString: Untagged
@@ -35,19 +34,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5362177824824338964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4323432001237372502}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5437202aeb71554b977e3c56aa52ce9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  open: 0
 --- !u!1001 &1063980878336650685
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -172,24 +158,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d0c8df448f3da434a92b3cb6553b39fa, type: 3}
   m_PrefabInstance: {fileID: 2822326765524313351}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &3164767115683715158 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: d0c8df448f3da434a92b3cb6553b39fa, type: 3}
-  m_PrefabInstance: {fileID: 2822326765524313351}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &588190529280002618
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3164767115683715158}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 2, y: 3, z: 0.25}
-  m_Center: {x: 1, y: 1.25, z: 0}
 --- !u!1001 &6258457850550454680
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -252,21 +220,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d0c8df448f3da434a92b3cb6553b39fa, type: 3}
   m_PrefabInstance: {fileID: 6258457850550454680}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &6493042293570647241 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: d0c8df448f3da434a92b3cb6553b39fa, type: 3}
-  m_PrefabInstance: {fileID: 6258457850550454680}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &4615635127085192879
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6493042293570647241}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 2, y: 3, z: 0.25}
-  m_Center: {x: 1, y: 1.55, z: 0}
