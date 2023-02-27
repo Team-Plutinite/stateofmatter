@@ -21,8 +21,15 @@ public class WeaponAttackRadius : MonoBehaviour
     public EnemyEnteredEvent OnStay;
     public EnemyEnteredEvent OnExit;
 
+    public delegate void InteractableEnteredEvent(Interactable interactable);
+    public delegate void InteractableExitEvent(Interactable interactable);
+
+    public InteractableEnteredEvent InteractableEnter;
+    public InteractableExitEvent InteractableExit;
+
     private List<EnemyStats> EnemiesInRadius = new List<EnemyStats>();
     private List<Meltable> MeltablesInRadius = new List<Meltable>();
+    private List<Interactable> InteractablesInRadius = new List<Interactable>();
 
 
     private void OnTriggerStay(Collider other)
@@ -35,12 +42,17 @@ public class WeaponAttackRadius : MonoBehaviour
         
        }
 
-
         if (other.TryGetComponent<Meltable>(out Meltable ice))
         {
             MeltablesInRadius.Add(ice);
             MeltEnter?.Invoke(ice);
 
+        }
+
+        if (other.TryGetComponent<Interactable>(out Interactable interactable))
+        {
+            InteractablesInRadius.Add(interactable);
+            InteractableEnter?.Invoke(interactable);
         }
     }
 
@@ -58,6 +70,12 @@ public class WeaponAttackRadius : MonoBehaviour
             MeltablesInRadius.Remove(ice);
             MeltExit?.Invoke(ice);
 
+        }
+
+        if (other.TryGetComponent<Interactable>(out Interactable interactable))
+        {
+            InteractablesInRadius.Remove(interactable);
+            InteractableExit?.Invoke(interactable);
         }
     }
 }
