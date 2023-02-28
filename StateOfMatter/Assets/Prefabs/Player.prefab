@@ -227,6 +227,7 @@ MonoBehaviour:
   moveSound: {fileID: 0}
   dashSound: {fileID: 8300000, guid: d214c856f274f3944b5f4c47a89d380a, type: 3}
   jumpSound: {fileID: 8300000, guid: 280ddb6a9a2640a4bbaed5b1d588edab, type: 3}
+  interactRadius: {fileID: 0}
 --- !u!114 &-6030132350112573881
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,8 +251,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4604164936605316853}
-  - component: {fileID: 7361957224953775743}
   - component: {fileID: 6290575565326275830}
+  - component: {fileID: 722375279663283406}
   m_Layer: 0
   m_Name: InteractRadius
   m_TagString: Untagged
@@ -267,27 +268,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5458491096765314109}
   m_LocalRotation: {x: -0.7130572, y: -0, z: -0, w: 0.7011059}
-  m_LocalPosition: {x: -2.32, y: -0.164, z: 1.281}
+  m_LocalPosition: {x: 0.054, y: -0.17, z: 0.76}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2389748624989007371}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: -90.968, y: 0, z: 0}
---- !u!136 &7361957224953775743
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5458491096765314109}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.524949
-  m_Height: 1.1519905
-  m_Direction: 1
-  m_Center: {x: 2.2950506, y: 0.40078592, z: -2.104521e-10}
 --- !u!114 &6290575565326275830
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,6 +287,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46212cf6d67dcb24fb0cd79d99446cf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &722375279663283406
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5458491096765314109}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.9710039, z: 1.914886}
+  m_Center: {x: 0, y: 0.01449816, z: -0.2828442}
 --- !u!1001 &2772023580552499130
 PrefabInstance:
   m_ObjectHideFlags: 0
