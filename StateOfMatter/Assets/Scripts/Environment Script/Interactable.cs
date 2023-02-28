@@ -11,7 +11,7 @@ public class Interactable : MonoBehaviour
 {
     public GameObject objectToActivate;
     [SerializeField]
-    private WeaponAttackRadius attackRadius;
+    private InteractRadius interactRadius;
     public Component interactableComponent;
     protected IInteractable interactableScript;
     
@@ -26,8 +26,8 @@ public class Interactable : MonoBehaviour
         isInteractable = true;
         isActivated = false;
 
-        attackRadius.InteractableEnter += InteractableInRange;
-        attackRadius.InteractableExit += InteractableOutOfRange;
+        interactRadius.InteractableEnter += InteractableInRange;
+        interactRadius.InteractableExit += InteractableOutOfRange;
     }
 
 

@@ -66,6 +66,10 @@ public class PlayerController : MonoBehaviour
     public AudioClip dashSound;
     public AudioClip jumpSound;
 
+    // interactables
+    public InteractRadius interactRadius;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -89,6 +93,8 @@ public class PlayerController : MonoBehaviour
 
         source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.2f;
+
+        interactRadius.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -140,6 +146,15 @@ public class PlayerController : MonoBehaviour
         {
             if (Physics.Raycast(transform.position, camTransform.forward, out RaycastHit hit, 100))
                 GameObject.Find("EnemyManager").GetComponent<EnemyManager>().SpawnEnemy(100, hit.point, Vector3.zero);
+        }
+
+        if (Input.GetKey(KeyCode.E))
+        {
+            interactRadius.gameObject.SetActive(true);
+        }
+        else
+        {
+            interactRadius.gameObject.SetActive(false);
         }
 
 

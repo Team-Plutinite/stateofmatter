@@ -111,16 +111,6 @@ public class Weapon : MonoBehaviour
             StopFiring();
             currentMode = MatterState.Gas;         
         }
-        /*
-        if (Input.GetKey(KeyCode.E))
-        {
-            AttackRadius.gameObject.SetActive(true);
-        }
-        else
-        {
-            AttackRadius.gameObject.SetActive(false);
-        }
-        */
 
 
         fireSoundTimer -= Time.deltaTime;
