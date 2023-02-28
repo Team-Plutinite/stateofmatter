@@ -23,6 +23,9 @@ public class PlayerController : MonoBehaviour
     public float movementAccelAir = 2.0f;
     public float groundDrag = 10.0f;
 
+    // Store the player's input movement
+    private Vector3 inputDir;
+
     // jumping variables
     public float airDrag = 2.0f;
     public float jumpHeight = 300.0f;
@@ -54,8 +57,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private bool isCrouched;
     private float jumpTime;
-
-    private Dictionary<GameObject, List<ContactPoint>> collisionMap;
+    [SerializeField]
+    private bool onLadder;
 
     // audio
     public AudioSource source;
@@ -72,6 +75,7 @@ public class PlayerController : MonoBehaviour
 
         isGrounded = false;
         isCrouched = false;
+        onLadder = false;
 
         jumpTime = 0.0f;
         dashCoolCountdown = 0.0f;
@@ -143,9 +147,9 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        isGrounded = CheckAirborne(); // Updates isGrounded and isSlopeWall bools
+        isGrounded = CheckAirborne(); // Updates isGrounded
         
-        body.useGravity = !isGrounded; // so player isn't sliding down a slope
+        body.useGravity = !(isGrounded || onLadder); // so player isn't sliding down a slope
 
         // -- BASIC MOVEMENT HANDLING -- \\
 
@@ -154,12 +158,12 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.S)) movementForce -= transform.forward;
         if (Input.GetKey(KeyCode.A)) movementForce -= transform.right;
         if (Input.GetKey(KeyCode.D)) movementForce += transform.right;
-        movementForce = Vector3.ProjectOnPlane(movementForce, groundNormal).normalized;
+        inputDir = Vector3.ProjectOnPlane(movementForce, groundNormal).normalized;
 
         // Accelerate the player in their movement direction and apply ground drag force
         body.AddForce((isGrounded ? 
             isCrouched ? crouchSpeedMultiplier * movementAccelGround : movementAccelGround : 
-            movementAccelAir) * movementForce);
+            movementAccelAir) * inputDir);
 
             // APPLY WALKING DRAG FORCE \\
 
@@ -176,7 +180,7 @@ public class PlayerController : MonoBehaviour
             if (dashCoolCountdown <= 0)
             {
                 dashCoolCountdown = dashCooldown;
-                dashDirection = (movementForce.sqrMagnitude > 0 ? movementForce : 
+                dashDirection = (inputDir.sqrMagnitude > 0 ? inputDir : 
                     Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized) * maxWalkSpeed;
                 body.useGravity = false;   
                 source.PlayOneShot(dashSound);
@@ -239,4 +243,8 @@ public class PlayerController : MonoBehaviour
         groundNormal = transform.up;
         return false;
     }
+
+    public Vector3 InputDirection { get { return inputDir; } }
+
+    public bool OnLadder { get { return onLadder; } set { onLadder = value; } }
 }
