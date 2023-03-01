@@ -7,33 +7,29 @@ public class Lever : MonoBehaviour, IInteractable
     [SerializeField]
     private GameObject ice;
     [SerializeField]
-    private GameObject leverArm;
-    private Animation animationComponent;
+    private GameObject lever;
+    private Animator animatorComponent;
+    [SerializeField]
+    private Interactable interactableComponent;
 
     // Start is called before the first frame update
     void Start()
     {
-        animationComponent = leverArm.GetComponent<Animation>();
-        animationComponent.enabled = false;
+        animatorComponent = lever.GetComponent<Animator>();
+        interactableComponent = gameObject.GetComponent<Interactable>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (!ice.gameObject.activeSelf)
+        {
+            interactableComponent.isInteractable = true;
+        }
     }
 
     public void Activate()
     {
-        if (!animationComponent.enabled)
-        {
-            return;
-        } else
-        {
-            animationComponent.enabled = true;
-            Debug.Log("playing animation");
-            animationComponent.Play("Activate");
-            animationComponent.enabled = false;
-        }
+        animatorComponent.SetTrigger("Activate");
     }
 }

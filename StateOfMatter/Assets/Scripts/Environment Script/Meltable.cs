@@ -69,6 +69,10 @@ public class Meltable : MonoBehaviour
         {
 
             melter.transform.localScale += meltDirectionDic[direction];
+            if (melter.transform.localScale.x <= 0 && melter.transform.localScale.y <= 0 && melter.transform.localScale.z <= 0)
+            {
+                melter.gameObject.SetActive(false);
+            }
             if(direction != MeltDirection.All)
             {
                 melter.transform.localPosition += meltDirectionDic[direction] / 2;

@@ -23,7 +23,7 @@ public class Interactable : MonoBehaviour
     void Start()
     {
         isInRange = false;
-        isInteractable = true;
+        isInteractable = false;
         isActivated = false;
 
         interactRadius.InteractableEnter += InteractableInRange;
@@ -47,7 +47,7 @@ public class Interactable : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isInteractable && isInRange)
+        if (isInteractable && isInRange && Input.GetKey(KeyCode.E))
         {
             interactableScript.Activate();
             // objectToActivate.Activate();

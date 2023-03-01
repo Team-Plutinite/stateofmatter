@@ -532,11 +532,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7781470204329469538, guid: 0e06fd19a60ac694aacd1a84f8949c56, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7781470204329469538, guid: 0e06fd19a60ac694aacd1a84f8949c56, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.0034552
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 7781470204329469538, guid: 0e06fd19a60ac694aacd1a84f8949c56, type: 3}
       propertyPath: m_LocalPosition.y
@@ -574,7 +574,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 9206263981354494669, guid: 0e06fd19a60ac694aacd1a84f8949c56, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9206263981354494669, guid: 0e06fd19a60ac694aacd1a84f8949c56, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 3070649022064836701, guid: 0e06fd19a60ac694aacd1a84f8949c56, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 0e06fd19a60ac694aacd1a84f8949c56, type: 3}
 --- !u!1 &833818329 stripped
 GameObject:
@@ -1561,7 +1570,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: -87.119, z: 0}
 --- !u!1 &2018781702
 GameObject:
@@ -1764,6 +1773,10 @@ PrefabInstance:
       propertyPath: maxHP
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 1913128098819417951, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1913128098819554777, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: source
       value: 
@@ -1820,6 +1833,10 @@ PrefabInstance:
       propertyPath: movementAccel
       value: 50
       objectReference: {fileID: 0}
+    - target: {fileID: 2389748625049299331, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: interactRadius
+      value: 
+      objectReference: {fileID: 2389748626415676395}
     - target: {fileID: 2389748625049299336, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: m_Name
       value: Player
@@ -1900,6 +1917,10 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 13400000, guid: 8836a8b8d96a6f042a83d41f12f74031, type: 2}
+    - target: {fileID: 4604164936605316853, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
 --- !u!114 &2389748626415676395 stripped
