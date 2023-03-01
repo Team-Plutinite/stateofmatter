@@ -111,6 +111,8 @@ public class Weapon : MonoBehaviour
             StopFiring();
             currentMode = MatterState.Gas;         
         }
+
+
         fireSoundTimer -= Time.deltaTime;
     }
 
