@@ -7,17 +7,24 @@ public interface IInteractable
     public abstract void Activate();
 }
 
+public interface IActivatable
+{
+    public abstract void Activate();
+}
+
 public class Interactable : MonoBehaviour
 {
     public GameObject objectToActivate;
-    [SerializeField]
-    private InteractRadius interactRadius;
     public Component interactableComponent;
-    protected IInteractable interactableScript;
     
     public bool isInRange;
     public bool isInteractable;
     public bool isActivated;
+
+    private IInteractable interactableScript;
+    private IActivatable activatableScript;
+    [SerializeField]
+    private InteractRadius interactRadius;
 
     // Start is called before the first frame update
     void Start()
@@ -28,6 +35,13 @@ public class Interactable : MonoBehaviour
 
         interactRadius.InteractableEnter += InteractableInRange;
         interactRadius.InteractableExit += InteractableOutOfRange;
+        try
+        {
+            activatableScript = objectToActivate.GetComponent<IActivatable>();
+        } catch 
+        {
+            Debug.Log("No activatable script on object to activate");
+        }
     }
 
 
@@ -42,6 +56,8 @@ public class Interactable : MonoBehaviour
         {
             interactableScript = (IInteractable)interactableComponent;
         }
+
+
     }
 
     // Update is called once per frame
@@ -50,7 +66,7 @@ public class Interactable : MonoBehaviour
         if (isInteractable && isInRange && Input.GetKey(KeyCode.E))
         {
             interactableScript.Activate();
-            // objectToActivate.Activate();
+            activatableScript.Activate();
             isActivated = true;
         }
     }

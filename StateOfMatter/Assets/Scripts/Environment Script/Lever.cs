@@ -9,7 +9,6 @@ public class Lever : MonoBehaviour, IInteractable
     [SerializeField]
     private GameObject lever;
     private Animator animatorComponent;
-    [SerializeField]
     private Interactable interactableComponent;
 
     // Start is called before the first frame update
