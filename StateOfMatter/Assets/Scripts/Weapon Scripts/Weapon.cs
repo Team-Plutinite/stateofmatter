@@ -6,6 +6,10 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
+    // GameObject references
+    private GameObject enemyManagerRef;
+    private GameObject player;
+
     MatterState currentMode = MatterState.Ice;
     //Handles the particles that come out when firing.
     [SerializeField]
@@ -45,6 +49,8 @@ public class Weapon : MonoBehaviour
 
     private void Awake()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
+        enemyManagerRef = GameObject.FindGameObjectWithTag("EnemyManager");
         FiringSystem = new ParticleSystem[3] { iceSystem, waterSystem, steamSystem  };
         AttackRadius.OnStay += DamageEnemy;
         AttackRadius.OnExit += StopDamage;
@@ -80,6 +86,20 @@ public class Weapon : MonoBehaviour
         else
         {
             StopFiring();
+        }
+
+        // Pulse ability - apply a knockback to all enemies in front in a 30-degree cone
+        if (Input.GetMouseButtonDown(1))
+        {
+            foreach (GameObject enemy in enemyManagerRef.GetComponent<EnemyManager>().Enemies.Values)
+            {
+                Vector3 enemyDir = enemy.transform.position - player.transform.position;
+
+                // If enemy is in 10-unit range and angle offset from forward vector is less than 45 degrees
+                if (enemyDir.sqrMagnitude < Mathf.Pow(10.0f, 2) && 
+                    Mathf.Acos(Vector3.Dot(player.transform.forward, enemyDir.normalized)) * Mathf.Rad2Deg < 45.0f)
+                    enemy.GetComponent<EnemyStats>().Knockback(player.transform.position, 100.0f);
+            }
         }
 
         //Press the r key to cycle through MatterState
