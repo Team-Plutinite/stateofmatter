@@ -17,6 +17,8 @@ public class EnemyStats : MonoBehaviour
 {
     public EnemyManager manager;
 
+    private float waterMoveSpeedMult;
+
     private float maxHP;
     private MatterState debuffState;
     private float debuffTime;
@@ -28,7 +30,6 @@ public class EnemyStats : MonoBehaviour
     private float debuffMax;
 
     private float stunTime;
-
     private float moveSpeed;
 
     // component references
@@ -66,6 +67,7 @@ public class EnemyStats : MonoBehaviour
         // DEBUFF data
         heatAmt = iceAmt = 0;
         debuffMax = 1.5f;
+        waterMoveSpeedMult = 0.9f;
 
         // STUN/ROOT data
         stunTime = 0.0f;
@@ -144,8 +146,8 @@ public class EnemyStats : MonoBehaviour
                 // Debuff the enemy with Wet, but only if they are not already debuffed
                 if (debuffState == MatterState.None)
                 {
-                    debuffState = MatterState.Water;
                     debuffTime = seconds;
+                    Douse(seconds);
                 }
                 break;
 
@@ -188,7 +190,6 @@ public class EnemyStats : MonoBehaviour
     {
         debuffState = MatterState.Gas;
         
-
         manager.CreateAOE(transform.position, 4.0f, a =>
         {
             EnemyStats e = a.GetComponent<EnemyStats>();
@@ -200,11 +201,19 @@ public class EnemyStats : MonoBehaviour
         ApplyDOT(50, seconds);
     }
 
+    // Apply any water debuff effects to the enemy
+    public void Douse(float seconds)
+    {
+        debuffState = MatterState.Water;
+        agent.speed = moveSpeed * waterMoveSpeedMult;
+    }
+
     // Eliminate enemy debuffs
     public void NeutralizeDebuffs()
     {
         debuffState = MatterState.None;
         agent.isStopped = false;
+        agent.speed = moveSpeed;
     }
 
     public void TakeDamage(float dmgAmt)
