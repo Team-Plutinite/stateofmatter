@@ -34,11 +34,13 @@ public class EnemyStats : MonoBehaviour
 
     // component references
     private NavMeshAgent agent;
+    private Rigidbody body;
 
     // Start is called before the first frame update
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        body = GetComponent<Rigidbody>();
     }
 
     /// <summary>
@@ -67,7 +69,7 @@ public class EnemyStats : MonoBehaviour
         // DEBUFF data
         heatAmt = iceAmt = 0;
         debuffMax = 1.5f;
-        waterMoveSpeedMult = 0.9f;
+        waterMoveSpeedMult = 0.8f;
 
         // STUN/ROOT data
         stunTime = 0.0f;
@@ -106,6 +108,7 @@ public class EnemyStats : MonoBehaviour
                 mat.SetColor("_Color", Color.cyan);
                 break;
             case MatterState.Water:
+                agent.speed *= waterMoveSpeedMult;
                 mat.SetColor("_Color", Color.blue + new Color(heatAmt / debuffMax, iceAmt / debuffMax, iceAmt / debuffMax, 1));
                 break;
             case MatterState.Gas:
@@ -146,12 +149,14 @@ public class EnemyStats : MonoBehaviour
                 // Debuff the enemy with Wet, but only if they are not already debuffed
                 if (debuffState == MatterState.None)
                 {
+                    debuffState = MatterState.Water;
                     debuffTime = seconds;
-                    Douse(seconds);
                 }
                 break;
 
             case MatterState.Gas:
+                // Deal raw damage (10 DPS)
+                TakeDamage(10.0f * Time.deltaTime);
                 // Burst the enemy if they are wet
                 if (debuffState == MatterState.Water)
                 {
@@ -201,11 +206,25 @@ public class EnemyStats : MonoBehaviour
         ApplyDOT(50, seconds);
     }
 
-    // Apply any water debuff effects to the enemy
-    public void Douse(float seconds)
+    /// <summary>
+    /// Knocks the enemy away form the given world position a specified magnitude.
+    /// If this enemy is currently FROZEN, this will also deal a massive amt of dmg
+    /// while also unfreezing it.
+    /// </summary>
+    /// <param name="position">The source of the knockback</param>
+    /// <param name="magnitude">The impulse magnitude by which to apply the knockback</param>
+    public void Knockback(Vector3 position, float magnitude)
     {
-        debuffState = MatterState.Water;
-        agent.speed = moveSpeed * waterMoveSpeedMult;
+        // Knockback
+        Stun(0.75f);
+        body.AddForce((transform.position - position).normalized * magnitude, ForceMode.Impulse);
+        
+        // Big shatter dmg
+        if (debuffState == MatterState.Ice)
+        {
+            TakeDamage(100.0f);
+            NeutralizeDebuffs();
+        }
     }
 
     // Eliminate enemy debuffs
@@ -235,4 +254,3 @@ public class EnemyStats : MonoBehaviour
         dotDmg = totalDamage / seconds;
     }
 }
-
