@@ -6,7 +6,7 @@ using UnityEngine;
 public delegate void DebuffAction();
 
 // class to represent an enemy's debuff
-class Debuff
+public class Debuff
 {
     private float debuffTimer;
     private float pauseTimer;

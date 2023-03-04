@@ -249,4 +249,36 @@ public class EnemyStats : MonoBehaviour
 
         if (hp <= 0) manager.KillEnemy(gameObject.GetInstanceID());
     }
+
+    /// <summary>
+    /// Applies a debuff to the enemy.
+    /// </summary>
+    /// <param name="debuffName">The name of the debuff in the debuff map. 
+    /// BE CAREFUL WITH THIS - if you're trying to create an entirely new debuff, use a unique name!</param>
+    /// <param name="debuff">The debuff object to apply.</param>
+    public void ApplyDebuff(string debuffName, Debuff debuff)
+    {
+        debuffMap[debuffName] = debuff;
+    }
+
+    /// <summary>
+    /// Returns the debuff object corresponding to the specified name.
+    /// </summary>
+    /// <param name="debuffName">The name of the debuff.</param>
+    /// <returns>The corresponding debuff, or null if this name does not exist in the debuff map.</returns>
+    public Debuff GetDebuff(string debuffName)
+    {
+        return debuffMap[debuffName];
+    }
+
+    /// <summary>
+    /// Gets teh names of all currently active debuffs on this enemy.
+    /// </summary>
+    /// <returns>A string array of the names of all active debuffs.</returns>
+    public string[] GetAllDebuffNames()
+    {
+        string[] names = new string[debuffMap.Count];
+        debuffMap.Keys.CopyTo(names, 0);
+        return names;
+    }
 }
