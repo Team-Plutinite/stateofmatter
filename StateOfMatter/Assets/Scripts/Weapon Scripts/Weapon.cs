@@ -13,21 +13,18 @@ public class Weapon : MonoBehaviour
     MatterState currentMode = MatterState.Ice;
     //Handles the particles that come out when firing.
     [SerializeField]
-    private ParticleSystem steamSystem;
+    private ParticleSystem gasSystem;
 
     [SerializeField]
-    private ParticleSystem waterSystem;
+    private ParticleSystem liquidSystem;
 
     [SerializeField]
-    private ParticleSystem iceSystem;
+    private ParticleSystem solidSystem;
 
     private ParticleSystem[] FiringSystem;
 
     [SerializeField]
     private WeaponAttackRadius AttackRadius;
-
-    private float debuffTimer;
-    
 
     [Space]
 
@@ -35,7 +32,7 @@ public class Weapon : MonoBehaviour
     private int dps = 3;
     
     [SerializeField]
-    private float effectDur = 3f;
+    private float effectDur = 5f;
 
     // audio
     [SerializeField]
@@ -51,12 +48,10 @@ public class Weapon : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player");
         enemyManagerRef = GameObject.FindGameObjectWithTag("EnemyManager");
-        FiringSystem = new ParticleSystem[3] { iceSystem, waterSystem, steamSystem  };
+        FiringSystem = new ParticleSystem[3] { solidSystem, liquidSystem, gasSystem  };
         AttackRadius.OnStay += DamageEnemy;
-        AttackRadius.OnExit += StopDamage;
 
         AttackRadius.MeltEnter += DamageMeltable;
-        debuffTimer = 0f;
 
         //FiringSystem = new ParticleSystem[3] { waterSystem, steamSystem, iceSystem };
         source = gameObject.AddComponent<AudioSource>();
@@ -74,7 +69,6 @@ public class Weapon : MonoBehaviour
     public void SetMode(MatterState t)
     {
         currentMode = t;
-        
     }
 
     private void Update()
@@ -108,11 +102,7 @@ public class Weapon : MonoBehaviour
             currentMode++;
 
             if((int)currentMode > 2)
-            {
                 currentMode = MatterState.Ice;
-                
-            }
-            Debug.Log(currentMode.ToString());
         }
 
         //Use the number keys to switch weapons.
@@ -139,13 +129,7 @@ public class Weapon : MonoBehaviour
     //Call Afflict when the enemy gets into the attack radius
     private void DamageEnemy(EnemyStats enemy)
     {
-        enemy.Afflict(GetMatterState(), 5f);
-    }
-
-    //Stop Damage After Leaving Radius
-    private void StopDamage(EnemyStats enemy)
-    {
-        //enemy.NeutralizeDebuffs();
+        enemy.Afflict(GetMatterState(), effectDur);
     }
 
     //Begin Damaging ice when it enters the radius.
@@ -169,7 +153,6 @@ public class Weapon : MonoBehaviour
             {
                 return;
             }
-            
         }
         else 
         { 
@@ -180,26 +163,37 @@ public class Weapon : MonoBehaviour
     //Sets particle system and hitbox to turn on and off respectively 
     private void Fire()
     {
+        // activate particles
         FiringSystem[(int)currentMode].gameObject.SetActive(true);
-        AttackRadius.gameObject.SetActive(true);
+
+        //AttackRadius.gameObject.SetActive(true);
         source.loop = true;
-        if (currentMode == MatterState.Gas) //gas
+
+        // Determine the firing mode
+        switch (currentMode)
         {
-            fireSoundCooldown = 0.52f; //setting cooldown to length of audio clip
-            if (fireSoundTimer <= 0.0f)
-            {
-                source.PlayOneShot(steamFireSound); //playing audio
-                fireSoundTimer = fireSoundCooldown; //reset timer
-            }
-        }
-        if (currentMode == MatterState.Ice) //ice
-        {
-            fireSoundCooldown = 0.83f;
-            if (fireSoundTimer <= 0.0f)
-            {
-                source.PlayOneShot(freezeFireSound);
-                fireSoundTimer = fireSoundCooldown;
-            }
+            case MatterState.Ice: //ice
+
+                fireSoundCooldown = 0.83f;
+                if (fireSoundTimer <= 0.0f)
+                {
+                    source.PlayOneShot(freezeFireSound);
+                    fireSoundTimer = fireSoundCooldown;
+                }
+
+                break;
+            case MatterState.Water:
+                break;
+            case MatterState.Gas: //gas
+
+                fireSoundCooldown = 0.52f; //setting cooldown to length of audio clip
+                if (fireSoundTimer <= 0.0f)
+                {
+                    source.PlayOneShot(steamFireSound); //playing audio
+                    fireSoundTimer = fireSoundCooldown; //reset timer
+                }
+
+                break;
         }
     }
 
