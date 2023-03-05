@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2389748624989007371}
   - component: {fileID: 2389748624989007368}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CameraFollower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 2389748625049299337}
   - component: {fileID: 2389748625049299331}
   - component: {fileID: -6030132350112573881}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -212,6 +212,7 @@ MonoBehaviour:
   crouchSpeedMultiplier: 0.35
   movementAccelAir: 5
   groundDrag: 12
+  maxIncline: 47.5
   airDrag: 1
   jumpHeight: 300
   jumpCooldown: 0.25
@@ -219,15 +220,14 @@ MonoBehaviour:
   dashDistance: 4
   dashTime: 0.15
   lookSensitivity: 2.5
-  maxIncline: 47.5
-  isGrounded: 0
-  isCrouched: 0
-  onLadder: 0
   source: {fileID: 0}
   moveSound: {fileID: 0}
   dashSound: {fileID: 8300000, guid: d214c856f274f3944b5f4c47a89d380a, type: 3}
   jumpSound: {fileID: 8300000, guid: 280ddb6a9a2640a4bbaed5b1d588edab, type: 3}
-  interactRadius: {fileID: 0}
+  isGrounded: 0
+  isCrouched: 0
+  onLadder: 0
+  movementLocked: 0
 --- !u!114 &-6030132350112573881
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,7 +253,7 @@ GameObject:
   - component: {fileID: 4604164936605316853}
   - component: {fileID: 6290575565326275830}
   - component: {fileID: 722375279663283406}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: InteractRadius
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -307,9 +307,29 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2389748624989007371}
     m_Modifications:
+    - target: {fileID: 2182750155326970006, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3612316302794785577, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4391446680251507192, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4391718508989792590, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 4392416035943363781, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
       propertyPath: m_Name
       value: Sci-fi Pistol
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392416035943363781, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4392416035943590117, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
       propertyPath: m_RootOrder
@@ -355,9 +375,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4392416036450780991, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5671923931814903010, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8190312993783930844, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 8920413229086063589, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dcb145c69d35adc4c9d6707a15824e2c, type: 3}

@@ -7,7 +7,7 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
     // GameObject references
-    private GameObject enemyManagerRef;
+    private EnemyManager enemyManager;
     private GameObject player;
 
     MatterState currentMode = MatterState.Ice;
@@ -47,7 +47,7 @@ public class Weapon : MonoBehaviour
     private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        enemyManagerRef = GameObject.FindGameObjectWithTag("EnemyManager");
+        enemyManager = GameObject.FindGameObjectWithTag("EnemyManager").GetComponent<EnemyManager>();
         FiringSystem = new ParticleSystem[3] { solidSystem, liquidSystem, gasSystem  };
         AttackRadius.OnStay += DamageEnemy;
 
@@ -73,19 +73,12 @@ public class Weapon : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButton(0))
-        {
-            Fire();
-        }
-        else
-        {
-            StopFiring();
-        }
+        TryFire();
 
         // Pulse ability - apply a knockback to all enemies in front in a 30-degree cone
         if (Input.GetMouseButtonDown(1))
         {
-            foreach (GameObject enemy in enemyManagerRef.GetComponent<EnemyManager>().Enemies.Values)
+            foreach (GameObject enemy in enemyManager.Enemies.Values)
             {
                 Vector3 enemyDir = enemy.transform.position - player.transform.position;
 
@@ -161,7 +154,7 @@ public class Weapon : MonoBehaviour
     }
 
     //Sets particle system and hitbox to turn on and off respectively 
-    private void Fire()
+    private void TryFire()
     {
         // activate particles
         FiringSystem[(int)currentMode].gameObject.SetActive(true);
@@ -173,25 +166,45 @@ public class Weapon : MonoBehaviour
         switch (currentMode)
         {
             case MatterState.Ice: //ice
-
-                fireSoundCooldown = 0.83f;
-                if (fireSoundTimer <= 0.0f)
+                if (Input.GetMouseButtonDown(0))
                 {
-                    source.PlayOneShot(freezeFireSound);
-                    fireSoundTimer = fireSoundCooldown;
+                    // Shotgun blast
+                    ShotgunAttack(20.0f, 30.0f, 6, 5.0f);
+
+                    fireSoundCooldown = 0.83f;
+                    if (fireSoundTimer <= 0.0f)
+                    {
+                        source.PlayOneShot(freezeFireSound);
+                        fireSoundTimer = fireSoundCooldown;
+                    }
                 }
+                else StopFiring();
 
                 break;
+
             case MatterState.Water:
+                if (Input.GetMouseButton(0))
+                {
+                    // TODO: implement laser
+                }
+                else StopFiring();
+
                 break;
+
             case MatterState.Gas: //gas
 
-                fireSoundCooldown = 0.52f; //setting cooldown to length of audio clip
-                if (fireSoundTimer <= 0.0f)
+                if (Input.GetMouseButton(0))
                 {
-                    source.PlayOneShot(steamFireSound); //playing audio
-                    fireSoundTimer = fireSoundCooldown; //reset timer
+                    // TODO: implement cloud thingy
+
+                    fireSoundCooldown = 0.52f; //setting cooldown to length of audio clip
+                    if (fireSoundTimer <= 0.0f)
+                    {
+                        source.PlayOneShot(steamFireSound); //playing audio
+                        fireSoundTimer = fireSoundCooldown; //reset timer
+                    }
                 }
+                else StopFiring();
 
                 break;
         }
@@ -203,5 +216,63 @@ public class Weapon : MonoBehaviour
         AttackRadius.gameObject.SetActive(false);
         source.loop = false;
         source.Stop();
+    }
+
+    /// <summary>
+    /// Shoot the weapon with a specifed spread angle, range, pellet count, and pellet damage
+    /// </summary>
+    /// <param name="spreadAngle">The cone angle of the shotgun blast.</param>
+    /// <param name="maxRange">The maximum range pellets can reach.</param>
+    /// <param name="numPellets">The number of pellets to shoot. These pellets will be uniform around the cone.</param>
+    /// <param name="dmgPerPellet">How much damage an enemy takes from a single pellet.</param>
+    private void ShotgunAttack(float spreadAngle, float maxRange, int numPellets, float dmgPerPellet)
+    {
+        // Clamp spread angle and convert to rads
+        spreadAngle = Mathf.Clamp(spreadAngle, 0, 90.0f) * Mathf.Deg2Rad;
+
+        List<GameObject> enemies = new();
+        GameObject[] enemyArr = new GameObject[enemyManager.Enemies.Count];
+        enemyManager.Enemies.Values.CopyTo(enemyArr, 0);
+        enemies.AddRange(enemyArr);
+        
+        // First, cull out any enemies not in the cone; they are guarenteed to not get hit
+        for (int i = enemies.Count - 1; i >= 0; i--)
+        {
+            Vector3 enemyDir = (enemies[i].transform.position - player.transform.position).normalized;
+
+            if (Vector3.Dot(player.transform.forward, enemyDir) < Mathf.Cos(spreadAngle))
+                enemies.RemoveAt(i);
+        }
+
+        // Next, raycast out in every pellet direction and hit enemies.
+        for (float theta = 0.0f; theta < 2.0f * Mathf.PI; theta += (Mathf.PI * 2.0f) / numPellets)
+        {
+            // This vector represents the direction of the pellets. spreadAngle is in radians.
+            // The length of the Z component of the forward direction is based on how high the cone's spread angle is.
+            // X and Y components combined are unit length and rotate around based on theta.
+            // Then simply normalize this whole thing to get the resulting direction.
+            Vector3 vec = Vector3.Normalize(new(Mathf.Cos(theta), Mathf.Sin(theta), 1 / Mathf.Tan(spreadAngle)));
+            
+            // This vec is in local space; transform it to world space relative to player camera.
+            vec = player.transform.GetChild(0).localToWorldMatrix.MultiplyVector(vec);
+
+
+            // bitwise shenanigans; Unity bitmask is 32 bits; Player's layer mask is the 6th bit.
+            // Since we want to raycast against everything BUT that, invert the bitmask.
+            int layerMask = ~(1 << 6); // 1111 1111 1111 1111 1111 1111 1101 1111
+
+            // Did we hit an enemy?
+            if (Physics.Raycast(player.transform.position, vec, out RaycastHit hit, maxRange, layerMask))
+            {
+                if (enemies.Contains(hit.transform.gameObject))
+                {
+                    EnemyStats statsComponent = hit.transform.gameObject.GetComponent<EnemyStats>();
+                    statsComponent.TakeDamage(dmgPerPellet);
+                    statsComponent.Afflict(currentMode, 5.0f);
+                }
+            }
+        }
+
+        
     }
 }

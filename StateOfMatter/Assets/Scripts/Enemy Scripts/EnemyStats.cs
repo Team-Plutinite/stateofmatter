@@ -126,9 +126,6 @@ public class EnemyStats : MonoBehaviour
         switch (state)
         {
             case MatterState.Ice:
-                // Deal raw damage (10 DPS)
-                TakeDamage(10.0f * Time.deltaTime);
-
                 debuffMap["RAW_ICE_DEBUFF"] = new Debuff(seconds,
                     () => agent.speed = moveSpeed * waterMoveSpeedMult * (1 - (iceAmt / debuffMax)), 
                     null, 
@@ -163,9 +160,6 @@ public class EnemyStats : MonoBehaviour
                 break;
 
             case MatterState.Gas:
-                // Deal raw damage (10 DPS)
-                TakeDamage(10.0f * Time.deltaTime);
-
                 // Burst the enemy if they are wet
                 if (debuffState == MatterState.Water)
                 {
