@@ -9755,9 +9755,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d7dac098dd9c5e4c8371c87e3482e4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 12
-  managerObject: {fileID: 0}
-  debuffState: 3
+  manager: {fileID: 0}
 --- !u!1 &9072653324062220282
 GameObject:
   m_ObjectHideFlags: 0

@@ -220,6 +220,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0.523, y: 3.83, z: -45}
+--- !u!198 &114251499 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 4105967748696960399, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+  m_PrefabInstance: {fileID: 2389748626415676394}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &312221737
 GameObject:
   m_ObjectHideFlags: 0
@@ -1821,6 +1826,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 2.863, y: -175.066, z: -38.531}
+--- !u!198 &1770753470 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 1743784772020101780, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+  m_PrefabInstance: {fileID: 2389748626415676394}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1880983684
 GameObject:
   m_ObjectHideFlags: 0
@@ -1918,6 +1928,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!198 &1984558502 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8140946643907407773, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+  m_PrefabInstance: {fileID: 2389748626415676394}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2007660393
 GameObject:
   m_ObjectHideFlags: 0
@@ -2120,6 +2135,22 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1913128098819554777, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: effectDur
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1913128098819554777, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: gasSystem
+      value: 
+      objectReference: {fileID: 1770753470}
+    - target: {fileID: 1913128098819554777, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: solidSystem
+      value: 
+      objectReference: {fileID: 114251499}
+    - target: {fileID: 1913128098819554777, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: liquidSystem
+      value: 
+      objectReference: {fileID: 1984558502}
     - target: {fileID: 2389748624989007368, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: near clip plane
       value: 0.1
