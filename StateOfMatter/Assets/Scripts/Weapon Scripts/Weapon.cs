@@ -39,15 +39,23 @@ public class Weapon : MonoBehaviour
     [Space]
 
     [Header("Solid Shotgun")]
-    [Tooltip("The angle IN DEGREES of the shotgun pellet spread (angle relative to forward axis)")]
-    public float spreadAngle = 20.0f;
+    [Tooltip("The inner angle IN DEGREES of the shotgun pellet spread (angle relative to forward axis)")]
+    public float innerSpreadAngle = 7.5f;
+    [Tooltip("The outer angle IN DEGREES of the shotgun pellet spread (angle relative to forward axis)")]
+    public float outerSpreadAngle = 20.0f;
     [Tooltip("The maximum range of the shotgun. Enemies cannot be hit from farther than this distance.")]
     public float maxRange = 30.0f;
-    [Tooltip("The number of pellets shot with each blast.")]
-    public int pelletCount = 6;
+    [Tooltip("The number of inner pellets shot with each blast.")]
+    public int innerPelletCount = 3;
+    [Tooltip("The number of outer pellets shot with each blast.")]
+    public int outerPelletCount = 7;
     [Tooltip("The damage to do per pellet.")]
     public float pelletDamage = 5.0f;
-    
+
+    [Space]
+    public bool debug;
+    private LineRenderer debugLines;
+
     [SerializeField]
     private float effectDur = 5f;
 
@@ -75,6 +83,14 @@ public class Weapon : MonoBehaviour
         source.volume = 0.2f;
         fireSoundTimer = 0.0f;
         fireSoundCooldown = 0.52f;
+
+        if (debug)
+        {
+            debugLines = gameObject.AddComponent(typeof(LineRenderer)) as LineRenderer;
+            debugLines.startWidth = 0.05f;
+            debugLines.positionCount = 10;
+            debugLines.useWorldSpace = false;
+        }
         
     }
 
@@ -187,7 +203,7 @@ public class Weapon : MonoBehaviour
                 if (Input.GetMouseButtonDown(0))
                 {
                     // Shotgun blast
-                    ShotgunAttack(spreadAngle, maxRange, pelletCount, pelletDamage);
+                    ShotgunAttack(innerSpreadAngle, outerSpreadAngle, maxRange, innerPelletCount, outerPelletCount, pelletDamage);
 
                     fireSoundCooldown = 0.83f;
                     if (fireSoundTimer <= 0.0f)
@@ -240,39 +256,43 @@ public class Weapon : MonoBehaviour
     /// <summary>
     /// Shoot the weapon with a specifed spread angle, range, pellet count, and pellet damage
     /// </summary>
-    /// <param name="spreadAngle">The cone angle of the shotgun blast, in degrees.</param>
+    /// <param name="innerSpreadAngle">The inner cone angle of the shotgun blast, in degrees.</param>
+    /// <param name="outerSpreadAngle">The outer cone angle of the shotgun blast, in degrees.</param>
     /// <param name="maxRange">The maximum range pellets can reach.</param>
-    /// <param name="numPellets">The number of pellets to shoot. These pellets will be uniform around the cone.</param>
+    /// <param name="numInnerPellets">The number of inner pellets to shoot. These pellets will be uniform around the cone.</param>
+    /// <param name="numOuterPellets">The number of outer pellets pellets to shoot. These pellets will be uniform around the cone.</param>
     /// <param name="dmgPerPellet">How much damage an enemy takes from a single pellet.</param>
-    private void ShotgunAttack(float spreadAngle, float maxRange, int numPellets, float dmgPerPellet)
+    private void ShotgunAttack(float innerSpreadAngle, float outerSpreadAngle, float maxRange, int numInnerPellets, int numOuterPellets, float dmgPerPellet)
     {
         // Clamp spread angle and convert to rads
-        spreadAngle = Mathf.Clamp(spreadAngle, 0, 90.0f) * Mathf.Deg2Rad;
+        innerSpreadAngle = Mathf.Clamp(innerSpreadAngle, 0, 90.0f) * Mathf.Deg2Rad;
 
         List<GameObject> enemies = new();
+        List<Vector3> debugVecs = new();
         GameObject[] enemyArr = new GameObject[enemyManager.Enemies.Count];
         enemyManager.Enemies.Values.CopyTo(enemyArr, 0);
         enemies.AddRange(enemyArr);
-        
+
         // First, cull out any enemies not in the cone; they are guarenteed to not get hit
         for (int i = enemies.Count - 1; i >= 0; i--)
         {
             Vector3 enemyDir = (enemies[i].transform.position - player.transform.position).normalized;
 
-            if (Vector3.Dot(player.transform.forward, enemyDir) < Mathf.Cos(spreadAngle))
+            if (Vector3.Dot(player.transform.forward, enemyDir) < Mathf.Cos(outerSpreadAngle))
                 enemies.RemoveAt(i);
         }
 
         // Next, raycast out in every pellet direction and hit enemies.
-        for (float theta = 0.0f; theta < 2.0f * Mathf.PI; theta += (Mathf.PI * 2.0f) / numPellets)
+        for (float theta = 0.0f; theta < 2.0f * Mathf.PI; theta += (Mathf.PI * 2.0f) / numInnerPellets)
         {
             // The length of the Z component of the forward direction is based on how high the cone's spread angle is.
             // X and Y components combined are unit length and rotate around based on theta.
             // Then simply normalize this whole thing to get the resulting direction.
-            Vector3 pelletDir = Vector3.Normalize(new(Mathf.Cos(theta), Mathf.Sin(theta), 1 / Mathf.Tan(spreadAngle)));
-
+            Vector3 pelletDir = Vector3.Normalize(new(Mathf.Cos(theta), Mathf.Sin(theta), 1 / Mathf.Tan(innerSpreadAngle)));
+            if (debug) debugVecs.Add(pelletDir);
             // This vec is in local space; transform it to world space relative to player camera.
             pelletDir = player.transform.GetChild(0).localToWorldMatrix.MultiplyVector(pelletDir);
+
 
             // Unity bitmask is 32 bits; Player's layer mask is the 6th bit.
             // Since we want to raycast against everything BUT that, invert the bitmask.
@@ -290,6 +310,24 @@ public class Weapon : MonoBehaviour
             }
         }
 
-        
+        // Do it again for outer pellets
+        for (float theta = 0.0f; theta < 2.0f * Mathf.PI; theta += (Mathf.PI * 2.0f) / numOuterPellets)
+        {
+            Vector3 pelletDir = Vector3.Normalize(new(Mathf.Cos(theta), Mathf.Sin(theta), 1 / Mathf.Tan(outerSpreadAngle)));
+            //if (debug) debugVecs.Add(pelletDir);
+            pelletDir = player.transform.GetChild(0).localToWorldMatrix.MultiplyVector(pelletDir);
+
+            if (Physics.Raycast(player.transform.position, pelletDir, out RaycastHit hit, maxRange, ~(1 << 6)))
+            {
+                if (enemies.Contains(hit.transform.gameObject))
+                {
+                    EnemyStats statsComponent = hit.transform.gameObject.GetComponent<EnemyStats>();
+                    statsComponent.TakeDamage(dmgPerPellet);
+                    statsComponent.Afflict(currentMode, 5.0f);
+                }
+            }
+        }
+
+        debugLines.SetPositions(debugVecs.ToArray());
     }
 }
