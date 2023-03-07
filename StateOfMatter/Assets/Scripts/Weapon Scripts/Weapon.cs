@@ -110,10 +110,14 @@ public class Weapon : MonoBehaviour
         //Press the r key to cycle through MatterState
         if (Input.GetKeyDown(KeyCode.R))
         {
+            FiringSystem[(int)currentMode].gameObject.SetActive(false);
+
             currentMode++;
 
             if((int)currentMode > 2)
                 currentMode = MatterState.Ice;
+
+            FiringSystem[(int)currentMode].gameObject.SetActive(true);
         }
 
         //Use the number keys to switch weapons.

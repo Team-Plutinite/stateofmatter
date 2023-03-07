@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5311355428177514761}
   - component: {fileID: 4872823803200433964}
   m_Layer: 0
-  m_Name: pCylinder7
+  m_Name: Vent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 3121445980031854930}
   - component: {fileID: 3645029158641429128}
   m_Layer: 0
-  m_Name: pCube1
+  m_Name: Handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -219,11 +219,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5adcdfb59b96684088b068486dc495a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  steamSystem: {fileID: 0}
-  waterSystem: {fileID: 0}
-  iceSystem: {fileID: 0}
+  gasSystem: {fileID: 7682328775094582060}
+  liquidSystem: {fileID: 408753945889414812}
+  solidSystem: {fileID: 6245483104651292490}
   AttackRadius: {fileID: 0}
-  dps: 3
+  pulseAngle: 45
+  pulseRange: 3
+  pulseForce: 150
+  spreadAngle: 20
+  maxRange: 30
+  pelletCount: 6
+  pelletDamage: 5
   effectDur: 3
   source: {fileID: 0}
   steamFireSound: {fileID: 0}
@@ -9864,7 +9870,7 @@ GameObject:
   - component: {fileID: 3484996644637012141}
   - component: {fileID: 2554529501598881170}
   m_Layer: 0
-  m_Name: pCylinder8
+  m_Name: Dial
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9877,14 +9883,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5304440114005700141}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.87286204, y: -0, z: -0.000000005587935, w: 0.48796707}
+  m_LocalPosition: {x: 0.0000035191674, y: 2.8640802, z: 5.5620656}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2220838805072577538}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 121.586, y: 0, z: 0}
 --- !u!33 &3484996644637012141
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -9947,7 +9953,7 @@ GameObject:
   - component: {fileID: 122149017589129325}
   - component: {fileID: 9117137233929178114}
   m_Layer: 0
-  m_Name: pCylinder6
+  m_Name: Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10030,7 +10036,7 @@ GameObject:
   - component: {fileID: 7786430133846329500}
   - component: {fileID: 2508462786051529300}
   m_Layer: 0
-  m_Name: polySurface3
+  m_Name: GunBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10264,5 +10270,10 @@ PrefabInstance:
 --- !u!4 &7506794336358194720 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4363000815121756, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}
+  m_PrefabInstance: {fileID: 7503838712614497148}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &7682328775094582060 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 198124144702787664, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}
   m_PrefabInstance: {fileID: 7503838712614497148}
   m_PrefabAsset: {fileID: 0}
