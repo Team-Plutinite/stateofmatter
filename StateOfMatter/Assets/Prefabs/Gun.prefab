@@ -219,11 +219,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5adcdfb59b96684088b068486dc495a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  steamSystem: {fileID: 0}
-  waterSystem: {fileID: 0}
-  iceSystem: {fileID: 0}
+  gasSystem: {fileID: 0}
+  liquidSystem: {fileID: 0}
+  solidSystem: {fileID: 0}
   AttackRadius: {fileID: 0}
-  dps: 3
+  pulseAngle: 45
+  pulseRange: 3
+  pulseForce: 150
+  innerSpreadAngle: 5
+  outerSpreadAngle: 15
+  maxRange: 30
+  innerPelletCount: 3
+  outerPelletCount: 7
+  pelletDamage: 5
+  debug: 0
   effectDur: 3
   source: {fileID: 0}
   steamFireSound: {fileID: 0}
