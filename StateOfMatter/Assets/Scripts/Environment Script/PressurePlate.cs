@@ -9,7 +9,7 @@ public class PressurePlate : MonoBehaviour
     [SerializeField]
     bool pressed = false;
 
-    // Start is called before the first frame update
+
     private void OnTriggerEnter(Collider other)
     {
         pressed = true;
@@ -17,10 +17,16 @@ public class PressurePlate : MonoBehaviour
 
     }
 
+    
     private void OnTriggerExit(Collider other)
     {
         pressed = false;
         Debug.Log(pressed + " Off Plate");
     }
 
+    public bool Pressed
+    {
+        get { return pressed; }
+        set { pressed = value; }
+    }
 }
