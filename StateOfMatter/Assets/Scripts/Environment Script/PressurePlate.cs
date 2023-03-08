@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+<<<<<<< Updated upstream
 
 [RequireComponent(typeof(Collider))]
 [DisallowMultipleComponent]
@@ -41,10 +42,23 @@ public class PressurePlate : MonoBehaviour
             depressed = true;
             Debug.Log(depressed);
         }
+=======
+public class PressurePlate : MonoBehaviour
+{
+    [SerializeField]
+    bool pressed = false;
+
+    // Start is called before the first frame update
+    private void OnTriggerEnter(Collider other)
+    {
+        pressed = true;
+        Debug.Log(pressed + " On Plate");
+>>>>>>> Stashed changes
     }
 
     private void OnTriggerExit(Collider other)
     {
+<<<<<<< Updated upstream
         if (other.TryGetComponent<GameObject>(out GameObject o))
         {
             ObjectOnPlate.Remove(o);
@@ -58,5 +72,10 @@ public class PressurePlate : MonoBehaviour
     {
         set { depressed = value; }
         get { return depressed; }
+=======
+        pressed = false;
+        Debug.Log(pressed + " Off Plate");
+
+>>>>>>> Stashed changes
     }
 }
