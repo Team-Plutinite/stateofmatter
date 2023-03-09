@@ -175,7 +175,7 @@ public class Weapon : MonoBehaviour
     private void TryFire()
     {
         // activate particles
-        FiringSystem[(int)currentMode].gameObject.SetActive(true);
+       // FiringSystem[(int)currentMode].gameObject.SetActive(true);
 
         //AttackRadius.gameObject.SetActive(true);
         source.loop = true;

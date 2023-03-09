@@ -2096,6 +2096,67 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1001 &1341674628926292691
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5778422420589636549, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_RootOrder
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 5778422420589636549, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5778422420589636549, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.492
+      objectReference: {fileID: 0}
+    - target: {fileID: 5778422420589636549, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.901
+      objectReference: {fileID: 0}
+    - target: {fileID: 5778422420589636549, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5778422420589636549, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5778422420589636549, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5778422420589636549, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5778422420589636549, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5778422420589636549, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5778422420589636549, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8474056687450019378, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_Name
+      value: PressurePlate
+      objectReference: {fileID: 0}
+    - target: {fileID: 8474056687450019378, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 861d75d1798b8af4988da8579abb935c, type: 3}
 --- !u!1001 &2389748626415676394
 PrefabInstance:
   m_ObjectHideFlags: 0
