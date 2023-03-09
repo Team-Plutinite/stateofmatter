@@ -6,22 +6,27 @@ using UnityEngine;
 
 public class PressurePlate : MonoBehaviour
 {
+    [SerializeField]
+    Material m;
     
-    bool pressed = false;
+
+    private bool pressed = false;
 
 
     private void OnTriggerEnter(Collider other)
     {
-        pressed = true;
+        this.pressed = true;
         Debug.Log(pressed + " On Plate");
+        m.SetColor("_Color", Color.green);
 
     }
 
     
     private void OnTriggerExit(Collider other)
     {
-        pressed = false;
+        this.pressed = false;
         Debug.Log(pressed + " Off Plate");
+        m.SetColor("_Color", Color.red);
     }
 
     public bool Pressed
