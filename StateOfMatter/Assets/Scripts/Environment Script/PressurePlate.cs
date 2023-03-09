@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class PressurePlate : MonoBehaviour
 {
-    [SerializeField]
+    
     bool pressed = false;
 
 
