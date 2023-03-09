@@ -7,11 +7,14 @@ public class DoorTrigger : MonoBehaviour
     [SerializeField]
     private List<PressurePlate> pressurePlates;
 
+    bool IsOpen = false;
+
     private void Update()
     {
-        if(pressurePlates.TrueForAll(pp => pp.Pressed))
+        if(pressurePlates.TrueForAll(pp => pp.Pressed) && !IsOpen)
         {
             OpenDoor();
+            IsOpen = true;
         }
     }
 
