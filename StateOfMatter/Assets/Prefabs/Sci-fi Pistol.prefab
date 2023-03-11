@@ -4945,12 +4945,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5adcdfb59b96684088b068486dc495a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  steamSystem: {fileID: 4488716365903490350}
-  waterSystem: {fileID: 6233622991739346983}
-  iceSystem: {fileID: 2198714480615776821}
+  gasSystem: {fileID: 4488716365903490350}
+  liquidSystem: {fileID: 6233622991739346983}
+  solidSystem: {fileID: 2198714480615776821}
   AttackRadius: {fileID: 4392416036450780986}
   dps: 3
   effectDur: 3
+  source: {fileID: 0}
+  steamFireSound: {fileID: 0}
+  freezeFireSound: {fileID: 0}
 --- !u!1 &4392416036450780991
 GameObject:
   m_ObjectHideFlags: 0

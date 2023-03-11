@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
+  - Interactable
+  - EnemyManager
   layers:
   - Default
   - TransparentFX
@@ -12,7 +14,7 @@ TagManager:
   - Attack Radius
   - Water
   - UI
-  - 
+  - PlayerMask
   - 
   - 
   - 

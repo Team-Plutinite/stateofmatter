@@ -24,7 +24,6 @@ public class WeaponAttackRadius : MonoBehaviour
     private List<EnemyStats> EnemiesInRadius = new List<EnemyStats>();
     private List<Meltable> MeltablesInRadius = new List<Meltable>();
 
-
     private void OnTriggerStay(Collider other)
     {
        //This function will handle collison with various objects.
@@ -34,7 +33,6 @@ public class WeaponAttackRadius : MonoBehaviour
             OnStay?.Invoke(enemy);
         
        }
-
 
         if (other.TryGetComponent<Meltable>(out Meltable ice))
         {

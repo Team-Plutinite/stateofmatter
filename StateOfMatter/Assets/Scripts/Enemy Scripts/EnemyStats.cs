@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.ObjectModel;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
@@ -17,20 +17,29 @@ public class EnemyStats : MonoBehaviour
 {
     public EnemyManager manager;
 
+    private float waterMoveSpeedMult;
+
     private float maxHP;
-    private MatterState debuffState;
-    private float debuffTime;
     private float hp;
-    private float dotTime;
-    private float dotDmg;
-    private float heatAmt, iceAmt;
+
+    private MatterState debuffState;
     private float debuffMax;
 
+    private float heatAmt, iceAmt;
+
     private float moveSpeed;
+
+    // component references
+    private NavMeshAgent agent;
+    private Rigidbody body;
+
+    Dictionary<string, Debuff> debuffMap;
 
     // Start is called before the first frame update
     void Start()
     {
+        agent = GetComponent<NavMeshAgent>();
+        body = GetComponent<Rigidbody>();
     }
 
     /// <summary>
@@ -40,38 +49,53 @@ public class EnemyStats : MonoBehaviour
     /// <param name="hp">The HP of the spawned enemy</param>
     public void Init(float hp, Vector3 position, Vector3 pitchYawRoll)
     {
-        // Set transform data
+        // TRANSFORM data
         transform.SetPositionAndRotation(position, Quaternion.Euler(pitchYawRoll));
 
+        // MATTER STATE data
         debuffState = MatterState.None;
-        debuffTime = 0.0f;
+
+        // HP data
         this.hp = hp;
         maxHP = hp;
-        dotTime = 0.0f;
-        dotDmg = 0.0f;
-        gameObject.SetActive(true);
+        transform.GetComponentInChildren<TextMeshPro>().text = hp.ToString();
+
+        // DEBUFF data
         heatAmt = iceAmt = 0;
         debuffMax = 1.5f;
+        waterMoveSpeedMult = 0.8f;
 
+        // SPEED data
         moveSpeed = GetComponent<NavMeshAgent>().speed;
+
+        // Set active
+        gameObject.SetActive(true);
+
+        // reset debuff map
+        debuffMap = new Dictionary<string, Debuff>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        dotTime -= Time.deltaTime;
-        if (dotTime > 0f)
-            TakeDamage(dotDmg * Time.deltaTime);
+        // Handle all debuffs
+        string[] keys = new string[debuffMap.Count];
+        debuffMap.Keys.CopyTo(keys, 0);
 
-        debuffTime -= Time.deltaTime;
-        // If debuff timer runs out, neutralize debuffs
-        if (debuffTime <= 0.0f && debuffState != MatterState.None)
-            NeutralizeDebuffs();
+        foreach (string key in keys)
+        {
+            if (debuffMap[key].Timer > 0.0f)
+                debuffMap[key].Tick();
+            else
+            {
+                debuffMap[key].InvokeFinalAction();
+                debuffMap.Remove(key);
+            }
+        }
 
         // Decrease freeze and heat amounts
         if (heatAmt > 0) heatAmt -= Time.deltaTime / 2;
         if (iceAmt > 0) iceAmt -= Time.deltaTime / 2;
-        GetComponent<NavMeshAgent>().speed = moveSpeed * (1-(iceAmt / debuffMax));
 
         Material mat = GetComponent<Renderer>().material;
         // Visually show debuff state on enemy
@@ -99,19 +123,23 @@ public class EnemyStats : MonoBehaviour
     /// <param name="seconds">How long this debuff should last</param>
     public void Afflict(MatterState state, float seconds)
     {
-        if (debuffState == MatterState.Water && state != MatterState.None)
-            debuffTime = seconds;
-
         switch (state)
         {
             case MatterState.Ice:
+                debuffMap["RAW_ICE_DEBUFF"] = new Debuff(seconds,
+                    () => agent.speed = moveSpeed * waterMoveSpeedMult * (1 - (iceAmt / debuffMax)), 
+                    null, 
+                    () => agent.speed = moveSpeed
+                    );
+                
                 // Freeze the enemy if they are currently wet
                 if (debuffState == MatterState.Water)
                 {
+                    debuffMap["STATE_DEBUFF"].Timer = seconds;
                     iceAmt += Time.deltaTime * 2;
                     if (iceAmt >= debuffMax)
                     {
-                        Freeze();
+                        debuffMap["STATE_DEBUFF"] = new Debuff(seconds, Freeze, null, NeutralizeDebuffs);
                         iceAmt = 0;
                     }
                 }  
@@ -119,10 +147,15 @@ public class EnemyStats : MonoBehaviour
 
             case MatterState.Water:
                 // Debuff the enemy with Wet, but only if they are not already debuffed
-                if (debuffState == MatterState.None)
+                if (debuffState == MatterState.None || debuffState == MatterState.Water)
                 {
-                    debuffState = MatterState.Water;
-                    debuffTime = seconds;
+                    DebuffAction init = () => debuffState = MatterState.Water;
+                    DebuffAction end = () => 
+                    { 
+                        if (debuffState != MatterState.None) 
+                            NeutralizeDebuffs(); 
+                    };
+                    debuffMap["STATE_DEBUFF"] = new Debuff(seconds, init, null, end);
                 }
                 break;
 
@@ -130,10 +163,11 @@ public class EnemyStats : MonoBehaviour
                 // Burst the enemy if they are wet
                 if (debuffState == MatterState.Water)
                 {
+                    debuffMap["STATE_DEBUFF"].Timer = seconds;
                     heatAmt += Time.deltaTime * 2;
                     if (heatAmt >= debuffMax)
                     {
-                        Burst(seconds);
+                        debuffMap["STATE_DEBUFF"] = new Debuff(seconds, Burst, () => TakeDamage(Time.deltaTime * (50.0f / seconds)), NeutralizeDebuffs);
                         heatAmt = 0;
                     }
                 }
@@ -143,34 +177,63 @@ public class EnemyStats : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Stuns the enemy (cannot move) for the given amount of time
+    /// </summary>
+    /// <param name="seconds">How long to stun for</param>
+    public void Stun(float seconds)
+    {
+        debuffMap["STUN"] = new Debuff(seconds, () => agent.isStopped = true, null, () => agent.isStopped = false);
+    }
+
     // Freezes the enemy, leaving them unresponsive
     public void Freeze()
     {
         debuffState = MatterState.Ice;
-        GetComponent<NavMeshAgent>().isStopped = true;
-        // Nothing yet
+        agent.isStopped = true;
     }
 
     // Burst the enemy, doing single-shot AOE then adding individual DOT effect
-    public void Burst(float seconds)
+    public void Burst()
     {
         debuffState = MatterState.Gas;
         
-
         manager.CreateAOE(transform.position, 4.0f, a =>
         {
-            a.GetComponent<Rigidbody>().AddExplosionForce(3000f, transform.position, 4f);
-            a.GetComponent<EnemyStats>().TakeDamage(35.0f);
+            EnemyStats e = a.GetComponent<EnemyStats>();
+            e.Stun(1f);
+            a.GetComponent<Rigidbody>().AddExplosionForce(5000f, transform.position, 4f);
+            e.TakeDamage(35.0f);
         });
+    }
 
-        ApplyDOT(50, seconds);
+    /// <summary>
+    /// Knocks the enemy away form the given world position a specified magnitude.
+    /// If this enemy is currently FROZEN, this will also deal a massive amt of dmg
+    /// while also unfreezing it.
+    /// </summary>
+    /// <param name="position">The source of the knockback</param>
+    /// <param name="magnitude">The impulse magnitude by which to apply the knockback</param>
+    public void Knockback(Vector3 position, float magnitude)
+    {
+        // Knockback
+        Stun(0.75f);
+        body.AddForce((transform.position - position).normalized * magnitude, ForceMode.Impulse);
+        
+        // Big shatter dmg
+        if (debuffState == MatterState.Ice)
+        {
+            TakeDamage(100.0f);
+            NeutralizeDebuffs();
+        }
     }
 
     // Eliminate enemy debuffs
     public void NeutralizeDebuffs()
     {
         debuffState = MatterState.None;
-        GetComponent<NavMeshAgent>().isStopped = false;
+        agent.isStopped = false;
+        agent.speed = moveSpeed;
     }
 
     public void TakeDamage(float dmgAmt)
@@ -182,14 +245,34 @@ public class EnemyStats : MonoBehaviour
     }
 
     /// <summary>
-    ///  Apply a Damage-Over-Time effect to this enemy.
+    /// Applies a debuff to the enemy.
     /// </summary>
-    /// <param name="seconds">Amount of time this effect lasts, in seconds.</param>
-    /// <param name="totalDamage">The total damage to deal over this time.</param>
-    public void ApplyDOT(float totalDamage, float seconds)
+    /// <param name="debuffName">The name of the debuff in the debuff map. 
+    /// BE CAREFUL WITH THIS - if you're trying to create an entirely new debuff, use a unique name!</param>
+    /// <param name="debuff">The debuff object to apply.</param>
+    public void ApplyDebuff(string debuffName, Debuff debuff)
     {
-        dotTime = seconds;
-        dotDmg = totalDamage / seconds;
+        debuffMap[debuffName] = debuff;
+    }
+
+    /// <summary>
+    /// Returns the debuff object corresponding to the specified name.
+    /// </summary>
+    /// <param name="debuffName">The name of the debuff.</param>
+    /// <returns>The corresponding debuff, or null if this name does not exist in the debuff map.</returns>
+    public Debuff GetDebuff(string debuffName)
+    {
+        return debuffMap[debuffName];
+    }
+
+    /// <summary>
+    /// Gets teh names of all currently active debuffs on this enemy.
+    /// </summary>
+    /// <returns>A string array of the names of all active debuffs.</returns>
+    public string[] GetAllDebuffNames()
+    {
+        string[] names = new string[debuffMap.Count];
+        debuffMap.Keys.CopyTo(names, 0);
+        return names;
     }
 }
-
