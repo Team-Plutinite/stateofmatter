@@ -11,19 +11,15 @@ public class Weapon : MonoBehaviour
     private GameObject player;
     private GameObject playerCam;
 
-    MatterState currentMode = MatterState.Ice;
+    private MatterState currentMode = MatterState.Ice;
     //Handles the particles that come out when firing.
     [SerializeField]
     private ParticleSystem gasSystem;
-
     [SerializeField]
     private ParticleSystem liquidSystem;
-
     [SerializeField]
     private ParticleSystem solidSystem;
-
     private ParticleSystem[] FiringSystem;
-
     [SerializeField]
     private WeaponAttackRadius AttackRadius;
 
@@ -45,15 +41,41 @@ public class Weapon : MonoBehaviour
     [Tooltip("The outer angle IN DEGREES of the shotgun pellet spread (angle relative to forward axis)")]
     public float outerSpreadAngle = 20.0f;
     [Tooltip("The maximum range of the shotgun. Enemies cannot be hit from farther than this distance.")]
-    public float maxRange = 30.0f;
+    public float solidRange = 30.0f;
     [Tooltip("The number of inner pellets shot with each blast.")]
     public int innerPelletCount = 3;
     [Tooltip("The number of outer pellets shot with each blast.")]
     public int outerPelletCount = 7;
     [Tooltip("The damage to do per pellet.")]
     public float pelletDamage = 5.0f;
+    [Tooltip("Solid Mode Rounds Per Minute.")]
+    public float solidRPM = 75.0f;
+    private float solidAtkTimer;
 
     [Space]
+
+    [Header("Liquid Laser")]
+    [Tooltip("Damage per laser shot.")]
+    public float liquidDmg = 1.7f;
+    [Tooltip("Max range of the laser.")]
+    public float liquidRange = int.MaxValue;
+    [Tooltip("Liquid Mode Rounds Per Minute.")]
+    public float liquidRPM = 1000.0f;
+    private float liquidAtkTimer;
+
+    [Space]
+
+    [Header("Gas Spreader")]
+    [Tooltip("The total damage to apply for a gas cloud.")]
+    public float gasDmg = 50.0f;
+    [Tooltip("Max range of the gas cloud.")]
+    public float gasRange = int.MaxValue;
+    [Tooltip("Gas Mode Rounds (clouds) Per Minute.")]
+    public float gasRPM = 320.0f;
+    private float gasAtkTimer;
+
+    [Space]
+
     [Tooltip("Show a line renderer that represents the spread of pellets. Each " +
         "vertex in the circle represents the point through which a ray is being cast.")]
     public bool debug;
@@ -76,13 +98,15 @@ public class Weapon : MonoBehaviour
 
     private void Awake()
     {
+        solidAtkTimer = liquidAtkTimer = gasAtkTimer = 0.0f;
+
         player = GameObject.FindGameObjectWithTag("Player");
         playerCam = player.transform.GetComponentInChildren<Camera>().gameObject;
         enemyManager = GameObject.FindGameObjectWithTag("EnemyManager").GetComponent<EnemyManager>();
         FiringSystem = new ParticleSystem[3] { solidSystem, liquidSystem, gasSystem  };
-        AttackRadius.OnStay += DamageEnemy;
+        //AttackRadius.OnStay += DamageEnemy;
 
-        AttackRadius.MeltEnter += DamageMeltable;
+        //AttackRadius.MeltEnter += DamageMeltable;
 
         //FiringSystem = new ParticleSystem[3] { waterSystem, steamSystem, iceSystem };
         source = gameObject.AddComponent<AudioSource>();
@@ -97,7 +121,6 @@ public class Weapon : MonoBehaviour
             debugLines.endWidth = 0.01f;
             debugLines.loop = true;
         }
-        
     }
 
     public MatterState GetMatterState()
@@ -112,6 +135,11 @@ public class Weapon : MonoBehaviour
 
     private void Update()
     {
+        // Reduce timers
+        solidAtkTimer -= Time.deltaTime;
+        liquidAtkTimer -= Time.deltaTime;
+        gasAtkTimer -= Time.deltaTime;
+
         // Primary fire - differs depending on state
         TryFire();
 
@@ -133,7 +161,6 @@ public class Weapon : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             currentMode++;
-
             if((int)currentMode > 2)
                 currentMode = MatterState.Ice;
         }
@@ -142,7 +169,7 @@ public class Weapon : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             StopFiring(); //Resets hitbox and particles
-            currentMode = MatterState.Ice;  
+            currentMode = MatterState.Ice;
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
@@ -152,9 +179,8 @@ public class Weapon : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             StopFiring();
-            currentMode = MatterState.Gas;         
+            currentMode = MatterState.Gas;
         }
-
 
         fireSoundTimer -= Time.deltaTime;
     }
@@ -196,9 +222,6 @@ public class Weapon : MonoBehaviour
     //Sets particle system and hitbox to turn on and off respectively 
     private void TryFire()
     {
-        // activate particles
-        FiringSystem[(int)currentMode].gameObject.SetActive(true);
-
         //AttackRadius.gameObject.SetActive(true);
         source.loop = true;
 
@@ -206,10 +229,11 @@ public class Weapon : MonoBehaviour
         switch (currentMode)
         {
             case MatterState.Ice: //ice
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButtonDown(0) && solidAtkTimer <= 0.0f)
                 {
+                    solidAtkTimer = 1 / (solidRPM / 60.0f);
                     // Shotgun blast
-                    ShotgunAttack(innerSpreadAngle, outerSpreadAngle, maxRange, innerPelletCount, outerPelletCount, pelletDamage);
+                    ShotgunAttack(innerSpreadAngle, outerSpreadAngle, solidRange, innerPelletCount, outerPelletCount, pelletDamage);
 
                     fireSoundCooldown = 0.83f;
                     if (fireSoundTimer <= 0.0f)
@@ -218,22 +242,29 @@ public class Weapon : MonoBehaviour
                         fireSoundTimer = fireSoundCooldown;
                     }
                 }
-
                 break;
 
             case MatterState.Water:
-                if (Input.GetMouseButton(0))
+                if (Input.GetMouseButton(0) && liquidAtkTimer <= 0.0f)
                 {
-                    // TODO: implement laser
+                    liquidAtkTimer = 1 / (liquidRPM / 60.0f);
+                    // Laser shot
+                    LineAttack(liquidDmg, liquidRange);
+                    // activate particles
+                    FiringSystem[(int)currentMode].gameObject.SetActive(true);
                 }
-
                 break;
 
             case MatterState.Gas: //gas
 
-                if (Input.GetMouseButton(0))
+                if (Input.GetMouseButton(0) && gasAtkTimer <= 0.0f)
                 {
+                    gasAtkTimer = 1 / (gasRPM / 60.0f);
+
                     // TODO: implement cloud thingy
+
+                    // activate particles
+                    FiringSystem[(int)currentMode].gameObject.SetActive(true);
 
                     fireSoundCooldown = 0.52f; //setting cooldown to length of audio clip
                     if (fireSoundTimer <= 0.0f)
@@ -242,7 +273,6 @@ public class Weapon : MonoBehaviour
                         fireSoundTimer = fireSoundCooldown; //reset timer
                     }
                 }
-
                 break;
         }
 
@@ -257,6 +287,30 @@ public class Weapon : MonoBehaviour
         //AttackRadius.gameObject.SetActive(false);
         source.loop = false;
         source.Stop();
+    }
+
+    /// <summary>
+    /// Shoot a single hitscan attack through middle of screen
+    /// </summary>
+    /// <param name="dmg">Damage of the shot</param>
+    /// <param name="maxRange">The max range of the attack (if not set, will be max int)</param>
+    private void LineAttack(float dmg, float maxRange = int.MaxValue)
+    {
+        List<GameObject> enemies = new();
+        GameObject[] enemyArr = new GameObject[enemyManager.Enemies.Count];
+        enemyManager.Enemies.Values.CopyTo(enemyArr, 0);
+        enemies.AddRange(enemyArr);
+
+        // Raycast through forward axis and check if it hit an enemy
+        if (Physics.Raycast(playerCam.transform.position, playerCam.transform.forward, out RaycastHit hit, maxRange, ~(1 << 6)))
+        {
+            if (enemies.Contains(hit.transform.gameObject))
+            {
+                EnemyStats statsComponent = hit.transform.gameObject.GetComponent<EnemyStats>();
+                statsComponent.TakeDamage(dmg);
+                statsComponent.Afflict(currentMode, 5.0f);
+            }
+        }
     }
 
     /// <summary>
@@ -276,6 +330,46 @@ public class Weapon : MonoBehaviour
         enemyManager.Enemies.Values.CopyTo(enemyArr, 0);
         enemies.AddRange(enemyArr);
 
+        // Helper method to raycast the pellet trajectories and hit enemies (pellets are hitscan)
+        List<Vector3> ShootCircle(float angle, float numPellets, float dmgPerPellet, float maxRange)
+        {
+            // clamp angle and convert to rads
+            angle = Mathf.Clamp(angle, 0, 90.0f) * Mathf.Deg2Rad;
+            List<Vector3> debugVecs = new();
+
+            // Raycast out in every pellet direction and hit enemies.
+            float thetaOffset = Random.value * Mathf.PI * 2;
+            for (float theta = 0.0f; theta < 2.0f * Mathf.PI; theta += (Mathf.PI * 2.0f) / numPellets)
+            {
+                // The length of the Z component of the forward direction is based on how high the cone's spread angle is.
+                // X and Y components combined are unit length and rotate around based on theta.
+                // Then simply normalize this whole thing to get the resulting direction.
+                Vector3 pelletDir = Vector3.Normalize(new(Mathf.Cos(theta + thetaOffset), Mathf.Sin(theta + thetaOffset), 1 / Mathf.Tan(angle)));
+
+                // This vec is in local space; transform it to world space relative to player camera.
+                pelletDir = playerCam.transform.localToWorldMatrix.MultiplyVector(pelletDir);
+
+                // Add vector to debug renderer
+                if (debug) debugVecs.Add(playerCam.transform.position + pelletDir);
+
+                // Unity bitmask is 32 bits; Player's layer mask is the 6th bit.
+                // Since we want to raycast against everything BUT that, invert the bitmask.
+                int layerMask = ~(1 << 6); // 1111 1111 1111 1111 1111 1111 1101 1111
+
+                // Did we hit an enemy?
+                if (Physics.Raycast(playerCam.transform.position, pelletDir, out RaycastHit hit, maxRange, layerMask))
+                {
+                    if (enemies.Contains(hit.transform.gameObject))
+                    {
+                        EnemyStats statsComponent = hit.transform.gameObject.GetComponent<EnemyStats>();
+                        statsComponent.TakeDamage(dmgPerPellet);
+                        statsComponent.Afflict(currentMode, 5.0f, 0.1f);
+                    }
+                }
+            }
+            return debugVecs; // for debugging purposes
+        }
+
         // First, cull out any enemies not in the cone; they are guarenteed to not get hit
         for (int i = enemies.Count - 1; i >= 0; i--)
         {
@@ -285,54 +379,14 @@ public class Weapon : MonoBehaviour
         }
 
         // Next, raycast out in every pellet direction and hit enemies.
-        debugVecs.AddRange(ShootCircle(innerSpreadAngle, numInnerPellets, dmgPerPellet, maxRange, enemies));
+        debugVecs.AddRange(ShootCircle(innerSpreadAngle, numInnerPellets, dmgPerPellet, maxRange));
         // Do it again for outer pellets
-        debugVecs.AddRange(ShootCircle(outerSpreadAngle, numOuterPellets, dmgPerPellet, maxRange, enemies));
+        debugVecs.AddRange(ShootCircle(outerSpreadAngle, numOuterPellets, dmgPerPellet, maxRange));
         // If debugging enabled, display the raycasts visually
         if (debug)
         {
             debugLines.positionCount = debugVecs.Count;
             debugLines.SetPositions(debugVecs.ToArray());
         }
-    }
-
-    // Helper method to raycast the pellet trajectories and hit enemies (pellets are hitscan)
-    private List<Vector3> ShootCircle(float angle, float numPellets, float dmgPerPellet, float maxRange, List<GameObject> enemies)
-    {
-        // clamp angle and convert to rads
-        angle = Mathf.Clamp(angle, 0, 90.0f) * Mathf.Deg2Rad;
-        List<Vector3> debugVecs = new();
-
-        // Raycast out in every pellet direction and hit enemies.
-        float thetaOffset = Random.value * Mathf.PI * 2;
-        for (float theta = 0.0f; theta < 2.0f * Mathf.PI; theta += (Mathf.PI * 2.0f) / numPellets)
-        {
-            // The length of the Z component of the forward direction is based on how high the cone's spread angle is.
-            // X and Y components combined are unit length and rotate around based on theta.
-            // Then simply normalize this whole thing to get the resulting direction.
-            Vector3 pelletDir = Vector3.Normalize(new(Mathf.Cos(theta + thetaOffset), Mathf.Sin(theta + thetaOffset), 1 / Mathf.Tan(angle)));
-
-            // This vec is in local space; transform it to world space relative to player camera.
-            pelletDir = playerCam.transform.localToWorldMatrix.MultiplyVector(pelletDir);
-
-            // Add vector to debug renderer
-            if (debug) debugVecs.Add(playerCam.transform.position + pelletDir);
-
-            // Unity bitmask is 32 bits; Player's layer mask is the 6th bit.
-            // Since we want to raycast against everything BUT that, invert the bitmask.
-            int layerMask = ~(1 << 6); // 1111 1111 1111 1111 1111 1111 1101 1111
-
-            // Did we hit an enemy?
-            if (Physics.Raycast(playerCam.transform.position, pelletDir, out RaycastHit hit, maxRange, layerMask))
-            {
-                if (enemies.Contains(hit.transform.gameObject))
-                {
-                    EnemyStats statsComponent = hit.transform.gameObject.GetComponent<EnemyStats>();
-                    statsComponent.TakeDamage(dmgPerPellet);
-                    statsComponent.Afflict(currentMode, 5.0f);
-                }
-            }
-        }
-        return debugVecs; // for debugging purposes
     }
 }

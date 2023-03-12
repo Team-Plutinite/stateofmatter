@@ -17,7 +17,7 @@ public class EnemyStats : MonoBehaviour
 {
     public EnemyManager manager;
 
-    private float waterMoveSpeedMult;
+    private float solidMoveSpeedMult;
 
     private float maxHP;
     private float hp;
@@ -62,8 +62,8 @@ public class EnemyStats : MonoBehaviour
 
         // DEBUFF data
         heatAmt = iceAmt = 0;
-        debuffMax = 1.5f;
-        waterMoveSpeedMult = 0.8f;
+        debuffMax = 1.0f;
+        solidMoveSpeedMult = 0.8f;
 
         // SPEED data
         moveSpeed = GetComponent<NavMeshAgent>().speed;
@@ -93,10 +93,6 @@ public class EnemyStats : MonoBehaviour
             }
         }
 
-        // Decrease freeze and heat amounts
-        if (heatAmt > 0) heatAmt -= Time.deltaTime / 2;
-        if (iceAmt > 0) iceAmt -= Time.deltaTime / 2;
-
         Material mat = GetComponent<Renderer>().material;
         // Visually show debuff state on enemy
         switch (debuffState)
@@ -121,26 +117,30 @@ public class EnemyStats : MonoBehaviour
     /// </summary>
     /// <param name="state">The Matter State to apply</param>
     /// <param name="seconds">How long this debuff should last</param>
-    public void Afflict(MatterState state, float seconds)
+    public void Afflict(MatterState state, float seconds, float debuffAmt = 0.0f)
     {
         switch (state)
         {
             case MatterState.Ice:
-                debuffMap["RAW_ICE_DEBUFF"] = new Debuff(seconds,
-                    () => agent.speed = moveSpeed * waterMoveSpeedMult * (1 - (iceAmt / debuffMax)), 
+                debuffMap["RAW_SOLID_DEBUFF"] = new Debuff(seconds,
+                    () => agent.speed = moveSpeed * solidMoveSpeedMult * (1 - (iceAmt / debuffMax)), 
                     null, 
-                    () => agent.speed = moveSpeed
+                    () => 
+                    {
+                        iceAmt = 0.0f;
+                        agent.speed = moveSpeed;
+                    }
                     );
                 
                 // Freeze the enemy if they are currently wet
                 if (debuffState == MatterState.Water)
                 {
                     debuffMap["STATE_DEBUFF"].Timer = seconds;
-                    iceAmt += Time.deltaTime * 2;
+                    iceAmt += debuffAmt;
                     if (iceAmt >= debuffMax)
                     {
+                        debuffMap["RAW_SOLID_DEBUFF"] = null;
                         debuffMap["STATE_DEBUFF"] = new Debuff(seconds, Freeze, null, NeutralizeDebuffs);
-                        iceAmt = 0;
                     }
                 }  
                 break;
@@ -164,11 +164,12 @@ public class EnemyStats : MonoBehaviour
                 if (debuffState == MatterState.Water)
                 {
                     debuffMap["STATE_DEBUFF"].Timer = seconds;
-                    heatAmt += Time.deltaTime * 2;
+                    debuffMap["RAW_GAS_DEBUFF"] = new Debuff(seconds, null, null, () => heatAmt = 0.0f);
+                    heatAmt += debuffAmt;
                     if (heatAmt >= debuffMax)
                     {
+                        debuffMap["RAW_GAS_DEBUFF"] = null;
                         debuffMap["STATE_DEBUFF"] = new Debuff(seconds, Burst, () => TakeDamage(Time.deltaTime * (50.0f / seconds)), NeutralizeDebuffs);
-                        heatAmt = 0;
                     }
                 }
                 break;
@@ -189,6 +190,7 @@ public class EnemyStats : MonoBehaviour
     // Freezes the enemy, leaving them unresponsive
     public void Freeze()
     {
+        iceAmt = 0;
         debuffState = MatterState.Ice;
         agent.isStopped = true;
     }
@@ -196,6 +198,7 @@ public class EnemyStats : MonoBehaviour
     // Burst the enemy, doing single-shot AOE then adding individual DOT effect
     public void Burst()
     {
+        heatAmt = 0;
         debuffState = MatterState.Gas;
         
         manager.CreateAOE(transform.position, 4.0f, a =>

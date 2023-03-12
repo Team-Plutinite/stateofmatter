@@ -77,13 +77,13 @@ public class EnemyManager : MonoBehaviour
         {
             goal = player;
         }
-
+        Debug.Log(player);
         // Add it to the active pool
         activeEnemies.Add(enemy.GetInstanceID(), enemy);
 
         // Initialize the enemy (spawning it). Also store its pool index
         enemy.GetComponent<EnemyStats>().Init(hp, position, pitchYawRoll);
-        // Init everything in the EnemyAttack compoenent
+        // Init everything in the EnemyAttack component
         //enemy.GetComponent<EnemyAttack>().Init();
         // Init everything in the Navigator component
         enemy.GetComponent<Navigator>().Init(goal, home);
