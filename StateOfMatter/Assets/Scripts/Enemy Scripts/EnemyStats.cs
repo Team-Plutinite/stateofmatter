@@ -123,23 +123,16 @@ public class EnemyStats : MonoBehaviour
         {
             case MatterState.Ice:
                 debuffMap["RAW_SOLID_DEBUFF"] = new Debuff(seconds,
-                    () => agent.speed = moveSpeed * solidMoveSpeedMult * (1 - (iceAmt / debuffMax)), 
-                    null, 
-                    () => 
-                    {
-                        iceAmt = 0.0f;
-                        agent.speed = moveSpeed;
-                    }
-                    );
+                    () => agent.speed = moveSpeed * solidMoveSpeedMult * (1 - (iceAmt / debuffMax)), null, NeutralizeDebuffs);
                 
                 // Freeze the enemy if they are currently wet
                 if (debuffState == MatterState.Water)
                 {
-                    debuffMap["STATE_DEBUFF"].Timer = seconds;
+                    debuffMap["STATE_DEBUFF"].ResetTimer();
                     iceAmt += debuffAmt;
                     if (iceAmt >= debuffMax)
                     {
-                        debuffMap["RAW_SOLID_DEBUFF"] = null;
+                        debuffMap.Remove("RAW_SOLID_DEBUFF");
                         debuffMap["STATE_DEBUFF"] = new Debuff(seconds, Freeze, null, NeutralizeDebuffs);
                     }
                 }  
@@ -149,13 +142,15 @@ public class EnemyStats : MonoBehaviour
                 // Debuff the enemy with Wet, but only if they are not already debuffed
                 if (debuffState == MatterState.None || debuffState == MatterState.Water)
                 {
-                    DebuffAction init = () => debuffState = MatterState.Water;
-                    DebuffAction end = () => 
-                    { 
-                        if (debuffState != MatterState.None) 
-                            NeutralizeDebuffs(); 
-                    };
-                    debuffMap["STATE_DEBUFF"] = new Debuff(seconds, init, null, end);
+                    if (!debuffMap.ContainsKey("STATE_DEBUFF"))
+                    {
+                        debuffMap["STATE_DEBUFF"] = new Debuff(seconds, 
+                            () => debuffState = MatterState.Water, 
+                            null, 
+                            () => { if (debuffState != MatterState.None) NeutralizeDebuffs(); });
+                    }
+                    else
+                        debuffMap["STATE_DEBUFF"].ResetTimer();
                 }
                 break;
 
@@ -163,14 +158,10 @@ public class EnemyStats : MonoBehaviour
                 // Burst the enemy if they are wet
                 if (debuffState == MatterState.Water)
                 {
-                    debuffMap["STATE_DEBUFF"].Timer = seconds;
-                    debuffMap["RAW_GAS_DEBUFF"] = new Debuff(seconds, null, null, () => heatAmt = 0.0f);
+                    debuffMap["STATE_DEBUFF"].ResetTimer();
                     heatAmt += debuffAmt;
                     if (heatAmt >= debuffMax)
-                    {
-                        debuffMap["RAW_GAS_DEBUFF"] = null;
-                        debuffMap["STATE_DEBUFF"] = new Debuff(seconds, Burst, () => TakeDamage(Time.deltaTime * (50.0f / seconds)), NeutralizeDebuffs);
-                    }
+                        debuffMap["STATE_DEBUFF"] = new Debuff(seconds, Burst, null, NeutralizeDebuffs);
                 }
                 break;
 
@@ -201,12 +192,12 @@ public class EnemyStats : MonoBehaviour
         heatAmt = 0;
         debuffState = MatterState.Gas;
         
-        manager.CreateAOE(transform.position, 4.0f, a =>
+        manager.CreateAOE(transform.position, 3.0f, a =>
         {
             EnemyStats e = a.GetComponent<EnemyStats>();
-            e.Stun(1f);
-            a.GetComponent<Rigidbody>().AddExplosionForce(5000f, transform.position, 4f);
-            e.TakeDamage(35.0f);
+            e.Stun(0.75f);
+            a.GetComponent<Rigidbody>().AddExplosionForce(3000f, transform.position, 3f);
+            e.TakeDamage(30.0f);
         });
     }
 
@@ -237,6 +228,8 @@ public class EnemyStats : MonoBehaviour
         debuffState = MatterState.None;
         agent.isStopped = false;
         agent.speed = moveSpeed;
+        heatAmt = 0;
+        iceAmt = 0;
     }
 
     public void TakeDamage(float dmgAmt)
@@ -256,6 +249,20 @@ public class EnemyStats : MonoBehaviour
     public void ApplyDebuff(string debuffName, Debuff debuff)
     {
         debuffMap[debuffName] = debuff;
+    }
+
+    /// <summary>
+    /// Resets the timer of the specified debuff.
+    /// </summary>
+    /// <param name="debuffName">The name of the debuff to reset.</param>
+    /// <returns>True if the debuff exists.</returns>
+    public bool ResetDebuff(string debuffName)
+    {
+        if (!debuffMap.ContainsKey(debuffName)) 
+            return false;
+
+        debuffMap[debuffName].ResetTimer();
+        return true;
     }
 
     /// <summary>

@@ -68,15 +68,17 @@ public class Weapon : MonoBehaviour
     [Space]
 
     [Header("Gas Cloud Emitter")]
-    [Tooltip("The total damage to apply for a gas cloud.")]
-    public float gasDmg = 50.0f;
+    [Tooltip("Gas cloud's damage per second.")]
+    public float gasDmg = 5.0f;
+    [Tooltip("The total lifetime of gas clouds.")]
+    public float gasLife = 5.0f;
     [Tooltip("Max range of the gas cloud.")]
     public float gasRange = int.MaxValue;
     [Tooltip("Gas Mode Rounds (clouds) Per Minute.")]
-    public float gasRPM = 200.0f;
+    public float gasRPM = 180.0f;
     private float gasAtkTimer;
     [Tooltip("Gas cloud spawn pool count.")]
-    public int gasCloudPoolCount = 100;
+    public int gasCloudPoolCount = 50;
     private Queue<GameObject> gasClouds;
     public GameObject gasCloudPrefab;
 
@@ -117,8 +119,8 @@ public class Weapon : MonoBehaviour
         {
             GameObject newCloud = Instantiate(gasCloudPrefab);
             newCloud.SetActive(false);
-            //newCloud.GetComponent<GasAttacker>().OnStay += DamageEnemy;
-            newCloud.GetComponent<GasAttacker>().MeltEnter += DamageMeltable;
+            newCloud.GetComponent<GasAttacker>().OnStay += CloudDamageEnemy;
+            newCloud.GetComponent<GasAttacker>().MeltEnter += CloudDamageMeltable;
             gasClouds.Enqueue(newCloud);
         }
 
@@ -204,8 +206,17 @@ public class Weapon : MonoBehaviour
         fireSoundTimer -= Time.deltaTime;
     }
 
-    //Begin Damaging ice when it enters the radius.
-    private void DamageMeltable(Meltable melt)
+    private void CloudDamageEnemy(EnemyStats enemy)
+    {
+        // If enemy already has a DOT on it, just reset its DOT timer.
+        if (!enemy.ResetDebuff("RAW_GAS_DEBUFF"))
+            enemy.ApplyDebuff("RAW_GAS_DEBUFF", new Debuff(0.25f, null, () => enemy.TakeDamage(Time.deltaTime * gasDmg), null));
+        
+        enemy.Afflict(MatterState.Gas, effectDur, Time.deltaTime);
+    }
+
+    //Begin Damaging ice when it enters the gas cloud.
+    private void CloudDamageMeltable(Meltable melt)
     {
         //If the cube is fully melted, do nothing.
         if (melt.transform.localScale.x <= 0f || melt.transform.localScale.y <= 0f || melt.transform.localScale.z <= 0f)
@@ -277,7 +288,7 @@ public class Weapon : MonoBehaviour
                     if (!gasClouds.Peek().activeSelf)
                     {
                         GameObject activatedCloud = gasClouds.Dequeue();
-                        activatedCloud.GetComponent<GasAttacker>().Spawn(transform.position + transform.forward, transform.rotation, 5.0f);
+                        activatedCloud.GetComponent<GasAttacker>().Spawn(transform.position + transform.forward, transform.rotation, gasLife);
                         gasClouds.Enqueue(activatedCloud);
                     }
 
@@ -318,9 +329,8 @@ public class Weapon : MonoBehaviour
         GameObject[] enemyArr = new GameObject[enemyManager.Enemies.Count];
         enemyManager.Enemies.Values.CopyTo(enemyArr, 0);
         enemies.AddRange(enemyArr);
-
         // Raycast through forward axis and check if it hit an enemy
-        if (Physics.Raycast(playerCam.transform.position, playerCam.transform.forward, out RaycastHit hit, maxRange, ~(1 << 6)))
+        if (Physics.Raycast(playerCam.transform.position, playerCam.transform.forward, out RaycastHit hit, maxRange, ~(1 << 3 | 1 << 6)))
         {
             if (enemies.Contains(hit.transform.gameObject))
             {
@@ -370,9 +380,9 @@ public class Weapon : MonoBehaviour
                 // Add vector to debug renderer
                 if (debug) debugVecs.Add(playerCam.transform.position + pelletDir);
 
-                // Unity bitmask is 32 bits; Player's layer mask is the 6th bit.
+                // Unity bitmask is 32 bits; Player's layer mask is the 6th bit and gas clouds are 3rd bit.
                 // Since we want to raycast against everything BUT that, invert the bitmask.
-                int layerMask = ~(1 << 6); // 1111 1111 1111 1111 1111 1111 1101 1111
+                int layerMask = ~(1 << 3 | 1 << 6); // 1111 1111 1111 1111 1111 1111 1101 1011
 
                 // Did we hit an enemy?
                 if (Physics.Raycast(playerCam.transform.position, pelletDir, out RaycastHit hit, maxRange, layerMask))
