@@ -113,8 +113,8 @@ public class Weapon : MonoBehaviour
         enemyManager = GameObject.FindGameObjectWithTag("EnemyManager").GetComponent<EnemyManager>();
         FiringSystem = new ParticleSystem[3] { solidSystem, liquidSystem, gasSystem  };
 
-        gasClouds = new Queue<GameObject>();
         // Fill the cloud pool
+        gasClouds = new Queue<GameObject>();
         for (int i = 0; i < gasCloudPoolCount; i++)
         {
             GameObject newCloud = Instantiate(gasCloudPrefab);
@@ -124,7 +124,6 @@ public class Weapon : MonoBehaviour
             gasClouds.Enqueue(newCloud);
         }
 
-        //FiringSystem = new ParticleSystem[3] { waterSystem, steamSystem, iceSystem };
         source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.2f;
         fireSoundTimer = 0.0f;
@@ -313,7 +312,6 @@ public class Weapon : MonoBehaviour
     private void StopFiring()
     {
         FiringSystem[(int)currentMode].gameObject.SetActive(false);
-        //AttackRadius.gameObject.SetActive(false);
         source.loop = false;
         source.Stop();
     }
