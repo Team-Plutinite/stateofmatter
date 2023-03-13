@@ -77,13 +77,12 @@ public class EnemyManager : MonoBehaviour
         {
             goal = player;
         }
-
         // Add it to the active pool
         activeEnemies.Add(enemy.GetInstanceID(), enemy);
 
         // Initialize the enemy (spawning it). Also store its pool index
         enemy.GetComponent<EnemyStats>().Init(hp, position, pitchYawRoll);
-        // Init everything in the EnemyAttack compoenent
+        // Init everything in the EnemyAttack component
         //enemy.GetComponent<EnemyAttack>().Init();
         // Init everything in the Navigator component
         enemy.GetComponent<Navigator>().Init(goal, home);
@@ -98,7 +97,6 @@ public class EnemyManager : MonoBehaviour
     /// <returns>Whether killing the enemy was successful or not</returns>
     public bool KillEnemy(int instanceID)
     {
-        Debug.Log(activeEnemies.ContainsKey(instanceID));
         // Make sure we aren't OOBing.
         if (!activeEnemies.ContainsKey(instanceID)) 
             return false;

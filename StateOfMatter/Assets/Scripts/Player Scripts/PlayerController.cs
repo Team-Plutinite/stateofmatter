@@ -163,7 +163,7 @@ public class PlayerController : MonoBehaviour
         // for testing; spawn an enemy
         if (Input.GetKeyDown(KeyCode.P))
         {
-            if (Physics.Raycast(transform.position, camTransform.forward, out RaycastHit hit, 100, ~(1 << 6)))
+            if (Physics.Raycast(transform.position, camTransform.forward, out RaycastHit hit, 100, ~(1 << 3 | 1 << 6)))
                 GameObject.Find("EnemyManager").GetComponent<EnemyManager>().SpawnEnemy(100, hit.point, Vector3.zero);
         }
     }
