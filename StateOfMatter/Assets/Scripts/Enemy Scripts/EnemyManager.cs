@@ -77,7 +77,6 @@ public class EnemyManager : MonoBehaviour
         {
             goal = player;
         }
-        Debug.Log(player);
         // Add it to the active pool
         activeEnemies.Add(enemy.GetInstanceID(), enemy);
 
@@ -98,7 +97,6 @@ public class EnemyManager : MonoBehaviour
     /// <returns>Whether killing the enemy was successful or not</returns>
     public bool KillEnemy(int instanceID)
     {
-        Debug.Log(activeEnemies.ContainsKey(instanceID));
         // Make sure we aren't OOBing.
         if (!activeEnemies.ContainsKey(instanceID)) 
             return false;

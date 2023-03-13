@@ -222,7 +222,7 @@ MonoBehaviour:
   lookSensitivity: 2.5
   source: {fileID: 0}
   moveSound: {fileID: 0}
-  dashSound: {fileID: 8300000, guid: d214c856f274f3944b5f4c47a89d380a, type: 3}
+  dashSound: {fileID: 8300000, guid: 4bdc89b14cbbbdd49844e8e035891082, type: 3}
   jumpSound: {fileID: 8300000, guid: 280ddb6a9a2640a4bbaed5b1d588edab, type: 3}
   isGrounded: 0
   isCrouched: 0
@@ -398,7 +398,7 @@ PrefabInstance:
     - target: {fileID: 5378872986086976266, guid: b74cee98329249544a629649d44aef04, type: 3}
       propertyPath: AttackRadius
       value: 
-      objectReference: {fileID: 7945437467255769747}
+      objectReference: {fileID: 0}
     - target: {fileID: 5378872986086976266, guid: b74cee98329249544a629649d44aef04, type: 3}
       propertyPath: liquidSystem
       value: 
@@ -444,17 +444,6 @@ ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 7682328775094582060, guid: b74cee98329249544a629649d44aef04, type: 3}
   m_PrefabInstance: {fileID: 3201629900330821533}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7945437467255769747 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4768648080543247630, guid: b74cee98329249544a629649d44aef04, type: 3}
-  m_PrefabInstance: {fileID: 3201629900330821533}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cbd632a450198934cb3bc8fda2a1cb65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!198 &8845650920039336151 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 6245483104651292490, guid: b74cee98329249544a629649d44aef04, type: 3}

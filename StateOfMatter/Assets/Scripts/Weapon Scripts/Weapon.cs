@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,8 +21,6 @@ public class Weapon : MonoBehaviour
     [SerializeField]
     private ParticleSystem solidSystem;
     private ParticleSystem[] FiringSystem;
-    [SerializeField]
-    private WeaponAttackRadius AttackRadius;
 
     [Space]
 
@@ -32,6 +31,9 @@ public class Weapon : MonoBehaviour
     public float pulseRange = 3.0f;
     [Tooltip("The force of the pulse to apply to enemies caught in it.")]
     public float pulseForce = 150.0f;
+    [Tooltip("Pulse ability cooldown, in seconds.")]
+    public float pulseCooldown = 1.0f;
+    private float pulseTimer;
 
     [Space]
 
@@ -65,14 +67,18 @@ public class Weapon : MonoBehaviour
 
     [Space]
 
-    [Header("Gas Spreader")]
+    [Header("Gas Cloud Emitter")]
     [Tooltip("The total damage to apply for a gas cloud.")]
     public float gasDmg = 50.0f;
     [Tooltip("Max range of the gas cloud.")]
     public float gasRange = int.MaxValue;
     [Tooltip("Gas Mode Rounds (clouds) Per Minute.")]
-    public float gasRPM = 320.0f;
+    public float gasRPM = 200.0f;
     private float gasAtkTimer;
+    [Tooltip("Gas cloud spawn pool count.")]
+    public int gasCloudPoolCount = 100;
+    private Queue<GameObject> gasClouds;
+    public GameObject gasCloudPrefab;
 
     [Space]
 
@@ -98,15 +104,23 @@ public class Weapon : MonoBehaviour
 
     private void Awake()
     {
-        solidAtkTimer = liquidAtkTimer = gasAtkTimer = 0.0f;
+        solidAtkTimer = liquidAtkTimer = gasAtkTimer = pulseTimer = 0.0f;
 
         player = GameObject.FindGameObjectWithTag("Player");
         playerCam = player.transform.GetComponentInChildren<Camera>().gameObject;
         enemyManager = GameObject.FindGameObjectWithTag("EnemyManager").GetComponent<EnemyManager>();
         FiringSystem = new ParticleSystem[3] { solidSystem, liquidSystem, gasSystem  };
-        //AttackRadius.OnStay += DamageEnemy;
 
-        //AttackRadius.MeltEnter += DamageMeltable;
+        gasClouds = new Queue<GameObject>();
+        // Fill the cloud pool
+        for (int i = 0; i < gasCloudPoolCount; i++)
+        {
+            GameObject newCloud = Instantiate(gasCloudPrefab);
+            newCloud.SetActive(false);
+            //newCloud.GetComponent<GasAttacker>().OnStay += DamageEnemy;
+            newCloud.GetComponent<GasAttacker>().MeltEnter += DamageMeltable;
+            gasClouds.Enqueue(newCloud);
+        }
 
         //FiringSystem = new ParticleSystem[3] { waterSystem, steamSystem, iceSystem };
         source = gameObject.AddComponent<AudioSource>();
@@ -139,21 +153,26 @@ public class Weapon : MonoBehaviour
         solidAtkTimer -= Time.deltaTime;
         liquidAtkTimer -= Time.deltaTime;
         gasAtkTimer -= Time.deltaTime;
+        pulseTimer -= Time.deltaTime;
 
         // Primary fire - differs depending on state
         TryFire();
 
         // Pulse ability - apply a knockback to all enemies in front in a cone
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1) && pulseTimer <= 0.0f)
         {
-            foreach (GameObject enemy in enemyManager.Enemies.Values)
+            pulseTimer = pulseCooldown;
+            GameObject[] enemyArr = new GameObject[enemyManager.Enemies.Count];
+            enemyManager.Enemies.Values.CopyTo(enemyArr, 0);
+
+            for (int i = enemyArr.Length - 1; i >= 0; i--)
             {
-                Vector3 enemyDir = enemy.transform.position - player.transform.position;
+                Vector3 enemyDir = enemyArr[i].transform.position - player.transform.position;
 
                 // If enemy is in pulse range
                 if (enemyDir.sqrMagnitude < Mathf.Pow(pulseRange, 2) && 
                     Mathf.Acos(Vector3.Dot(player.transform.forward, enemyDir.normalized)) * Mathf.Rad2Deg < pulseAngle)
-                    enemy.GetComponent<EnemyStats>().Knockback(player.transform.position, pulseForce);
+                    enemyArr[i].GetComponent<EnemyStats>().Knockback(player.transform.position, pulseForce);
             }
         }
 
@@ -183,12 +202,6 @@ public class Weapon : MonoBehaviour
         }
 
         fireSoundTimer -= Time.deltaTime;
-    }
-
-    //Call Afflict when the enemy gets into the attack radius
-    private void DamageEnemy(EnemyStats enemy)
-    {
-        enemy.Afflict(GetMatterState(), effectDur);
     }
 
     //Begin Damaging ice when it enters the radius.
@@ -222,13 +235,12 @@ public class Weapon : MonoBehaviour
     //Sets particle system and hitbox to turn on and off respectively 
     private void TryFire()
     {
-        //AttackRadius.gameObject.SetActive(true);
         source.loop = true;
 
         // Determine the firing mode
         switch (currentMode)
         {
-            case MatterState.Ice: //ice
+            case MatterState.Ice: // Solid
                 if (Input.GetMouseButtonDown(0) && solidAtkTimer <= 0.0f)
                 {
                     solidAtkTimer = 1 / (solidRPM / 60.0f);
@@ -244,7 +256,7 @@ public class Weapon : MonoBehaviour
                 }
                 break;
 
-            case MatterState.Water:
+            case MatterState.Water: // Liquid
                 if (Input.GetMouseButton(0) && liquidAtkTimer <= 0.0f)
                 {
                     liquidAtkTimer = 1 / (liquidRPM / 60.0f);
@@ -255,13 +267,19 @@ public class Weapon : MonoBehaviour
                 }
                 break;
 
-            case MatterState.Gas: //gas
+            case MatterState.Gas: // Gas
 
                 if (Input.GetMouseButton(0) && gasAtkTimer <= 0.0f)
                 {
                     gasAtkTimer = 1 / (gasRPM / 60.0f);
 
-                    // TODO: implement cloud thingy
+                    // Emit a gas cloud from the pool (dequeuing it, activating it, then requeuing it)
+                    if (!gasClouds.Peek().activeSelf)
+                    {
+                        GameObject activatedCloud = gasClouds.Dequeue();
+                        activatedCloud.GetComponent<GasAttacker>().Spawn(transform.position + transform.forward, transform.rotation, 5.0f);
+                        gasClouds.Enqueue(activatedCloud);
+                    }
 
                     // activate particles
                     FiringSystem[(int)currentMode].gameObject.SetActive(true);
@@ -308,7 +326,7 @@ public class Weapon : MonoBehaviour
             {
                 EnemyStats statsComponent = hit.transform.gameObject.GetComponent<EnemyStats>();
                 statsComponent.TakeDamage(dmg);
-                statsComponent.Afflict(currentMode, 5.0f);
+                statsComponent.Afflict(currentMode, effectDur);
             }
         }
     }
@@ -363,7 +381,7 @@ public class Weapon : MonoBehaviour
                     {
                         EnemyStats statsComponent = hit.transform.gameObject.GetComponent<EnemyStats>();
                         statsComponent.TakeDamage(dmgPerPellet);
-                        statsComponent.Afflict(currentMode, 5.0f, 0.1f);
+                        statsComponent.Afflict(currentMode, effectDur, 0.15f);
                     }
                 }
             }

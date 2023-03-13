@@ -200,7 +200,6 @@ Transform:
   - {fileID: 3048765007960746231}
   - {fileID: 4442594412290032323}
   - {fileID: 2129484360422434142}
-  - {fileID: 5491112581417440655}
   - {fileID: 7506794336358194720}
   - {fileID: 6719240292747588706}
   - {fileID: 1647995644216343696}
@@ -222,21 +221,29 @@ MonoBehaviour:
   gasSystem: {fileID: 0}
   liquidSystem: {fileID: 0}
   solidSystem: {fileID: 0}
-  AttackRadius: {fileID: 0}
   pulseAngle: 45
   pulseRange: 3
   pulseForce: 150
   innerSpreadAngle: 5
   outerSpreadAngle: 15
-  maxRange: 30
+  solidRange: 30
   innerPelletCount: 3
   outerPelletCount: 7
   pelletDamage: 5
+  solidRPM: 75
+  liquidDmg: 1.7
+  liquidRange: 2.1474836e+9
+  liquidRPM: 1000
+  gasDmg: 50
+  gasRange: 2.1474836e+9
+  gasRPM: 320
+  gasCloudPoolCount: 100
+  gasCloudPrefab: {fileID: 4412169943812523958, guid: a640520e837623246acd56ec9706ddd1, type: 3}
   debug: 0
-  effectDur: 3
+  effectDur: 5
   source: {fileID: 0}
-  steamFireSound: {fileID: 0}
-  freezeFireSound: {fileID: 0}
+  steamFireSound: {fileID: 8300000, guid: bbf1c6d3754b89d4b8a1c91aaaf0b6b5, type: 3}
+  freezeFireSound: {fileID: 8300000, guid: c76990b4719b04f47acf3a014b8b47aa, type: 3}
 --- !u!1 &2034437677648025772
 GameObject:
   m_ObjectHideFlags: 0
@@ -268,7 +275,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2220838805072577538}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &6245483104651292490
 ParticleSystem:
@@ -5080,7 +5087,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2220838805072577538}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &408753945889414812
 ParticleSystem:
@@ -10110,65 +10117,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &8136022400150236223
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5491112581417440655}
-  - component: {fileID: 172566959151997531}
-  - component: {fileID: 4768648080543247630}
-  m_Layer: 3
-  m_Name: AttackRadius
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5491112581417440655
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8136022400150236223}
-  m_LocalRotation: {x: 0.009128707, y: -0.7099295, z: 0.7041475, w: 0.009650606}
-  m_LocalPosition: {x: -3.27, y: 0.03, z: -11.07}
-  m_LocalScale: {x: 6.747, y: 22.24, z: 6.747}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2220838805072577538}
-  m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 89.531, y: -174.081, z: 4.397}
---- !u!136 &172566959151997531
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8136022400150236223}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4768648080543247630
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8136022400150236223}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cbd632a450198934cb3bc8fda2a1cb65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &7503838712614497148
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10186,7 +10134,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4363000815121756, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4363000815121756, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}
       propertyPath: m_LocalScale.x
