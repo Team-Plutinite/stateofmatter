@@ -14,6 +14,9 @@ public enum PlayerMoveState
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField]
+    private bool movementLocked;
+
     // Instance Editable variables
     [Header("Walk & Crouch Settings")]
     public float maxWalkSpeed = 5.0f;
@@ -67,8 +70,6 @@ public class PlayerController : MonoBehaviour
     private float jumpTime;
     [SerializeField]
     private bool onLadder;
-    [SerializeField]
-    private bool movementLocked;
 
     // Internal dash data
     private float dashCoolCountdown, dashEventCountdown;
@@ -112,11 +113,11 @@ public class PlayerController : MonoBehaviour
         if (movementLocked)  
         {
             // CAMERA CONTROL \\
-            camPitch += Input.GetAxisRaw("Mouse X") * (lookSensitivity);
-            camYaw = Mathf.Clamp(camYaw + (Input.GetAxisRaw("Mouse Y") * lookSensitivity), -90, 90);
-            camRotQuat.eulerAngles = new(0, camPitch, 0);
-            body.MoveRotation(camRotQuat.normalized); // camera pitch (also character transform pitch)
-            camTransform.localRotation = Quaternion.Euler(-camYaw, 0, 0); // camera yaw
+            //camPitch += Input.GetAxisRaw("Mouse X") * (lookSensitivity);
+            //camYaw = Mathf.Clamp(camYaw + (Input.GetAxisRaw("Mouse Y") * lookSensitivity), -90, 90);
+            //camRotQuat.eulerAngles = new(0, camPitch, 0);
+            //body.MoveRotation(camRotQuat.normalized); // camera pitch (also character transform pitch)
+            //camTransform.localRotation = Quaternion.Euler(-camYaw, 0, 0); // camera yaw
         }
 
         // -- GAMEPLAY MODE -- \\ 
@@ -163,7 +164,7 @@ public class PlayerController : MonoBehaviour
         // for testing; spawn an enemy
         if (Input.GetKeyDown(KeyCode.P))
         {
-            if (Physics.Raycast(transform.position, camTransform.forward, out RaycastHit hit, 100, ~(1 << 6)))
+            if (Physics.Raycast(transform.position, camTransform.forward, out RaycastHit hit, 100, ~(1 << 3 | 1 << 6)))
                 GameObject.Find("EnemyManager").GetComponent<EnemyManager>().SpawnEnemy(100, hit.point, Vector3.zero);
         }
     }
