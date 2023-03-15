@@ -245,6 +245,10 @@ public class Weapon : MonoBehaviour
     //Sets particle system and hitbox to turn on and off respectively 
     private void TryFire()
     {
+        // activate particles
+       // FiringSystem[(int)currentMode].gameObject.SetActive(true);
+
+        //AttackRadius.gameObject.SetActive(true);
         source.loop = true;
 
         // Determine the firing mode
