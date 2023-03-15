@@ -2,17 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GunPickup : MonoBehaviour, IInteractable
+public class GunPickup : MonoBehaviour
 {
     public GameObject playerGun; // Reference to the gun on the player
+    public GameObject player;
 
-    public void Activate()
+
+    public void OnTriggerEnter(Collider other)
     {
-        gameObject.SetActive(false);
-        // play equipping animation
-        // play some sort of sound
-        // etc etc etc...
-        playerGun.SetActive(true);
+        if (other.gameObject == player)
+        {
+            gameObject.SetActive(false);
+            // play equipping animation
+            // play some sort of sound
+            // etc etc etc...
+            playerGun.SetActive(true);
+        }
+    }
+    
+public void Activate()
+    {
+        
         
     }
 }

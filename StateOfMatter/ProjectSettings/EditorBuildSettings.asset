@@ -9,6 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/TestingGrounds-Mert/TestingGround-Mert MainMenu.unity
     guid: 90b02b66e30ac7748bde1229dffc7c98
   - enabled: 1
-    path: Assets/Scenes/LevelLayout 1.unity
-    guid: f978679451ca5b84b9d257eec7d19b9d
+    path: Assets/Scenes/Level1 O3DEDemo.unity
+    guid: 29b73f4a594450043906122905496e52
   m_configObjects: {}
