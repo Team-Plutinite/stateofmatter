@@ -9,6 +9,7 @@ public class EnemyManager : MonoBehaviour
 {
     private Dictionary<int, GameObject> activeEnemies;
     private Queue<GameObject> inactiveEnemies;
+    private GameObject[] enemyHomes; // currently spawns in at homes; this can be refactored to have spawns and homes seperated. however rn homes = spawns
 
     [Tooltip("The size of the enemy object pool.")]
     public int poolSize;
@@ -30,6 +31,16 @@ public class EnemyManager : MonoBehaviour
             newEnemy.GetComponent<EnemyStats>().manager = this;
             newEnemy.SetActive(false);
             inactiveEnemies.Enqueue(newEnemy);
+        }
+
+        // Create list of enemy homes
+        enemyHomes = GameObject.FindGameObjectsWithTag("EnemyHome");
+
+        // Spawn enemies based on homes
+
+        for (int i = 0; i < enemyHomes.Length; i++)
+        {
+            SpawnEnemy(100, enemyHomes[i].transform.position, Vector3.zero, player, enemyHomes[i].transform);
         }
     }
 

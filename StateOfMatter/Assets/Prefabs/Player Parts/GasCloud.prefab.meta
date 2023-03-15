@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:StateOfMatter/Assets/Prefabs/Plate.prefab.meta
+guid: 31702495fcb0f0040898e8483cf578fb
+========
 guid: a640520e837623246acd56ec9706ddd1
+>>>>>>>> main:StateOfMatter/Assets/Prefabs/Player Parts/GasCloud.prefab.meta
 PrefabImporter:
   externalObjects: {}
   userData: 

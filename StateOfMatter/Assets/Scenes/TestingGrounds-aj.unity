@@ -282,7 +282,11 @@ PrefabInstance:
     - target: {fileID: 7407261492800933015, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: AttackRadius
       value: 
-      objectReference: {fileID: 457272522}
+      objectReference: {fileID: 0}
+    - target: {fileID: 7407261492800933015, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
+      propertyPath: gasCloudPrefab
+      value: 
+      objectReference: {fileID: 4412169943812523958, guid: 31702495fcb0f0040898e8483cf578fb, type: 3}
     - target: {fileID: 7407261492800933015, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
       propertyPath: innerSpreadAngle
       value: 2.5
@@ -668,17 +672,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &457272522 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7945437467255769747, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
-  m_PrefabInstance: {fileID: 272935366}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cbd632a450198934cb3bc8fda2a1cb65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &463631438
 PrefabInstance:
   m_ObjectHideFlags: 0
