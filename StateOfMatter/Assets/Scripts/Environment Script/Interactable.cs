@@ -19,10 +19,10 @@ public class Interactable : MonoBehaviour
     public Component interactableComponent;
     
     public bool isInteractable;
-    
-    // these two public for debug purposes; isinteractable should stay toggleable in inspector
-    public bool isInRange;
     public bool isActivated;
+
+    //public for debug purposes
+    public bool isInRange;
 
     private IInteractable interactableScript;
     private IActivatable activatableScript;
@@ -33,7 +33,7 @@ public class Interactable : MonoBehaviour
     void Start()
     {
         isInRange = false;
-        isActivated = false;
+        //isActivated = false;
 
         interactRadius.InteractableEnter += InteractableInRange;
         interactRadius.InteractableExit += InteractableOutOfRange;
@@ -67,9 +67,12 @@ public class Interactable : MonoBehaviour
     {
         if (isInteractable && isInRange && Input.GetKey(KeyCode.E))
         {
+            isActivated = true;
+        }
+        if (isActivated)
+        {
             interactableScript.Activate();
             activatableScript.Activate();
-            isActivated = true;
         }
     }
 
