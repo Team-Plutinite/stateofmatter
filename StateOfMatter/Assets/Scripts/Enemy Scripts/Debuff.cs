@@ -8,6 +8,7 @@ public delegate void DebuffAction();
 // class to represent an enemy's debuff
 public class Debuff
 {
+    private float maxTime;
     private float debuffTimer;
     private float pauseTimer;
     private DebuffAction initialAction;
@@ -17,6 +18,7 @@ public class Debuff
     public Debuff(float time, DebuffAction initialAction, DebuffAction tickAction, DebuffAction finalAction)
     {
         debuffTimer = time;
+        maxTime = time;
         pauseTimer = 0.0f;
         this.initialAction = initialAction;
         this.tickAction = tickAction;
@@ -68,5 +70,10 @@ public class Debuff
     public void Pause(float time)
     {
         pauseTimer = time;
+    }
+
+    public void ResetTimer()
+    {
+        debuffTimer = maxTime;
     }
 }

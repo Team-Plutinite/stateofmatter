@@ -7,11 +7,12 @@ TagManager:
   - Enemy
   - Interactable
   - EnemyManager
+  - EnemyHome
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Attack Radius
+  - GasCloud
   - Water
   - UI
   - PlayerMask
