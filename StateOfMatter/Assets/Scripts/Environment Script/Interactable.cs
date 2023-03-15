@@ -10,6 +10,7 @@ public interface IInteractable
 public interface IActivatable
 {
     public abstract void Activate();
+    public abstract void Deactivate();
 }
 
 public class Interactable : MonoBehaviour
@@ -17,8 +18,10 @@ public class Interactable : MonoBehaviour
     public GameObject objectToActivate;
     public Component interactableComponent;
     
-    public bool isInRange;
     public bool isInteractable;
+    
+    // these two public for debug purposes; isinteractable should stay toggleable in inspector
+    public bool isInRange;
     public bool isActivated;
 
     private IInteractable interactableScript;
@@ -30,7 +33,6 @@ public class Interactable : MonoBehaviour
     void Start()
     {
         isInRange = false;
-        isInteractable = false;
         isActivated = false;
 
         interactRadius.InteractableEnter += InteractableInRange;
