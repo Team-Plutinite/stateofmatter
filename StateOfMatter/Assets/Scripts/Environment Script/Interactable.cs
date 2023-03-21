@@ -10,6 +10,7 @@ public interface IInteractable
 public interface IActivatable
 {
     public abstract void Activate();
+    public abstract void Deactivate();
 }
 
 public class Interactable : MonoBehaviour
@@ -17,36 +18,42 @@ public class Interactable : MonoBehaviour
     public GameObject objectToActivate;
     public Component interactableComponent;
     
-    public bool isInRange;
     public bool isInteractable;
     public bool isActivated;
+
+    //public for debug purposes
+    public bool isInRange;
 
     private IInteractable interactableScript;
     private IActivatable activatableScript;
     [SerializeField]
-    private InteractRadius interactRadius;
+    public InteractRadius interactRadius;
 
     // Start is called before the first frame update
     void Start()
     {
         isInRange = false;
-        isInteractable = false;
-        isActivated = false;
-
+        //isActivated = false;
+        interactableScript = (IInteractable)interactableComponent;
         interactRadius.InteractableEnter += InteractableInRange;
         interactRadius.InteractableExit += InteractableOutOfRange;
-        try
+        if (objectToActivate != null)
         {
-            activatableScript = objectToActivate.GetComponent<IActivatable>();
-        } catch 
-        {
-            Debug.Log("No activatable script on object to activate");
+            try
+            {
+                activatableScript = objectToActivate.GetComponent<IActivatable>();
+            }
+            catch
+            {
+                Debug.Log("No activatable script on object to activate");
+            }
         }
     }
 
 
     private void OnValidate()
     {
+        /*
         // checks if the component has the interactable interface. if it does, cast it to it
         if (!(interactableComponent is IInteractable))
         {
@@ -56,18 +63,29 @@ public class Interactable : MonoBehaviour
         {
             interactableScript = (IInteractable)interactableComponent;
         }
-
+        */
 
     }
 
     // Update is called once per frame
     void Update()
     {
+        /*
+        if (Input.GetKey(KeyCode.E))
+        {
+            Debug.Log("attempted interaction");
+        }
+        */
         if (isInteractable && isInRange && Input.GetKey(KeyCode.E))
         {
+            isActivated = true;
+        }
+        if (isActivated)
+        {
+            //if (interactableScript != null) interactableScript.Activate();
             interactableScript.Activate();
             activatableScript.Activate();
-            isActivated = true;
+            isActivated = false;
         }
     }
 

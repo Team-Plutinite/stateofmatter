@@ -21,4 +21,9 @@ public class BasicDoor : MonoBehaviour, IActivatable
     {
         animatorComponent.SetTrigger("Activate");
     }
+
+    public void Deactivate()
+    {
+        animatorComponent.SetTrigger("Deactivate");
+    }
 }

@@ -7,7 +7,21 @@ public class DoorTrigger : MonoBehaviour
     [SerializeField]
     private List<PressurePlate> pressurePlates;
 
+    private IActivatable activatableScript;
+
     bool IsOpen = false;
+
+    private void Start()
+    {
+        try
+        {
+            activatableScript = gameObject.GetComponent<IActivatable>();
+        }
+        catch
+        {
+            Debug.Log("No activatable script on object to activate");
+        }
+    }
 
     private void Update()
     {
@@ -18,8 +32,10 @@ public class DoorTrigger : MonoBehaviour
         }
     }
 
+    // This can probably be condensed into just being in the Update method?
     public void OpenDoor()
     {
+        activatableScript.Activate();
         Debug.Log("Door Open");
     }
 }

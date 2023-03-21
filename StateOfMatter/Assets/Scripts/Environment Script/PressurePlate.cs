@@ -6,14 +6,15 @@ using UnityEngine;
 
 public class PressurePlate : MonoBehaviour
 {
+    [SerializeField] // serialized for debug purposes
     private bool pressed = false;
-
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Player" || other.gameObject.tag == "Enemy")
+        if (other.gameObject.tag == "Player" || other.gameObject.tag == "Enemy" || other.gameObject.tag == "Weight")
         {
             this.pressed = true;
+            //gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 0.5f,gameObject.transform.position.z);
             Debug.Log(pressed + " On Plate");
         }
     }
@@ -21,9 +22,10 @@ public class PressurePlate : MonoBehaviour
     
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Player" || other.gameObject.tag == "Enemy")
+        if (other.gameObject.tag == "Player" || other.gameObject.tag == "Enemy" || other.gameObject.tag == "Weight")
         {
             this.pressed = false;
+            //gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 0.5f, gameObject.transform.position.z);
             Debug.Log(pressed + " Off Plate");            
         }
 
