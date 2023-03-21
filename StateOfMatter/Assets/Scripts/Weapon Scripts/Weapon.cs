@@ -136,6 +136,8 @@ public class Weapon : MonoBehaviour
             debugLines.endWidth = 0.01f;
             debugLines.loop = true;
         }
+
+        currentMode = MatterState.Gas;
     }
 
     public MatterState GetMatterState()
