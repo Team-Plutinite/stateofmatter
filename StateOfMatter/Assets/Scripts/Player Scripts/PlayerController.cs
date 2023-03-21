@@ -54,11 +54,14 @@ public class PlayerController : MonoBehaviour
 
     // Camera variables
     private Transform camTransform;
-    private float camPitch = 0, camYaw = 0;
+    private Vector2 camPitchYaw = Vector2.zero;
+    private Vector2 targetCamPitchYaw = Vector2.zero;
     private Quaternion camRotQuat;
 
     // Cutscene camera stuff
     private Vector3 cutsceneLookDir;
+    private float slowCone = 0.5f; // 60-deg
+    private float stopCone = 0.996f; // 5-deg
 
     // grounded, crouched, and ladder states
     [Header("Exposed Debug States")]
@@ -90,19 +93,16 @@ public class PlayerController : MonoBehaviour
         isGrounded = false;
         isCrouched = false;
         onLadder = false;
-        movementLocked = false;
 
         jumpTime = 0.0f;
         dashCoolCountdown = 0.0f;
         dashEventCountdown = dashTime;
         tryDash = false;
         dashDirection = Vector3.zero;
-
         groundNormal = Vector3.zero;
 
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
 
-        source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.2f;
     }
 
@@ -112,23 +112,40 @@ public class PlayerController : MonoBehaviour
         // -- CUTSCENE MODE -- \\
         if (movementLocked)  
         {
-            // CAMERA CONTROL \\
-            //camPitch += Input.GetAxisRaw("Mouse X") * (lookSensitivity);
-            //camYaw = Mathf.Clamp(camYaw + (Input.GetAxisRaw("Mouse Y") * lookSensitivity), -90, 90);
-            //camRotQuat.eulerAngles = new(0, camPitch, 0);
-            //body.MoveRotation(camRotQuat.normalized); // camera pitch (also character transform pitch)
-            //camTransform.localRotation = Quaternion.Euler(-camYaw, 0, 0); // camera yaw
+            static float EaseInOutSine(float x)
+            {
+                return -(Mathf.Cos(Mathf.PI * x) - 1) / 2;
+            }
+
+            // CAMERA CONTROL (Acceleration Mode) \\
+            targetCamPitchYaw.x = (targetCamPitchYaw.x + Input.GetAxisRaw("Mouse X") * lookSensitivity);
+            targetCamPitchYaw.y = Mathf.Clamp(targetCamPitchYaw.y + (Input.GetAxisRaw("Mouse Y") * lookSensitivity), -90, 90);
+
+            Quaternion targetQuat = Quaternion.Euler(-targetCamPitchYaw.y, targetCamPitchYaw.x, 0f);
+            Quaternion camQuat = Quaternion.Euler(-camPitchYaw.y, camPitchYaw.x, 0f);
+            Vector2 camVel = (targetCamPitchYaw - camPitchYaw).normalized * (lookSensitivity * 100) * Time.deltaTime;
+
+            camPitchYaw += Quaternion.Dot(targetQuat, camQuat) < slowCone ? camVel :
+                camVel * EaseInOutSine(1 - (Quaternion.Dot(targetQuat, camQuat) - slowCone) / (stopCone - slowCone));
+
+            // Rotate if camera rotation has not reached target rotation
+            if (Quaternion.Dot(targetQuat, camQuat) < stopCone)
+            {
+                camRotQuat.eulerAngles = new(0, camPitchYaw.x, 0);
+                body.MoveRotation(camRotQuat.normalized); // camera pitch (also character transform pitch)
+                camTransform.localRotation = Quaternion.Euler(-camPitchYaw.y, 0, 0); // camera yaw
+            }
         }
 
         // -- GAMEPLAY MODE -- \\ 
         else
         {
             // CAMERA CONTROL \\
-            camPitch += Input.GetAxisRaw("Mouse X") * lookSensitivity;
-            camYaw = Mathf.Clamp(camYaw + (Input.GetAxisRaw("Mouse Y") * lookSensitivity), -90, 90);
-            camRotQuat.eulerAngles = new(0, camPitch, 0);
+            camPitchYaw.x += Input.GetAxisRaw("Mouse X") * lookSensitivity;
+            camPitchYaw.y = Mathf.Clamp(camPitchYaw.y + (Input.GetAxisRaw("Mouse Y") * lookSensitivity), -90, 90);
+            camRotQuat.eulerAngles = new(0, camPitchYaw.x, 0);
             body.MoveRotation(camRotQuat.normalized); // camera pitch (also character transform pitch)
-            camTransform.localRotation = Quaternion.Euler(-camYaw, 0, 0); // camera yaw
+            camTransform.localRotation = Quaternion.Euler(-camPitchYaw.y, 0, 0); // camera yaw
 
             // GROUND-ONLY MOVEMENT CONTROLS \\
             if (isGrounded && jumpTime <= 0.0f)
