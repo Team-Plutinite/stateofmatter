@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
 public enum PlayerMoveState
 {
@@ -100,6 +101,7 @@ public class PlayerController : MonoBehaviour
         tryDash = false;
         dashDirection = Vector3.zero;
         groundNormal = Vector3.zero;
+        cutsceneLookDir = transform.forward;
 
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
 
@@ -117,16 +119,23 @@ public class PlayerController : MonoBehaviour
                 return -(Mathf.Cos(Mathf.PI * x) - 1) / 2;
             }
 
-            // CAMERA CONTROL (Acceleration Mode) \\
-            targetCamPitchYaw.x = (targetCamPitchYaw.x + Input.GetAxisRaw("Mouse X") * lookSensitivity);
-            targetCamPitchYaw.y = Mathf.Clamp(targetCamPitchYaw.y + (Input.GetAxisRaw("Mouse Y") * lookSensitivity), -90, 90);
+            // CAMERA CONTROL (Smooth Mode) \\
+            Vector2 temp = targetCamPitchYaw;
+            temp.x += Input.GetAxisRaw("Mouse X") * lookSensitivity;
+            temp.y = Mathf.Clamp(targetCamPitchYaw.y + (Input.GetAxisRaw("Mouse Y") * lookSensitivity), -90, 90);
 
-            Quaternion targetQuat = Quaternion.Euler(-targetCamPitchYaw.y, targetCamPitchYaw.x, 0f);
+            Quaternion targetQuat = Quaternion.Euler(-temp.y, temp.x, 0f);
             Quaternion camQuat = Quaternion.Euler(-camPitchYaw.y, camPitchYaw.x, 0f);
-            Vector2 camVel = (targetCamPitchYaw - camPitchYaw).normalized * (lookSensitivity * 100) * Time.deltaTime;
+            Matrix4x4 rot = Matrix4x4.Rotate(targetQuat);
 
+            Debug.Log(Vector3.Dot(cutsceneLookDir, rot * Vector3.forward));
+            if (Vector3.Dot(cutsceneLookDir, rot * Vector3.forward) > 0.866f)
+            {
+                targetCamPitchYaw = temp;
+            }
+            Vector2 camVel = (lookSensitivity * 100) * Time.deltaTime * (targetCamPitchYaw - camPitchYaw).normalized;
             camPitchYaw += Quaternion.Dot(targetQuat, camQuat) < slowCone ? camVel :
-                camVel * EaseInOutSine(1 - (Quaternion.Dot(targetQuat, camQuat) - slowCone) / (stopCone - slowCone));
+                camVel * (1 - (Quaternion.Dot(targetQuat, camQuat) - slowCone) / (stopCone - slowCone));
 
             // Rotate if camera rotation has not reached target rotation
             if (Quaternion.Dot(targetQuat, camQuat) < stopCone)
