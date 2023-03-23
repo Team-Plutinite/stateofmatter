@@ -11,12 +11,17 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: black
-    second: {fileID: 2100000, guid: 6a614116c5d2fc04fb9e327be06006d1, type: 2}
+    second: {fileID: 2100000, guid: 8d14667171bcab84dac9c4b97bbcfc66, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: blue
     second: {fileID: 2100000, guid: 6a614116c5d2fc04fb9e327be06006d1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: olive
+    second: {fileID: 2100000, guid: 8b669365cad0a184d9416716d5f5ab3e, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
