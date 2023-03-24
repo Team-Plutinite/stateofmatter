@@ -13,14 +13,18 @@ public class Lever : MonoBehaviour, IInteractable
 
     public Material LeverOnMaterial;
 
-    // Start is called before the first frame update
+    public AudioSource source;
+    public AudioClip leverSound;
+
     void Start()
     {
         animatorComponent = lever.GetComponent<Animator>();
         interactableComponent = gameObject.GetComponent<Interactable>();
+
+        source = gameObject.AddComponent<AudioSource>();
+        source.volume = 0.3f;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (!ice.gameObject.activeSelf)
@@ -34,5 +38,7 @@ public class Lever : MonoBehaviour, IInteractable
         animatorComponent.SetTrigger("Activate");
 
         lever.GetComponent<MeshRenderer>().material = LeverOnMaterial;
+
+        source.PlayOneShot(leverSound);
     }
 }
