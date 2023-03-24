@@ -24,6 +24,8 @@ public class CheckpointManager : MonoBehaviour
         if (checkpointData == null)
         {
             // this is bad and should never happen. but if it does... who knows
+            // though, i guess having no solution for IF this happens is technically worse. 
+            // for M3, and future, we should build in a sorta "default spawn" checkpoint which this will default to if nothing is passed in
         } else
         {
             // reset player transform
@@ -33,6 +35,17 @@ public class CheckpointManager : MonoBehaviour
             player.transform.localScale = checkpointData.playerTransform.localScale;
 
             player.GetComponent<PlayerController>().hasGun = checkpointData.playerHasGun;
+            if (checkpointData.playerHasGun)
+            {
+                GameObject gunPickup;
+                gunPickup = GameObject.Find("GunPickup");
+                if (gunPickup != null)
+                {
+                    gunPickup.SetActive(false);
+                }
+            }
+
+            player.GetComponent<PlayerStats>().hp = 5;
 
             // removes unnecessary homes and despawns/respawns all enemies
             GameObject enemyManager = GameObject.FindGameObjectWithTag("EnemyManager");

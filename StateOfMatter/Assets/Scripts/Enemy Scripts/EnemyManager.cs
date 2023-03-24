@@ -24,6 +24,7 @@ public class EnemyManager : MonoBehaviour
     {
         activeEnemies = new Dictionary<int, GameObject>();
         inactiveEnemies = new Queue<GameObject>();
+        enemyHomes = new List<GameObject>();
 
         // Create the enemy pool
         for (int i = 0; i < poolSize; i++)
@@ -128,9 +129,11 @@ public class EnemyManager : MonoBehaviour
 
     public void DespawnAllEnemies()
     {
-        for (int i = 0; i < activeEnemies.Count; i++)
+        GameObject[] enemyArr = new GameObject[Enemies.Count];
+        Enemies.Values.CopyTo(enemyArr, 0);
+        for (int i = 0; i < enemyArr.Length; i++)
         {
-            activeEnemies[i].GetComponent<EnemyStats>().TakeDamage(999);
+            enemyArr[i].GetComponent<EnemyStats>().TakeDamage(999);
         }
     }
 

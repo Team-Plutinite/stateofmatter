@@ -40,9 +40,16 @@ public class Lever : MonoBehaviour, IInteractable
 
     public void Deactivate()
     {
+        // reset animations
         animatorComponent.Rebind();
         animatorComponent.Update(0f);
+        // turn material to off material
         lever.GetComponent<MeshRenderer>().material = LeverOffMaterial;
+        // bring back ice
+        if (!ice.gameObject.activeSelf)
+        {
+            ice.gameObject.SetActive(true);
+        }
 
     }
 }

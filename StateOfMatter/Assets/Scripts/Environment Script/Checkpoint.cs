@@ -39,13 +39,15 @@ public class Checkpoint : MonoBehaviour
     public List<GameObject> objectsToDeactivate;
     public List<GameObject> interactablesToActivate;
 
-    private GameObject player;
+    public GameObject checkpointManager;
+
+    //private GameObject player;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        player = GameObject.FindWithTag("Player");
+        //player = GameObject.FindWithTag("Player");
     }
 
     // Update is called once per frame
@@ -56,7 +58,7 @@ public class Checkpoint : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.transform.parent.gameObject == player)
+        if (other.CompareTag("Player"))
         {
             if (respawnTransform == null)
             {
@@ -64,7 +66,8 @@ public class Checkpoint : MonoBehaviour
             }
 
             CheckpointDataObject checkpointData = new CheckpointDataObject(enemyHomesToRemove, objectsToDeactivate, interactablesToActivate, respawnTransform, playerHasGun);
-            GameObject.FindWithTag("CheckpointManager").GetComponent<CheckpointManager>().checkpointData = checkpointData;
+            checkpointManager.GetComponent<CheckpointManager>().checkpointData = checkpointData;
+            
 
         }
     }
