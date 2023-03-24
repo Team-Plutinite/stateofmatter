@@ -25,4 +25,8 @@ public class ForwardButton : MonoBehaviour, IInteractable
         feed.BackButton = false;
     }
 
+    public void Deactivate()
+    {
+        
+    }
 }

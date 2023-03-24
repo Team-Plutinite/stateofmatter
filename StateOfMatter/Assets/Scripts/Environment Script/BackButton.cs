@@ -25,4 +25,8 @@ public class BackButton : MonoBehaviour, IInteractable
         feed.BackButton = true;
     }
 
+    public void Deactivate()
+    {
+        
+    }
 }
