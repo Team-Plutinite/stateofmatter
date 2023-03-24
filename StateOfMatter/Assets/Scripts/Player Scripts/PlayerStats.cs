@@ -7,6 +7,8 @@ public class PlayerStats : MonoBehaviour
     public float maxHP;
     public float hp;
 
+    public GameObject checkpointManager;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,6 +23,6 @@ public class PlayerStats : MonoBehaviour
 
     void Die()
     {
-        // Nothing yet
+        checkpointManager.GetComponent<CheckpointManager>().RespawnAtCheckpoint();
     }
 }

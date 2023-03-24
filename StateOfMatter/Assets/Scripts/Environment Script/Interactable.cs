@@ -5,6 +5,7 @@ using UnityEngine;
 public interface IInteractable
 {
     public abstract void Activate();
+    public abstract void Deactivate();
 }
 
 public interface IActivatable
@@ -97,6 +98,11 @@ public class Interactable : MonoBehaviour
     private void InteractableOutOfRange(Interactable interactable)
     {
         interactable.isInRange = false;
+    }
+
+    public void Reset()
+    {
+        interactableScript.Deactivate();
     }
 
 }
