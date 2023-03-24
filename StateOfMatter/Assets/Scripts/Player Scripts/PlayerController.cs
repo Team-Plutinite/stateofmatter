@@ -111,6 +111,7 @@ public class PlayerController : MonoBehaviour
         source.volume = 0.2f;
 
         playerGun = GameObject.Find("Player/CameraFollower/Gun_Problem");
+        //source.volume = 0.3f;
     }
 
     // Update is called once per frame
