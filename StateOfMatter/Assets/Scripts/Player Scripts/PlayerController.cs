@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CheckpointData;
 
 public enum PlayerMoveState
 {
@@ -80,6 +81,10 @@ public class PlayerController : MonoBehaviour
     private Rigidbody body;
     private PlayerMoveState moveState;
 
+    public bool hasGun;
+
+    private GameObject playerGun;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -103,7 +108,10 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
 
         source = gameObject.AddComponent<AudioSource>();
-        source.volume = 0.3f;
+        source.volume = 0.2f;
+
+        playerGun = GameObject.Find("Player/CameraFollower/Gun_Problem");
+        //source.volume = 0.3f;
     }
 
     // Update is called once per frame
@@ -158,6 +166,14 @@ public class PlayerController : MonoBehaviour
             // COOLDOWN REDUCTIONS \\
             dashCoolCountdown -= Time.deltaTime;
             jumpTime -= Time.deltaTime;
+
+            if (hasGun && !playerGun.activeSelf)
+            {
+                playerGun.SetActive(true);
+            } else if (!hasGun && playerGun.activeSelf)
+            {
+                playerGun.SetActive(false);
+            }
         }
 
 

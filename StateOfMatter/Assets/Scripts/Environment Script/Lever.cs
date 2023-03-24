@@ -11,8 +11,11 @@ public class Lever : MonoBehaviour, IInteractable
     private Animator animatorComponent;
     private Interactable interactableComponent;
 
+    public Material LeverOffMaterial;
     public Material LeverOnMaterial;
 
+
+    // Start is called before the first frame update
     public AudioSource source;
     public AudioClip leverSound;
 
@@ -40,5 +43,20 @@ public class Lever : MonoBehaviour, IInteractable
         lever.GetComponent<MeshRenderer>().material = LeverOnMaterial;
 
         source.PlayOneShot(leverSound);
+    }
+
+    public void Deactivate()
+    {
+        // reset animations
+        animatorComponent.Rebind();
+        animatorComponent.Update(0f);
+        // turn material to off material
+        lever.GetComponent<MeshRenderer>().material = LeverOffMaterial;
+        // bring back ice
+        if (!ice.gameObject.activeSelf)
+        {
+            ice.gameObject.SetActive(true);
+        }
+
     }
 }
