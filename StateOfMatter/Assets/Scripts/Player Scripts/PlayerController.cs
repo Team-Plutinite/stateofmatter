@@ -103,7 +103,7 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
 
         source = gameObject.AddComponent<AudioSource>();
-        source.volume = 0.2f;
+        source.volume = 0.3f;
     }
 
     // Update is called once per frame

@@ -79,9 +79,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectToActivate: {fileID: 0}
   interactableComponent: {fileID: 3580384766276607714}
-  isInRange: 0
   isInteractable: 1
   isActivated: 0
+  isInRange: 0
   interactRadius: {fileID: 0}
 --- !u!114 &3580384766276607714
 MonoBehaviour:
@@ -98,6 +98,8 @@ MonoBehaviour:
   ice: {fileID: 5366098647265463346}
   lever: {fileID: 2142709448685331859}
   LeverOnMaterial: {fileID: 2100000, guid: 4c4611b4c25c853459e098ccf866fcc8, type: 2}
+  source: {fileID: 0}
+  leverSound: {fileID: 8300000, guid: 374f10009da392f4a8c252e0da642005, type: 3}
 --- !u!1001 &1260171399206410434
 PrefabInstance:
   m_ObjectHideFlags: 0
