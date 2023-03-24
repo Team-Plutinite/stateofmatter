@@ -84,6 +84,7 @@ public class PlayerController : MonoBehaviour
     public bool hasGun;
 
     private GameObject playerGun;
+    private GameObject playerArms;
 
     // Start is called before the first frame update
     void Start()
@@ -111,6 +112,7 @@ public class PlayerController : MonoBehaviour
         source.volume = 0.2f;
 
         playerGun = GameObject.Find("Player/CameraFollower/Gun_Problem");
+        playerArms = GameObject.Find("Player/CameraFollower/SM_Player_SCR/SM_Player_Armed");
         //source.volume = 0.3f;
     }
 
@@ -170,10 +172,14 @@ public class PlayerController : MonoBehaviour
             if (hasGun && !playerGun.activeSelf)
             {
                 playerGun.SetActive(true);
+                //playerArms.SetActive(true);
             } else if (!hasGun && playerGun.activeSelf)
             {
                 playerGun.SetActive(false);
+                //playerArms.SetActive(false);
             }
+            
+            playerArms.SetActive(playerGun.activeSelf);
         }
 
 
