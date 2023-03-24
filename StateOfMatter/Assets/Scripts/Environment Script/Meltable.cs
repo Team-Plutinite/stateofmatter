@@ -14,8 +14,6 @@ public class Meltable : MonoBehaviour
 {
 
     [SerializeField]
-    private float meltHealth = 10.0f;
-    [SerializeField]
     private GameObject melter;
     [SerializeField]
     private Vector3 deltaScaleAll = new Vector3(-0.01f, -0.01f, -0.01f);
