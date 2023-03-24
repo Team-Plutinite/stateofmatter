@@ -184,6 +184,12 @@ public class PlayerController : MonoBehaviour
                 GameObject.Find("EnemyManager").GetComponent<EnemyManager>().SpawnEnemy(100, hit.point, Vector3.zero);
         }
 
+        // kill player
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            gameObject.GetComponent<PlayerStats>().hp = 0;
+        }
+
         /*
         if (Input.GetKeyDown(KeyCode.Escape))
         {
