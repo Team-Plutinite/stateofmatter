@@ -168,10 +168,11 @@ public class PlayerController : MonoBehaviour
                 GameObject.Find("EnemyManager").GetComponent<EnemyManager>().SpawnEnemy(100, hit.point, Vector3.zero);
         }
 
+        /*
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
-        }
+        }*/
     }
 
     private void FixedUpdate()
