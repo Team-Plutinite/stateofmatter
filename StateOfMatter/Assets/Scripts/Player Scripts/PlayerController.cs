@@ -190,10 +190,11 @@ public class PlayerController : MonoBehaviour
             gameObject.GetComponent<PlayerStats>().hp = 0;
         }
 
+        /*
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
-        }
+        }*/
     }
 
     private void FixedUpdate()
