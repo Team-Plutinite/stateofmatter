@@ -11,7 +11,9 @@ public class Lever : MonoBehaviour, IInteractable
     private Animator animatorComponent;
     private Interactable interactableComponent;
 
+    public Material LeverOffMaterial;
     public Material LeverOnMaterial;
+
 
     // Start is called before the first frame update
     void Start()
@@ -34,5 +36,13 @@ public class Lever : MonoBehaviour, IInteractable
         animatorComponent.SetTrigger("Activate");
 
         lever.GetComponent<MeshRenderer>().material = LeverOnMaterial;
+    }
+
+    public void Deactivate()
+    {
+        animatorComponent.Rebind();
+        animatorComponent.Update(0f);
+        lever.GetComponent<MeshRenderer>().material = LeverOffMaterial;
+
     }
 }

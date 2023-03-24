@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public delegate void EnemyAction(GameObject e);
 
@@ -9,7 +10,7 @@ public class EnemyManager : MonoBehaviour
 {
     private Dictionary<int, GameObject> activeEnemies;
     private Queue<GameObject> inactiveEnemies;
-    private GameObject[] enemyHomes; // currently spawns in at homes; this can be refactored to have spawns and homes seperated. however rn homes = spawns
+    private List<GameObject> enemyHomes; // currently spawns in at homes; this can be refactored to have spawns and homes seperated. however rn homes = spawns
 
     [Tooltip("The size of the enemy object pool.")]
     public int poolSize;
@@ -34,11 +35,11 @@ public class EnemyManager : MonoBehaviour
         }
 
         // Create list of enemy homes
-        enemyHomes = GameObject.FindGameObjectsWithTag("EnemyHome");
+        enemyHomes.AddRange(GameObject.FindGameObjectsWithTag("EnemyHome"));
 
         // Spawn enemies based on homes
 
-        for (int i = 0; i < enemyHomes.Length; i++)
+        for (int i = 0; i < enemyHomes.Count; i++)
         {
             SpawnEnemy(100, enemyHomes[i].transform.position, Vector3.zero, player, enemyHomes[i].transform);
         }
@@ -118,6 +119,27 @@ public class EnemyManager : MonoBehaviour
         enemy.SetActive(false);
         inactiveEnemies.Enqueue(enemy);
         return true;
+    }
+
+    public void RemoveHomes(List<GameObject> homesToRemove)
+    {
+        enemyHomes = enemyHomes.Except(homesToRemove).ToList();
+    }
+
+    public void DespawnAllEnemies()
+    {
+        for (int i = 0; i < activeEnemies.Count; i++)
+        {
+            activeEnemies[i].GetComponent<EnemyStats>().TakeDamage(999);
+        }
+    }
+
+    public void SpawnAllEnemies()
+    {
+        for (int i = 0; i < enemyHomes.Count; i++)
+        {
+            SpawnEnemy(100, enemyHomes[i].transform.position, Vector3.zero, player, enemyHomes[i].transform);
+        }
     }
 
     /// <summary>
