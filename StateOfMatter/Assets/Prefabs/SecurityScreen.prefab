@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6408442761678228934}
   - component: {fileID: 6408442761678228931}
   - component: {fileID: 6408442761678228932}
-  - component: {fileID: 6408442761678228933}
   m_Layer: 0
   m_Name: Previous
   m_TagString: Untagged
@@ -60,29 +59,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectToActivate: {fileID: 6408442761790083069}
-  interactableComponent: {fileID: 6408442761678228933}
+  interactableComponent: {fileID: 0}
   isInteractable: 1
   isActivated: 0
   isInRange: 0
   interactRadius: {fileID: 0}
---- !u!114 &6408442761678228933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6408442761678228935}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6f9240270315148aa95cf2a6f6c096, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  securityCams:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  renderTexture: {fileID: 8400000, guid: 37ca7e0476444e6489eb6af7bb564cef, type: 2}
-  backButton: 1
 --- !u!1 &6408442761790083069
 GameObject:
   m_ObjectHideFlags: 0
@@ -462,7 +443,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6408442762904193887}
   - component: {fileID: 6408442762904193884}
-  - component: {fileID: 6408442762904193885}
   - component: {fileID: 6408442762904193886}
   m_Layer: 0
   m_Name: Next
@@ -499,24 +479,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6408442762904193885
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6408442762904193872}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6f9240270315148aa95cf2a6f6c096, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  securityCams:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  renderTexture: {fileID: 8400000, guid: 37ca7e0476444e6489eb6af7bb564cef, type: 2}
-  backButton: 0
 --- !u!114 &6408442762904193886
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -530,7 +492,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectToActivate: {fileID: 6408442761790083069}
-  interactableComponent: {fileID: 6408442762904193885}
+  interactableComponent: {fileID: 0}
   isInteractable: 1
   isActivated: 0
   isInRange: 0

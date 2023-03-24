@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SecurityFeed : MonoBehaviour, IInteractable
+public class SecurityFeed : MonoBehaviour, IActivatable
 {
     [SerializeField]
     private List<Camera> securityCams;
@@ -11,9 +11,11 @@ public class SecurityFeed : MonoBehaviour, IInteractable
     private RenderTexture renderTexture;
 
     [SerializeField]
-    public bool backButton;
-
-    private Interactable interactableComponent;
+    public bool backButton
+    {
+        get { return backButton; }
+        set { backButton = value; }
+    }
 
     private int idx;
 
@@ -21,8 +23,7 @@ public class SecurityFeed : MonoBehaviour, IInteractable
     void Start()
     {
 
-        interactableComponent = gameObject.GetComponent<Interactable>();
-        interactableComponent.isInteractable = true;
+
         idx = 0;
         securityCams[idx].targetTexture = renderTexture;
     }
@@ -48,7 +49,6 @@ public class SecurityFeed : MonoBehaviour, IInteractable
                 securityCams[idx].targetTexture = null ;
                 idx--;
                 securityCams[idx].targetTexture = renderTexture;
-                
             }
             
         }
@@ -68,5 +68,7 @@ public class SecurityFeed : MonoBehaviour, IInteractable
         }
     }
 
-
+    public void Deactivate()
+    {
+    }
 }
