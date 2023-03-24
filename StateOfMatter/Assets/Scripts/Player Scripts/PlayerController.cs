@@ -56,6 +56,7 @@ public class PlayerController : MonoBehaviour
 
     // Cutscene camera stuff
     private Vector3 cutsceneLookDir, targetLookDir, currentLookDir;
+    private Vector2 targetCamPitchYaw;
     private readonly float slowCone = 0.5f; // 60-deg
     private readonly float stopCone = 0.996f; // 5-deg
 
@@ -102,10 +103,10 @@ public class PlayerController : MonoBehaviour
         cutsceneLookDir = transform.forward;
         targetLookDir = transform.forward;
         currentLookDir = transform.forward;
+        targetCamPitchYaw = Vector2.zero;
 
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
 
-        source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.3f;
     }
 
@@ -116,23 +117,26 @@ public class PlayerController : MonoBehaviour
         if (movementLocked)  
         {
             // CAMERA CONTROL (Smooth Mode) \\
-            Vector2 offset = new(Input.GetAxisRaw("Mouse X") * lookSensitivity, Input.GetAxisRaw("Mouse Y") * lookSensitivity);
 
             // Rotate the target looking direction by the mouse movement
-            targetLookDir = Matrix4x4.Rotate(Quaternion.Euler(-offset.y, offset.x, 0f)) * targetLookDir;
+            targetCamPitchYaw.x += Input.GetAxisRaw("Mouse X") * lookSensitivity;  // rotation about y
+            targetCamPitchYaw.y = Mathf.Clamp(targetCamPitchYaw.y + Input.GetAxisRaw("Mouse Y") * lookSensitivity, -90.0f, 90.0f); // rotation about x
 
             // Clamp view angle to inside the allowed look cone
-            if (Vector3.Dot(cutsceneLookDir, targetLookDir) < 0.866f)
-                targetLookDir = Matrix4x4.Rotate(Quaternion.AngleAxis(30.0f, Vector3.Cross(cutsceneLookDir, targetLookDir).normalized)) * cutsceneLookDir;
+            Vector3 dirXZ = Vector3.Normalize(new(cutsceneLookDir.x, 0, cutsceneLookDir.z));
+            targetCamPitchYaw.x = Mathf.Clamp(targetCamPitchYaw.x, Vector3.Angle(Vector3.forward, dirXZ) - 30.0f, Vector3.Angle(Vector3.forward, dirXZ) + 30.0f);
+            targetCamPitchYaw.y = Mathf.Clamp(targetCamPitchYaw.y, Vector3.Angle(dirXZ, cutsceneLookDir) - 30.0f, Vector3.Angle(dirXZ, cutsceneLookDir) + 30.0f);
+
+            targetLookDir = Matrix4x4.Rotate(Quaternion.Euler(-targetCamPitchYaw.y, targetCamPitchYaw.x, 0f)) * Vector3.forward;
+            //if (Vector3.Dot(cutsceneLookDir, targetLookDir) < 0.866f)
+            //    targetLookDir = Matrix4x4.Rotate(Quaternion.AngleAxis(30.0f, Vector3.Cross(cutsceneLookDir, targetLookDir).normalized)) * cutsceneLookDir;
 
             // Smooth the camera rotational velocity between the slow and stop angles (currently a linear interpolation)
-            float curToTarget = Vector3.Dot(targetLookDir, currentLookDir);
-            float rotationalVel = Mathf.Min(1f - (curToTarget - slowCone) / (stopCone - slowCone), 1f) * lookSensitivity * 100;
+            float rotationalVel = Mathf.Min(1f - (Vector3.Dot(targetLookDir, currentLookDir) - slowCone) / (stopCone - slowCone), 1f) * lookSensitivity * 100;
 
             // Rotate the actual look direction the player sees by this value
             currentLookDir = Matrix4x4.Rotate(Quaternion.AngleAxis(rotationalVel * Time.deltaTime, Vector3.Cross(currentLookDir, targetLookDir).normalized)) * currentLookDir;
 
-            // Actually rotate the rigid body and camera transforms with this new looking direction
             camRotQuat = Quaternion.LookRotation(Vector3.Normalize(new(currentLookDir.x, 0, currentLookDir.z)), Vector3.up);
             body.MoveRotation(camRotQuat.normalized);
             camTransform.localRotation = Quaternion.Euler(Mathf.Asin(-currentLookDir.y) * Mathf.Rad2Deg, 0, 0);
@@ -178,7 +182,6 @@ public class PlayerController : MonoBehaviour
             dashCoolCountdown -= Time.deltaTime;
             jumpTime -= Time.deltaTime;
         }
-
 
         // for testing; spawn an enemy
         if (Input.GetKeyDown(KeyCode.P))
@@ -269,6 +272,7 @@ public class PlayerController : MonoBehaviour
         // does not work yet
         camPitchYaw.x = Vector3.Angle(camTransform.forward, new(currentLookDir.x, camTransform.forward.y, currentLookDir.z));
         camPitchYaw.y = Vector3.Angle(camTransform.forward, new(camTransform.forward.x, currentLookDir.y, camTransform.forward.z));
+        Debug.Log(camPitchYaw);
         movementLocked = false;
     }
 
