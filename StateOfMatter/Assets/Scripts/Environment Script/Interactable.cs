@@ -76,7 +76,7 @@ public class Interactable : MonoBehaviour
             Debug.Log("attempted interaction");
         }
         */
-        if (isInteractable && isInRange && Input.GetKey(KeyCode.E))
+        if (isInteractable && isInRange && Input.GetKeyDown(KeyCode.E))
         {
             isActivated = true;
         }

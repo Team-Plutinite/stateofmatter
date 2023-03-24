@@ -22,7 +22,7 @@ public class ForwardButton : MonoBehaviour, IInteractable
 
     public void Activate()
     {
-        feed.backButton = false;
+        feed.BackButton = false;
     }
 
 }

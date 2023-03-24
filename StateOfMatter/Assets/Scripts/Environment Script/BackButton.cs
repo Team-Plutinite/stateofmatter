@@ -22,7 +22,7 @@ public class BackButton : MonoBehaviour, IInteractable
 
     public void Activate()
     {
-        feed.backButton = true;
+        feed.BackButton = true;
     }
 
 }

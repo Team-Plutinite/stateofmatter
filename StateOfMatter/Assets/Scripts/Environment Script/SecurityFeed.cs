@@ -11,10 +11,13 @@ public class SecurityFeed : MonoBehaviour, IActivatable
     private RenderTexture renderTexture;
 
     [SerializeField]
-    public bool backButton
+    bool backButt;
+
+
+    public bool BackButton
     {
-        get { return backButton; }
-        set { backButton = value; }
+        get { return backButt; }
+        set { backButt = value; }
     }
 
     private int idx;
@@ -22,8 +25,6 @@ public class SecurityFeed : MonoBehaviour, IActivatable
     // Start is called before the first frame update
     void Start()
     {
-
-
         idx = 0;
         securityCams[idx].targetTexture = renderTexture;
     }
@@ -37,7 +38,7 @@ public class SecurityFeed : MonoBehaviour, IActivatable
     public void Activate()
     {
 
-        if (backButton)
+        if (backButt)
         {
             if(idx - 1 < 0)
             {
@@ -45,14 +46,15 @@ public class SecurityFeed : MonoBehaviour, IActivatable
             }
             else
             {
-
                 securityCams[idx].targetTexture = null ;
                 idx--;
                 securityCams[idx].targetTexture = renderTexture;
+
+               
             }
             
         }
-        if (!backButton)
+        if (!backButt)
         {
             if (idx + 1 >= securityCams.Count)
             {
@@ -60,12 +62,13 @@ public class SecurityFeed : MonoBehaviour, IActivatable
             }
             else
             {
-
                 securityCams[idx].targetTexture = null;
                 idx++;
                 securityCams[idx].targetTexture = renderTexture;
             }
         }
+
+        Debug.Log(idx);
     }
 
     public void Deactivate()
