@@ -16,7 +16,13 @@ public class GunPickup : MonoBehaviour
             // play equipping animation
             // play some sort of sound
             // etc etc etc...
-            player.GetComponent<PlayerController>().hasGun = true;
+            playerGun.SetActive(true);
         }
+    }
+    
+public void Activate()
+    {
+        
+        
     }
 }

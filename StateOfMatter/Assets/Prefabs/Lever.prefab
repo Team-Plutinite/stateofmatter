@@ -97,7 +97,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ice: {fileID: 5366098647265463346}
   lever: {fileID: 2142709448685331859}
-  LeverOffMaterial: {fileID: 2100000, guid: f3f87ecb3d118b344b2965e3f9da996e, type: 2}
   LeverOnMaterial: {fileID: 2100000, guid: 4c4611b4c25c853459e098ccf866fcc8, type: 2}
   source: {fileID: 0}
   leverSound: {fileID: 8300000, guid: 374f10009da392f4a8c252e0da642005, type: 3}

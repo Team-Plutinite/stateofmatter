@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Lever : MonoBehaviour
+public class Lever : MonoBehaviour, IInteractable
 {
     [SerializeField]
     private GameObject ice;
@@ -11,11 +11,8 @@ public class Lever : MonoBehaviour
     private Animator animatorComponent;
     private Interactable interactableComponent;
 
-    public Material LeverOffMaterial;
     public Material LeverOnMaterial;
 
-
-    // Start is called before the first frame update
     public AudioSource source;
     public AudioClip leverSound;
 
@@ -43,20 +40,5 @@ public class Lever : MonoBehaviour
         lever.GetComponent<MeshRenderer>().material = LeverOnMaterial;
 
         source.PlayOneShot(leverSound);
-    }
-
-    public void Deactivate()
-    {
-        // reset animations
-        animatorComponent.Rebind();
-        animatorComponent.Update(0f);
-        // turn material to off material
-        lever.GetComponent<MeshRenderer>().material = LeverOffMaterial;
-        // bring back ice
-        if (!ice.gameObject.activeSelf)
-        {
-            ice.gameObject.SetActive(true);
-        }
-
     }
 }

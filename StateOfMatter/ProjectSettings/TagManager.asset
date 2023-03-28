@@ -9,7 +9,6 @@ TagManager:
   - EnemyManager
   - EnemyHome
   - Weight
-  - CheckpointManager
   layers:
   - Default
   - TransparentFX

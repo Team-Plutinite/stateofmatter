@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
 public delegate void EnemyAction(GameObject e);
 
@@ -10,7 +9,7 @@ public class EnemyManager : MonoBehaviour
 {
     private Dictionary<int, GameObject> activeEnemies;
     private Queue<GameObject> inactiveEnemies;
-    private List<GameObject> enemyHomes; // currently spawns in at homes; this can be refactored to have spawns and homes seperated. however rn homes = spawns
+    private GameObject[] enemyHomes; // currently spawns in at homes; this can be refactored to have spawns and homes seperated. however rn homes = spawns
 
     [Tooltip("The size of the enemy object pool.")]
     public int poolSize;
@@ -24,7 +23,6 @@ public class EnemyManager : MonoBehaviour
     {
         activeEnemies = new Dictionary<int, GameObject>();
         inactiveEnemies = new Queue<GameObject>();
-        enemyHomes = new List<GameObject>();
 
         // Create the enemy pool
         for (int i = 0; i < poolSize; i++)
@@ -36,11 +34,11 @@ public class EnemyManager : MonoBehaviour
         }
 
         // Create list of enemy homes
-        enemyHomes.AddRange(GameObject.FindGameObjectsWithTag("EnemyHome"));
+        enemyHomes = GameObject.FindGameObjectsWithTag("EnemyHome");
 
         // Spawn enemies based on homes
 
-        for (int i = 0; i < enemyHomes.Count; i++)
+        for (int i = 0; i < enemyHomes.Length; i++)
         {
             SpawnEnemy(100, enemyHomes[i].transform.position, Vector3.zero, player, enemyHomes[i].transform);
         }
@@ -120,29 +118,6 @@ public class EnemyManager : MonoBehaviour
         enemy.SetActive(false);
         inactiveEnemies.Enqueue(enemy);
         return true;
-    }
-
-    public void RemoveHomes(List<GameObject> homesToRemove)
-    {
-        enemyHomes = enemyHomes.Except(homesToRemove).ToList();
-    }
-
-    public void DespawnAllEnemies()
-    {
-        GameObject[] enemyArr = new GameObject[Enemies.Count];
-        Enemies.Values.CopyTo(enemyArr, 0);
-        for (int i = 0; i < enemyArr.Length; i++)
-        {
-            enemyArr[i].GetComponent<EnemyStats>().TakeDamage(999);
-        }
-    }
-
-    public void SpawnAllEnemies()
-    {
-        for (int i = 0; i < enemyHomes.Count; i++)
-        {
-            SpawnEnemy(100, enemyHomes[i].transform.position, Vector3.zero, player, enemyHomes[i].transform);
-        }
     }
 
     /// <summary>
