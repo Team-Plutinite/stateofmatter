@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
+using CheckpointData;
 
 public enum PlayerMoveState
 {
@@ -86,6 +86,11 @@ public class PlayerController : MonoBehaviour
     private Rigidbody body;
     private PlayerMoveState moveState;
 
+    public bool hasGun;
+
+    private GameObject playerGun;
+    private GameObject playerArms;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -111,7 +116,12 @@ public class PlayerController : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
 
-        source.volume = 0.3f;
+        source = gameObject.AddComponent<AudioSource>();
+        source.volume = 0.2f;
+
+        playerGun = GameObject.Find("Player/CameraFollower/Gun_Problem");
+        playerArms = GameObject.Find("Player/CameraFollower/SM_Player_SCR/SM_Player_Armed");
+        //source.volume = 0.3f;
     }
 
     // Update is called once per frame
@@ -187,6 +197,18 @@ public class PlayerController : MonoBehaviour
             // COOLDOWN REDUCTIONS \\
             dashCoolCountdown -= Time.deltaTime;
             jumpTime -= Time.deltaTime;
+
+            if (hasGun && !playerGun.activeSelf)
+            {
+                playerGun.SetActive(true);
+                //playerArms.SetActive(true);
+            } else if (!hasGun && playerGun.activeSelf)
+            {
+                playerGun.SetActive(false);
+                //playerArms.SetActive(false);
+            }
+            
+            playerArms.SetActive(playerGun.activeSelf);
         }
 
         // for testing; spawn an enemy
@@ -198,10 +220,17 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Minus)) SetCutsceneMode(true);
         if (Input.GetKeyDown(KeyCode.Equals)) SetCutsceneMode(false);
 
+        // kill player
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            gameObject.GetComponent<PlayerStats>().hp = 0;
+        }
+
+        /*
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
-        }
+        }*/
     }
 
     private void FixedUpdate()
