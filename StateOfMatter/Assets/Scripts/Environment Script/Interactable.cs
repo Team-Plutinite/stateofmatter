@@ -5,6 +5,7 @@ using UnityEngine;
 public interface IInteractable
 {
     public abstract void Activate();
+    public abstract void Deactivate();
 }
 
 public interface IActivatable
@@ -76,7 +77,7 @@ public class Interactable : MonoBehaviour
             Debug.Log("attempted interaction");
         }
         */
-        if (isInteractable && isInRange && Input.GetKey(KeyCode.E))
+        if (isInteractable && isInRange && Input.GetKeyDown(KeyCode.E))
         {
             isActivated = true;
         }
@@ -97,6 +98,11 @@ public class Interactable : MonoBehaviour
     private void InteractableOutOfRange(Interactable interactable)
     {
         interactable.isInRange = false;
+    }
+
+    public void Reset()
+    {
+        interactableScript.Deactivate();
     }
 
 }
