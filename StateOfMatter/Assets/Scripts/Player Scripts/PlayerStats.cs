@@ -23,6 +23,7 @@ public class PlayerStats : MonoBehaviour
 
     void Die()
     {
-        checkpointManager.GetComponent<CheckpointManager>().RespawnAtCheckpoint();
+        if (checkpointManager != null)
+            checkpointManager.GetComponent<CheckpointManager>().RespawnAtCheckpoint();
     }
 }
