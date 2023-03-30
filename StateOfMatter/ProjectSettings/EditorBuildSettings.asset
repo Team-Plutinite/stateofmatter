@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/TestingGrounds-Mert/TestingGround-Mert MainMenu.unity
+    guid: 90b02b66e30ac7748bde1229dffc7c98
+  - enabled: 1
+    path: Assets/Scenes/Level1 Milestone2.unity
+    guid: 109ea49dc7360a84aa497915edc866a6
   m_configObjects: {}

@@ -5,14 +5,19 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
+  - Interactable
+  - EnemyManager
+  - EnemyHome
+  - Weight
+  - CheckpointManager
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Attack Radius
+  - GasCloud
   - Water
   - UI
-  - 
+  - PlayerMask
   - 
   - 
   - 

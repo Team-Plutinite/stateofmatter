@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public delegate void EnemyAction(GameObject e);
 
@@ -9,6 +10,7 @@ public class EnemyManager : MonoBehaviour
 {
     private Dictionary<int, GameObject> activeEnemies;
     private Queue<GameObject> inactiveEnemies;
+    private List<GameObject> enemyHomes; // currently spawns in at homes; this can be refactored to have spawns and homes seperated. however rn homes = spawns
 
     [Tooltip("The size of the enemy object pool.")]
     public int poolSize;
@@ -22,6 +24,7 @@ public class EnemyManager : MonoBehaviour
     {
         activeEnemies = new Dictionary<int, GameObject>();
         inactiveEnemies = new Queue<GameObject>();
+        enemyHomes = new List<GameObject>();
 
         // Create the enemy pool
         for (int i = 0; i < poolSize; i++)
@@ -30,6 +33,16 @@ public class EnemyManager : MonoBehaviour
             newEnemy.GetComponent<EnemyStats>().manager = this;
             newEnemy.SetActive(false);
             inactiveEnemies.Enqueue(newEnemy);
+        }
+
+        // Create list of enemy homes
+        enemyHomes.AddRange(GameObject.FindGameObjectsWithTag("EnemyHome"));
+
+        // Spawn enemies based on homes
+
+        for (int i = 0; i < enemyHomes.Count; i++)
+        {
+            SpawnEnemy(100, enemyHomes[i].transform.position, Vector3.zero, player, enemyHomes[i].transform);
         }
     }
 
@@ -68,6 +81,7 @@ public class EnemyManager : MonoBehaviour
     /// <returns>If spawning was successful</returns>
     public bool SpawnEnemy(float hp, Vector3 position, Vector3 pitchYawRoll, GameObject goal = null, Transform home = null)
     {
+        
         // Attempt to dequeue from inactive pool; if pool is empty, return false
         if (!inactiveEnemies.TryDequeue(out GameObject enemy))
             return false;
@@ -76,13 +90,12 @@ public class EnemyManager : MonoBehaviour
         {
             goal = player;
         }
-
         // Add it to the active pool
         activeEnemies.Add(enemy.GetInstanceID(), enemy);
 
         // Initialize the enemy (spawning it). Also store its pool index
         enemy.GetComponent<EnemyStats>().Init(hp, position, pitchYawRoll);
-        // Init everything in the EnemyAttack compoenent
+        // Init everything in the EnemyAttack component
         //enemy.GetComponent<EnemyAttack>().Init();
         // Init everything in the Navigator component
         enemy.GetComponent<Navigator>().Init(goal, home);
@@ -97,7 +110,6 @@ public class EnemyManager : MonoBehaviour
     /// <returns>Whether killing the enemy was successful or not</returns>
     public bool KillEnemy(int instanceID)
     {
-        Debug.Log(activeEnemies.ContainsKey(instanceID));
         // Make sure we aren't OOBing.
         if (!activeEnemies.ContainsKey(instanceID)) 
             return false;
@@ -108,6 +120,29 @@ public class EnemyManager : MonoBehaviour
         enemy.SetActive(false);
         inactiveEnemies.Enqueue(enemy);
         return true;
+    }
+
+    public void RemoveHomes(List<GameObject> homesToRemove)
+    {
+        enemyHomes = enemyHomes.Except(homesToRemove).ToList();
+    }
+
+    public void DespawnAllEnemies()
+    {
+        GameObject[] enemyArr = new GameObject[Enemies.Count];
+        Enemies.Values.CopyTo(enemyArr, 0);
+        for (int i = 0; i < enemyArr.Length; i++)
+        {
+            enemyArr[i].GetComponent<EnemyStats>().TakeDamage(999);
+        }
+    }
+
+    public void SpawnAllEnemies()
+    {
+        for (int i = 0; i < enemyHomes.Count; i++)
+        {
+            SpawnEnemy(100, enemyHomes[i].transform.position, Vector3.zero, player, enemyHomes[i].transform);
+        }
     }
 
     /// <summary>
