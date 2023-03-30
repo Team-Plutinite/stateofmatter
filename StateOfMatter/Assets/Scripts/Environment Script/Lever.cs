@@ -14,8 +14,6 @@ public class Lever : MonoBehaviour
     public Material LeverOffMaterial;
     public Material LeverOnMaterial;
 
-
-    // Start is called before the first frame update
     public AudioSource source;
     public AudioClip leverSound;
 
