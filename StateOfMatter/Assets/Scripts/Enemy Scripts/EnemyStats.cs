@@ -202,24 +202,20 @@ public class EnemyStats : MonoBehaviour
     }
 
     /// <summary>
-    /// Knocks the enemy away form the given world position a specified magnitude.
-    /// If this enemy is currently FROZEN, this will also deal a massive amt of dmg
+    /// If this enemy is currently FROZEN, this will deal a massive amt of dmg
     /// while also unfreezing it.
     /// </summary>
-    /// <param name="position">The source of the knockback</param>
-    /// <param name="magnitude">The impulse magnitude by which to apply the knockback</param>
-    public void Knockback(Vector3 position, float magnitude)
+    /// <returns>If shatter attempt was successful</returns>
+    public bool Shatter()
     {
-        // Knockback
-        Stun(0.75f);
-        body.AddForce((transform.position - position).normalized * magnitude, ForceMode.Impulse);
-        
         // Big shatter dmg
         if (debuffState == MatterState.Ice)
         {
             TakeDamage(100.0f);
             NeutralizeDebuffs();
+            return true;
         }
+        return false;
     }
 
     // Eliminate enemy debuffs

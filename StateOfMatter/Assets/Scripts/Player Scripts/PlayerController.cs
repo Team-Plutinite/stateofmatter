@@ -128,8 +128,8 @@ public class PlayerController : MonoBehaviour
         {
             // CAMERA CONTROL (Smooth Mode) \\
 
-            Vector3 offset = new(-Input.GetAxisRaw("Mouse Y") * (targetLookDir.z / Mathf.Abs(targetLookDir.z)), Input.GetAxisRaw("Mouse X"), 0);
-            targetLookDir = Matrix4x4.Rotate(Quaternion.Euler(offset * lookSensitivity)) * targetLookDir;
+            targetLookDir = Matrix4x4.Rotate(Quaternion.Euler(new(0, Input.GetAxisRaw("Mouse X") * lookSensitivity, 0)) * 
+                Quaternion.AngleAxis(-Input.GetAxisRaw("Mouse Y") * lookSensitivity, camTransform.right)) * targetLookDir;
 
             // Clamp view angle inside the allowed look cone
             float maxAngle = Mathf.Lerp(maxAngleOffset, 0, Mathf.Pow(Mathf.Abs(cutsceneLookDir.y), 3)); // look cone gets smaller as camera looks up or down
