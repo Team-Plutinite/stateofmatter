@@ -158,68 +158,71 @@ public class Weapon : MonoBehaviour
         liquidAtkTimer -= Time.deltaTime;
         gasAtkTimer -= Time.deltaTime;
         pulseTimer -= Time.deltaTime;
+        fireSoundTimer -= Time.deltaTime;
 
-        // Primary fire - differs depending on state
-        TryFire();
-
-        // Pulse ability - apply a knockback to stuff in front in a cone
-        if (Input.GetMouseButtonDown(1) && pulseTimer <= 0.0f)
+        // Weapon Controls - ONLY if in Gameplay Mode
+        if (!player.GetComponent<PlayerController>().CutsceneMode)
         {
-            pulseTimer = pulseCooldown;
-            player.GetComponent<PlayerController>().AddZRecoil(0.1f);
+            // Primary fire - differs depending on state
+            TryFire();
 
-            Collider[] cols = Physics.OverlapSphere(player.transform.position, pulseRange);
-            foreach (Collider c in cols)
+            // Pulse ability - apply a knockback to stuff in front in a cone
+            if (Input.GetMouseButtonDown(1) && pulseTimer <= 0.0f)
             {
-                if (Mathf.Acos(Vector3.Dot((c.transform.position - player.transform.position).normalized, player.transform.forward)) * Mathf.Rad2Deg < pulseAngle)
-                {
-                    // If collider gameobject has a rigidbody, push it back
-                    if (c.gameObject.TryGetComponent(out Rigidbody rb))
-                    {
-                        float dist = (rb.transform.position - player.transform.position).magnitude;
-                        rb.AddForceAtPosition(playerCam.transform.forward * Mathf.Lerp(pulseForce, 0, dist / pulseRange), player.transform.position);
-                    }
+                pulseTimer = pulseCooldown;
+                player.GetComponent<PlayerController>().AddZRecoil(0.1f);
 
-                    // If collider is an enemy, stun and, if applicable, shatter it
-                    if (c.gameObject.TryGetComponent(out EnemyStats enemy))
+                Collider[] cols = Physics.OverlapSphere(player.transform.position, pulseRange);
+                foreach (Collider c in cols)
+                {
+                    if (Mathf.Acos(Vector3.Dot((c.transform.position - player.transform.position).normalized, player.transform.forward)) * Mathf.Rad2Deg < pulseAngle)
                     {
-                        enemy.Stun(0.75f);
-                        enemy.Shatter();
+                        // If collider gameobject has a rigidbody, push it back
+                        if (c.gameObject.TryGetComponent(out Rigidbody rb))
+                        {
+                            float dist = (rb.transform.position - player.transform.position).magnitude;
+                            rb.AddForceAtPosition(playerCam.transform.forward * Mathf.Lerp(pulseForce, 0, dist / pulseRange), player.transform.position);
+                        }
+
+                        // If collider is an enemy, stun and, if applicable, shatter it
+                        if (c.gameObject.TryGetComponent(out EnemyStats enemy))
+                        {
+                            enemy.Stun(0.75f);
+                            enemy.Shatter();
+                        }
                     }
                 }
             }
-        }
 
-        //Press the r key to cycle through MatterState
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            FiringSystem[(int)currentMode].gameObject.SetActive(false);
+            //Press the r key to cycle through MatterState
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                FiringSystem[(int)currentMode].gameObject.SetActive(false);
 
-            currentMode++;
-            if((int)currentMode > 2)
+                currentMode++;
+                if ((int)currentMode > 2)
+                    currentMode = MatterState.Ice;
+
+                FiringSystem[(int)currentMode].gameObject.SetActive(true);
+            }
+
+            //Use the number keys to switch weapons.
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                StopFiring(); //Resets hitbox and particles
                 currentMode = MatterState.Ice;
-
-            FiringSystem[(int)currentMode].gameObject.SetActive(true);
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                StopFiring();
+                currentMode = MatterState.Water;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                StopFiring();
+                currentMode = MatterState.Gas;
+            }
         }
-
-        //Use the number keys to switch weapons.
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            StopFiring(); //Resets hitbox and particles
-            currentMode = MatterState.Ice;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            StopFiring();
-            currentMode = MatterState.Water;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            StopFiring();
-            currentMode = MatterState.Gas;
-        }
-
-        fireSoundTimer -= Time.deltaTime;
     }
 
     private void CloudDamageEnemy(EnemyStats enemy)

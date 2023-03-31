@@ -212,8 +212,8 @@ public class PlayerController : MonoBehaviour
             if (Physics.Raycast(transform.position, camTransform.forward, out RaycastHit hit, 100, ~(1 << 3 | 1 << 6)))
                 GameObject.Find("EnemyManager").GetComponent<EnemyManager>().SpawnEnemy(100, hit.point, Vector3.zero);
         }
-        if (Input.GetKeyDown(KeyCode.Minus)) SetCutsceneMode(true);
-        if (Input.GetKeyDown(KeyCode.Equals)) SetCutsceneMode(false);
+        if (Input.GetKeyDown(KeyCode.Minus)) CutsceneMode = true;
+        if (Input.GetKeyDown(KeyCode.Equals)) CutsceneMode = false;
 
         // kill player
         if (Input.GetKeyDown(KeyCode.K))
@@ -282,19 +282,23 @@ public class PlayerController : MonoBehaviour
     PlayerMoveState MoveState { get { return moveState; } }
 
     // Set the player's control state between gameplay and cutscene (true for cutscene)
-    public void SetCutsceneMode(bool value)
+    public bool CutsceneMode
     {
-        if (value)
+        get { return movementLocked; }
+        set 
         {
-            cutsceneLookDir = camTransform.forward;
-            currentLookDir = camTransform.forward;
-            targetLookDir = camTransform.forward;
-            movementLocked = true;
-            return;
+            if (value)
+            {
+                cutsceneLookDir = camTransform.forward;
+                currentLookDir = camTransform.forward;
+                targetLookDir = camTransform.forward;
+                movementLocked = true;
+                return;
+            }
+            camPitchYaw.x = transform.eulerAngles.y;
+            camPitchYaw.y = camTransform.eulerAngles.x > 90 ? 360 - camTransform.eulerAngles.x : -camTransform.eulerAngles.x;
+            movementLocked = false;
         }
-        camPitchYaw.x = transform.eulerAngles.y;
-        camPitchYaw.y = camTransform.eulerAngles.x > 90 ? 360 - camTransform.eulerAngles.x : -camTransform.eulerAngles.x;
-        movementLocked = false;
     }
 
     /// <summary>
