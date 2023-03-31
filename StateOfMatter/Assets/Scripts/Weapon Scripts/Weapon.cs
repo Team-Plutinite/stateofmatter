@@ -166,6 +166,8 @@ public class Weapon : MonoBehaviour
         if (Input.GetMouseButtonDown(1) && pulseTimer <= 0.0f)
         {
             pulseTimer = pulseCooldown;
+            player.GetComponent<PlayerController>().AddZRecoil(0.1f);
+
             Collider[] cols = Physics.OverlapSphere(player.transform.position, pulseRange);
             foreach (Collider c in cols)
             {
@@ -177,7 +179,6 @@ public class Weapon : MonoBehaviour
                         float dist = (rb.transform.position - player.transform.position).magnitude;
                         rb.AddForceAtPosition(playerCam.transform.forward * Mathf.Lerp(pulseForce, 0, dist / pulseRange), player.transform.position);
                     }
-                        
 
                     // If collider is an enemy, stun and, if applicable, shatter it
                     if (c.gameObject.TryGetComponent(out EnemyStats enemy))
@@ -272,6 +273,7 @@ public class Weapon : MonoBehaviour
                 {
                     solidAtkTimer = 1 / (solidRPM / 60.0f);
                     // Shotgun blast
+                    player.GetComponent<PlayerController>().AddZRecoil(0.1f);
                     ShotgunAttack(innerSpreadAngle, outerSpreadAngle, solidRange, innerPelletCount, outerPelletCount, pelletDamage);
 
                     fireSoundCooldown = 0.83f;

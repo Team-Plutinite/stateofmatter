@@ -53,6 +53,7 @@ public class PlayerController : MonoBehaviour
     private Transform camTransform;
     private Vector2 camPitchYaw = Vector2.zero;
     private Quaternion camRotQuat;
+    private float zRecoilTarget = 0, zRecoilSmooth = 0;
 
     // Cutscene camera stuff
     [Header("Cutscene Mode")]
@@ -159,6 +160,10 @@ public class PlayerController : MonoBehaviour
             body.MoveRotation(camRotQuat.normalized); // camera pitch (also character transform pitch)
             camTransform.localRotation = Quaternion.Euler(-camPitchYaw.y, 0, 0); // camera yaw
 
+            // Handle camera backwards recoil
+            zRecoilSmooth = Mathf.Clamp(0, zRecoilSmooth - Time.deltaTime/3, 0.25f);
+            camTransform.localPosition = new(camTransform.localPosition.x, camTransform.localPosition.y, -zRecoilSmooth);
+
             // GROUND-ONLY MOVEMENT CONTROLS \\
             if (isGrounded && jumpTime <= 0.0f)
             {
@@ -212,9 +217,7 @@ public class PlayerController : MonoBehaviour
 
         // kill player
         if (Input.GetKeyDown(KeyCode.K))
-        {
             gameObject.GetComponent<PlayerStats>().hp = 0;
-        }
     }
 
     private void FixedUpdate()
@@ -292,6 +295,15 @@ public class PlayerController : MonoBehaviour
         camPitchYaw.x = transform.eulerAngles.y;
         camPitchYaw.y = camTransform.eulerAngles.x > 90 ? 360 - camTransform.eulerAngles.x : -camTransform.eulerAngles.x;
         movementLocked = false;
+    }
+
+    /// <summary>
+    /// Adds an offset to the camera in the backwards direction to simulate recoil in the z-direction
+    /// </summary>
+    /// <param name="value">The value to add to the current recoil value</param>
+    public void AddZRecoil(float value)
+    {
+        zRecoilSmooth += value;
     }
 
     // Get or Set the Cutscene Mode Looking Direction
