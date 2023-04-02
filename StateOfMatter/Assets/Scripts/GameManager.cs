@@ -8,11 +8,19 @@ public class GameManager : MonoBehaviour
     public GameObject pauseScreen;
     public GameObject greenOverlay;
 
+    public AudioSource source;
+    public AudioClip clickSound;
+    public AudioClip backSound;
+    public AudioClip hoverSound;
+
     public bool paused { get; set; }
     void Start()
     {
         paused = false;
         ResumeGame();
+
+        source = gameObject.AddComponent<AudioSource>();
+        source.volume = 0.3f;
     }
 
     void Update()
@@ -54,5 +62,19 @@ public class GameManager : MonoBehaviour
         Cursor.visible = true;
 
         SceneManager.LoadScene(0);
+    }
+
+    public void PlayClickSound()
+    {
+        source.PlayOneShot(clickSound);
+    }
+    public void PlayBackSound()
+    {
+        source.PlayOneShot(backSound);
+    }
+
+    public void PlayHoverSound()
+    {
+        source.PlayOneShot(hoverSound);
     }
 }
