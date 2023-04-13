@@ -5,21 +5,22 @@ using UnityEngine;
 public class BasicDoor : MonoBehaviour, IActivatable
 {
     private Animator animatorComponent;
-    // Start is called before the first frame update
+
+    public AudioSource source;
+    public AudioClip doorOpenSound;
     void Start()
     {
         animatorComponent = gameObject.GetComponent<Animator>();
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        source = gameObject.AddComponent<AudioSource>();
+        source.volume = 0.3f;
     }
 
     public void Activate()
     {
         animatorComponent.SetTrigger("Activate");
+
+        source.PlayOneShot(doorOpenSound);
     }
 
     public void Deactivate()
