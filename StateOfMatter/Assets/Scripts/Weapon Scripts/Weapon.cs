@@ -73,11 +73,19 @@ public class Weapon : MonoBehaviour
     public float gasDmg = 5.0f;
     [Tooltip("The total lifetime of gas clouds.")]
     public float gasLife = 5.0f;
-    [Tooltip("Max range of the gas cloud.")]
-    public float gasRange = int.MaxValue;
     [Tooltip("Gas Mode Rounds (clouds) Per Minute.")]
-    public float gasRPM = 400.0f;
+    public float gasRPM = 250.0f;
+    [Tooltip("How long to hold down mouse1 to charge to 100%")]
+    public float gasChargeTime = 0.75f;
+    [Tooltip("How long to emit gas clouds for when charged to max")]
+    public float gasMaxEmissionTime = 1.5f;
+    [Tooltip("Cooldown before player can charge up the next emission")]
+    public float gasCooldown = 2.0f;
+    private float gasCharge = 0.0f;
+    private float gasCDTmr;
+    private float gasEmissionTmr;
     private float gasAtkTimer;
+    private bool gasReleased;
     [Tooltip("Gas cloud spawn pool count.")]
     public int gasCloudPoolCount = 50;
     private Queue<GameObject> gasClouds;
@@ -107,7 +115,9 @@ public class Weapon : MonoBehaviour
 
     private void Awake()
     {
-        solidAtkTimer = liquidAtkTimer = gasAtkTimer = pulseTimer = 0.0f;
+        solidAtkTimer = liquidAtkTimer = gasAtkTimer = 
+            gasCDTmr = gasEmissionTmr = pulseTimer = 0.0f;
+        gasReleased = false;
 
         player = GameObject.FindGameObjectWithTag("Player");
         playerCam = player.transform.GetComponentInChildren<Camera>().gameObject;
@@ -156,7 +166,12 @@ public class Weapon : MonoBehaviour
         // Reduce timers
         solidAtkTimer -= Time.deltaTime;
         liquidAtkTimer -= Time.deltaTime;
+
         gasAtkTimer -= Time.deltaTime;
+        gasCDTmr -= Time.deltaTime;
+        if (gasReleased)
+            gasEmissionTmr -= Time.deltaTime;
+
         pulseTimer -= Time.deltaTime;
         fireSoundTimer -= Time.deltaTime;
 
@@ -298,8 +313,23 @@ public class Weapon : MonoBehaviour
                 break;
 
             case MatterState.Gas: // GAS MODE PRIMARY FIRE
+                gasReleased = true;
+                if (Input.GetMouseButton(0) && gasCDTmr <= 0.0f)
+                {
+                    gasReleased = false;
+                    gasCharge += Time.deltaTime;
+                    gasEmissionTmr = Mathf.Lerp(0, gasMaxEmissionTime, gasCharge / gasChargeTime);
 
-                if (Input.GetMouseButton(0) && gasAtkTimer <= 0.0f)
+                    // Immediately release once hitting max charge time
+                    if (gasCharge >= gasChargeTime)
+                    {
+                        gasReleased = true;
+                        gasCDTmr = gasCooldown;
+                        gasCharge = 0.0f;
+                    }
+                }
+
+                if (gasReleased && gasEmissionTmr > 0.0f && gasAtkTimer <= 0.0f)
                 {
                     gasAtkTimer = 1 / (gasRPM / 60.0f);
 
@@ -311,9 +341,6 @@ public class Weapon : MonoBehaviour
                         gasClouds.Enqueue(activatedCloud);
                     }
 
-                    // activate particles
-                    FiringSystem[(int)currentMode].gameObject.SetActive(true);
-
                     fireSoundCooldown = 0.52f; //setting cooldown to length of audio clip
                     if (fireSoundTimer <= 0.0f)
                     {
@@ -321,9 +348,11 @@ public class Weapon : MonoBehaviour
                         fireSoundTimer = fireSoundCooldown; //reset timer
                     }
                 }
+                // activate particles
+                FiringSystem[(int)currentMode].gameObject.SetActive(gasReleased && gasEmissionTmr > 0.0f);
                 break;
         }
-
+       
         // Player stopped shooting.
         if (Input.GetMouseButtonUp(0))
             StopFiring();
@@ -331,6 +360,13 @@ public class Weapon : MonoBehaviour
 
     private void StopFiring()
     {
+        gasCharge = 0.0f;
+        if (gasCDTmr <= 0.0f)
+        {
+            Debug.Log(gasReleased);
+            gasCDTmr = gasCooldown;
+        }
+
         FiringSystem[(int)currentMode].gameObject.SetActive(false);
         source.loop = false;
         source.Stop();

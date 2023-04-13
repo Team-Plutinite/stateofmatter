@@ -35,8 +35,13 @@ public class GasAttacker : MonoBehaviour
         lifetime -= Time.deltaTime;
         // cloud knocks enemies back for the first 20% of its life
         knockbackable = lifetime >= lifetimeMax * 0.8f; 
+        
+        // Clear enemies hit and deactivate cloud when it's done
         if (lifetime <= 0.0f && gameObject.activeSelf)
+        {
             gameObject.SetActive(false);
+            EnemiesHit.Clear();
+        }
     }
 
     // Spawns this gas cloud at the given location with the given rotation
@@ -57,7 +62,8 @@ public class GasAttacker : MonoBehaviour
             if (!EnemiesHit.Contains(enemy) && knockbackable)
             {
                 EnemiesHit.Add(enemy);
-                enemy.gameObject.GetComponent<Rigidbody>().AddForce(transform.forward * 50f);
+                enemy.gameObject.GetComponent<Rigidbody>().AddForce(-transform.forward * 50f);
+                enemy.TakeDamage(5.0f);
             }
             OnStay?.Invoke(enemy, this.gameObject);
        }
