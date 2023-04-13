@@ -76,7 +76,7 @@ public class Weapon : MonoBehaviour
     [Tooltip("Max range of the gas cloud.")]
     public float gasRange = int.MaxValue;
     [Tooltip("Gas Mode Rounds (clouds) Per Minute.")]
-    public float gasRPM = 180.0f;
+    public float gasRPM = 400.0f;
     private float gasAtkTimer;
     [Tooltip("Gas cloud spawn pool count.")]
     public int gasCloudPoolCount = 50;
@@ -225,7 +225,7 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    private void CloudDamageEnemy(EnemyStats enemy)
+    private void CloudDamageEnemy(EnemyStats enemy, GameObject cloud)
     {
         // If enemy already has a DOT on it, just reset its DOT timer.
         if (!enemy.ResetDebuff("RAW_GAS_DEBUFF"))
@@ -263,15 +263,13 @@ public class Weapon : MonoBehaviour
     private void TryFire()
     {
         // activate particles
-       // FiringSystem[(int)currentMode].gameObject.SetActive(true);
-
-        //AttackRadius.gameObject.SetActive(true);
+        // FiringSystem[(int)currentMode].gameObject.SetActive(true);
         source.loop = true;
 
         // Determine the firing mode
         switch (currentMode)
         {
-            case MatterState.Ice: // Solid
+            case MatterState.Ice: // SOLID MODE PRIMARY FIRE
                 if (Input.GetMouseButtonDown(0) && solidAtkTimer <= 0.0f)
                 {
                     solidAtkTimer = 1 / (solidRPM / 60.0f);
@@ -288,7 +286,7 @@ public class Weapon : MonoBehaviour
                 }
                 break;
 
-            case MatterState.Water: // Liquid
+            case MatterState.Water: // LIQUID MODE PRIMARY FIRE
                 if (Input.GetMouseButton(0) && liquidAtkTimer <= 0.0f)
                 {
                     liquidAtkTimer = 1 / (liquidRPM / 60.0f);
@@ -299,7 +297,7 @@ public class Weapon : MonoBehaviour
                 }
                 break;
 
-            case MatterState.Gas: // Gas
+            case MatterState.Gas: // GAS MODE PRIMARY FIRE
 
                 if (Input.GetMouseButton(0) && gasAtkTimer <= 0.0f)
                 {
