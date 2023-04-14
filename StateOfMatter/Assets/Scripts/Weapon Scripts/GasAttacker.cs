@@ -66,7 +66,11 @@ public class GasAttacker : MonoBehaviour
         {
             BarrelsInRadius.Add(barrel);
             BarrelEnter?.Invoke(barrel);
+
+            Debug.Log("Barrel Called");
         }
+
+        Debug.Log(other.gameObject.name);
     }
 
     private void OnTriggerExit(Collider other)
@@ -86,7 +90,7 @@ public class GasAttacker : MonoBehaviour
         if (other.TryGetComponent(out Barrel barrel))
         {
             BarrelsInRadius.Remove(barrel);
-            BarrelEnter?.Invoke(barrel);
+            BarrelExit?.Invoke(barrel);
         }
     }
 }
