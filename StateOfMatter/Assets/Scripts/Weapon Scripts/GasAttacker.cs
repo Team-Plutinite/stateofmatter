@@ -54,8 +54,8 @@ public class GasAttacker : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-       //This function will handle collison with various objects.
-       if (other.TryGetComponent(out EnemyStats enemy))
+        //This function will handle collison with various objects.
+        if (other.TryGetComponent(out EnemyStats enemy))
        {
             // If this is the first time enemy has been hit by this cloud
             // and the cloud was recently created, knock the enemy back

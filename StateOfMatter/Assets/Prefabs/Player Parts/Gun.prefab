@@ -237,10 +237,13 @@ MonoBehaviour:
   liquidRPM: 1000
   gasDmg: 5
   gasLife: 5
-  gasRPM: 400
-  gasChargeTime: 0.75
+  gasRPM: 250
+  gasChargeTime: 1
   gasMaxEmissionTime: 1.5
-  gasCooldown: 2
+  gasCooldown: 1
+  gasCharge: 0
+  gasCDTmr: 0
+  gasEmissionTmr: 0
   gasCloudPoolCount: 50
   gasCloudPrefab: {fileID: 4412169943812523958, guid: 31702495fcb0f0040898e8483cf578fb, type: 3}
   debug: 0
