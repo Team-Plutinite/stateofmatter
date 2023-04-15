@@ -11,8 +11,6 @@ public class BasicDoor : MonoBehaviour, IActivatable
     void Start()
     {
         animatorComponent = gameObject.GetComponent<Animator>();
-
-        source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.3f;
     }
 
