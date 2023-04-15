@@ -222,8 +222,8 @@ MonoBehaviour:
   liquidSystem: {fileID: 0}
   solidSystem: {fileID: 0}
   pulseAngle: 45
-  pulseRange: 3
-  pulseForce: 150
+  pulseRange: 10
+  pulseForce: 250
   pulseCooldown: 1
   innerSpreadAngle: 5
   outerSpreadAngle: 15

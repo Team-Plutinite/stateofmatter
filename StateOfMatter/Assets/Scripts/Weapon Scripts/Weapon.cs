@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -161,21 +162,31 @@ public class Weapon : MonoBehaviour
         // Primary fire - differs depending on state
         TryFire();
 
-        // Pulse ability - apply a knockback to all enemies in front in a cone
+        // Pulse ability - apply a knockback to stuff in front in a cone
         if (Input.GetMouseButtonDown(1) && pulseTimer <= 0.0f)
         {
             pulseTimer = pulseCooldown;
-            GameObject[] enemyArr = new GameObject[enemyManager.Enemies.Count];
-            enemyManager.Enemies.Values.CopyTo(enemyArr, 0);
+            player.GetComponent<PlayerController>().AddZRecoil(0.1f);
 
-            for (int i = enemyArr.Length - 1; i >= 0; i--)
+            Collider[] cols = Physics.OverlapSphere(player.transform.position, pulseRange);
+            foreach (Collider c in cols)
             {
-                Vector3 enemyDir = enemyArr[i].transform.position - player.transform.position;
+                if (Mathf.Acos(Vector3.Dot((c.transform.position - player.transform.position).normalized, player.transform.forward)) * Mathf.Rad2Deg < pulseAngle)
+                {
+                    // If collider gameobject has a rigidbody, push it back
+                    if (c.gameObject.TryGetComponent(out Rigidbody rb))
+                    {
+                        float dist = (rb.transform.position - player.transform.position).magnitude;
+                        rb.AddForceAtPosition(playerCam.transform.forward * Mathf.Lerp(pulseForce, 0, dist / pulseRange), player.transform.position);
+                    }
 
-                // If enemy is in pulse range
-                if (enemyDir.sqrMagnitude < Mathf.Pow(pulseRange, 2) && 
-                    Mathf.Acos(Vector3.Dot(player.transform.forward, enemyDir.normalized)) * Mathf.Rad2Deg < pulseAngle)
-                    enemyArr[i].GetComponent<EnemyStats>().Knockback(player.transform.position, pulseForce);
+                    // If collider is an enemy, stun and, if applicable, shatter it
+                    if (c.gameObject.TryGetComponent(out EnemyStats enemy))
+                    {
+                        enemy.Stun(0.75f);
+                        enemy.Shatter();
+                    }
+                }
             }
         }
 
@@ -235,16 +246,13 @@ public class Weapon : MonoBehaviour
             if(GetMatterState() == MatterState.Ice)
             {
                 melt.GetMelter().GetComponent<MeshRenderer>().enabled = true;
-                melt.Melt(GetMatterState());
+                melt.Melt(MatterState.Gas);
             }
-            else
-            {
-                return;
-            }
+            return;
         }
         else 
-        { 
-            melt.Melt(GetMatterState());
+        {
+            melt.Melt(MatterState.Gas);
         }
     }
 
@@ -265,6 +273,7 @@ public class Weapon : MonoBehaviour
                 {
                     solidAtkTimer = 1 / (solidRPM / 60.0f);
                     // Shotgun blast
+                    player.GetComponent<PlayerController>().AddZRecoil(0.1f);
                     ShotgunAttack(innerSpreadAngle, outerSpreadAngle, solidRange, innerPelletCount, outerPelletCount, pelletDamage);
 
                     fireSoundCooldown = 0.83f;
