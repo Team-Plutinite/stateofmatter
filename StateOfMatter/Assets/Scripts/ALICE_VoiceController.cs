@@ -6,6 +6,9 @@ public class ALICE_VoiceController : MonoBehaviour
 {
     private AudioSource dialogue;
     float[] spectrumData = new float[1024];
+    [SerializeField]
+    [Range(0f, 1000f)]
+    float mutiplier = 25f;
 
     private Light voiceLight;
 
@@ -21,6 +24,6 @@ public class ALICE_VoiceController : MonoBehaviour
     {
         dialogue.GetSpectrumData(spectrumData, 0, FFTWindow.BlackmanHarris);
 
-        voiceLight.intensity = Mathf.Max(spectrumData) * 25;
+        voiceLight.intensity = Mathf.Max(spectrumData) * mutiplier;
     }
 }
