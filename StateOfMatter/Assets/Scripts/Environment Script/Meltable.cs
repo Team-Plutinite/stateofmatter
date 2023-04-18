@@ -14,8 +14,6 @@ public class Meltable : MonoBehaviour
 {
 
     [SerializeField]
-    private float meltHealth = 10.0f;
-    [SerializeField]
     private GameObject melter;
     [SerializeField]
     private Vector3 deltaScaleAll = new Vector3(-0.01f, -0.01f, -0.01f);
@@ -69,7 +67,7 @@ public class Meltable : MonoBehaviour
         {
 
             melter.transform.localScale += meltDirectionDic[direction];
-            if (melter.transform.localScale.x <= 0 && melter.transform.localScale.y <= 0 && melter.transform.localScale.z <= 0)
+            if (melter.transform.localScale.x <= 0 || melter.transform.localScale.y <= 0 || melter.transform.localScale.z <= 0)
             {
                 melter.gameObject.SetActive(false);
             }

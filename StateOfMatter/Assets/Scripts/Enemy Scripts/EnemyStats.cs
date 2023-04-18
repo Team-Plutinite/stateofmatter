@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.ObjectModel;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
@@ -17,24 +17,23 @@ public class EnemyStats : MonoBehaviour
 {
     public EnemyManager manager;
 
-    private float waterMoveSpeedMult;
+    private float solidMoveSpeedMult;
 
     private float maxHP;
-    private MatterState debuffState;
-    private float debuffTime;
     private float hp;
-    private float dotTime;
-    private float dotDmg;
 
-    private float heatAmt, iceAmt;
+    private MatterState debuffState;
     private float debuffMax;
 
-    private float stunTime;
+    private float heatAmt, iceAmt;
+
     private float moveSpeed;
 
     // component references
     private NavMeshAgent agent;
     private Rigidbody body;
+
+    Dictionary<string, Debuff> debuffMap;
 
     // Start is called before the first frame update
     void Start()
@@ -55,50 +54,44 @@ public class EnemyStats : MonoBehaviour
 
         // MATTER STATE data
         debuffState = MatterState.None;
-        debuffTime = 0.0f;
 
         // HP data
         this.hp = hp;
         maxHP = hp;
         transform.GetComponentInChildren<TextMeshPro>().text = hp.ToString();
 
-        // DOT data
-        dotTime = 0.0f;
-        dotDmg = 0.0f;
-
         // DEBUFF data
         heatAmt = iceAmt = 0;
-        debuffMax = 1.5f;
-        waterMoveSpeedMult = 0.8f;
-
-        // STUN/ROOT data
-        stunTime = 0.0f;
+        debuffMax = 1.0f;
+        solidMoveSpeedMult = 0.8f;
 
         // SPEED data
         moveSpeed = GetComponent<NavMeshAgent>().speed;
 
         // Set active
         gameObject.SetActive(true);
+
+        // reset debuff map
+        debuffMap = new Dictionary<string, Debuff>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        dotTime -= Time.deltaTime;
-        if (dotTime > 0f)
-            TakeDamage(dotDmg * Time.deltaTime);
+        // Handle all debuffs
+        string[] keys = new string[debuffMap.Count];
+        debuffMap.Keys.CopyTo(keys, 0);
 
-        debuffTime -= Time.deltaTime;
-        // If debuff timer runs out, neutralize debuffs
-        if (debuffTime <= 0.0f && debuffState != MatterState.None)
-            NeutralizeDebuffs();
-
-        // Decrease freeze and heat amounts
-        if (heatAmt > 0) heatAmt -= Time.deltaTime / 2;
-        if (iceAmt > 0) iceAmt -= Time.deltaTime / 2;
-
-        stunTime -= Time.deltaTime;
-        agent.speed = stunTime <= 0 ? moveSpeed * (1 - (iceAmt / debuffMax)) : 0;
+        foreach (string key in keys)
+        {
+            if (debuffMap[key].Timer > 0.0f)
+                debuffMap[key].Tick();
+            else
+            {
+                debuffMap[key].InvokeFinalAction();
+                debuffMap.Remove(key);
+            }
+        }
 
         Material mat = GetComponent<Renderer>().material;
         // Visually show debuff state on enemy
@@ -108,7 +101,6 @@ public class EnemyStats : MonoBehaviour
                 mat.SetColor("_Color", Color.cyan);
                 break;
             case MatterState.Water:
-                agent.speed *= waterMoveSpeedMult;
                 mat.SetColor("_Color", Color.blue + new Color(heatAmt / debuffMax, iceAmt / debuffMax, iceAmt / debuffMax, 1));
                 break;
             case MatterState.Gas:
@@ -125,47 +117,51 @@ public class EnemyStats : MonoBehaviour
     /// </summary>
     /// <param name="state">The Matter State to apply</param>
     /// <param name="seconds">How long this debuff should last</param>
-    public void Afflict(MatterState state, float seconds)
+    public void Afflict(MatterState state, float seconds, float debuffAmt = 0.0f)
     {
-        if (debuffState == MatterState.Water && state != MatterState.None)
-            debuffTime = seconds;
-
         switch (state)
         {
             case MatterState.Ice:
+                debuffMap["RAW_SOLID_DEBUFF"] = new Debuff(seconds,
+                    () => agent.speed = moveSpeed * solidMoveSpeedMult * (1 - (iceAmt / debuffMax)), null, NeutralizeDebuffs);
+                
                 // Freeze the enemy if they are currently wet
                 if (debuffState == MatterState.Water)
                 {
-                    iceAmt += Time.deltaTime * 2;
+                    debuffMap["STATE_DEBUFF"].ResetTimer();
+                    iceAmt += debuffAmt;
                     if (iceAmt >= debuffMax)
                     {
-                        Freeze();
-                        iceAmt = 0;
+                        debuffMap.Remove("RAW_SOLID_DEBUFF");
+                        debuffMap["STATE_DEBUFF"] = new Debuff(seconds, Freeze, null, NeutralizeDebuffs);
                     }
                 }  
                 break;
 
             case MatterState.Water:
                 // Debuff the enemy with Wet, but only if they are not already debuffed
-                if (debuffState == MatterState.None)
+                if (debuffState == MatterState.None || debuffState == MatterState.Water)
                 {
-                    debuffState = MatterState.Water;
-                    debuffTime = seconds;
+                    if (!debuffMap.ContainsKey("STATE_DEBUFF"))
+                    {
+                        debuffMap["STATE_DEBUFF"] = new Debuff(seconds, 
+                            () => debuffState = MatterState.Water, 
+                            null, 
+                            () => { if (debuffState != MatterState.None) NeutralizeDebuffs(); });
+                    }
+                    else
+                        debuffMap["STATE_DEBUFF"].ResetTimer();
                 }
                 break;
 
             case MatterState.Gas:
-                // Deal raw damage (10 DPS)
-                TakeDamage(10.0f * Time.deltaTime);
                 // Burst the enemy if they are wet
                 if (debuffState == MatterState.Water)
                 {
-                    heatAmt += Time.deltaTime * 2;
+                    debuffMap["STATE_DEBUFF"].ResetTimer();
+                    heatAmt += debuffAmt;
                     if (heatAmt >= debuffMax)
-                    {
-                        Burst(seconds);
-                        heatAmt = 0;
-                    }
+                        debuffMap["STATE_DEBUFF"] = new Debuff(seconds, Burst, null, NeutralizeDebuffs);
                 }
                 break;
 
@@ -179,52 +175,47 @@ public class EnemyStats : MonoBehaviour
     /// <param name="seconds">How long to stun for</param>
     public void Stun(float seconds)
     {
-        stunTime = seconds;
+        debuffMap["STUN"] = new Debuff(seconds, () => agent.isStopped = true, null, () => agent.isStopped = false);
     }
 
     // Freezes the enemy, leaving them unresponsive
     public void Freeze()
     {
+        iceAmt = 0;
         debuffState = MatterState.Ice;
         agent.isStopped = true;
-        // Nothing yet
     }
 
     // Burst the enemy, doing single-shot AOE then adding individual DOT effect
-    public void Burst(float seconds)
+    public void Burst()
     {
+        heatAmt = 0;
         debuffState = MatterState.Gas;
         
-        manager.CreateAOE(transform.position, 4.0f, a =>
+        manager.CreateAOE(transform.position, 3.0f, a =>
         {
             EnemyStats e = a.GetComponent<EnemyStats>();
-            e.Stun(1f);
-            a.GetComponent<Rigidbody>().AddExplosionForce(5000f, transform.position, 4f);
-            e.TakeDamage(35.0f);
+            e.Stun(0.75f);
+            a.GetComponent<Rigidbody>().AddExplosionForce(250f, transform.position, 3f);
+            e.TakeDamage(30.0f);
         });
-
-        ApplyDOT(50, seconds);
     }
 
     /// <summary>
-    /// Knocks the enemy away form the given world position a specified magnitude.
-    /// If this enemy is currently FROZEN, this will also deal a massive amt of dmg
+    /// If this enemy is currently FROZEN, this will deal a massive amt of dmg
     /// while also unfreezing it.
     /// </summary>
-    /// <param name="position">The source of the knockback</param>
-    /// <param name="magnitude">The impulse magnitude by which to apply the knockback</param>
-    public void Knockback(Vector3 position, float magnitude)
+    /// <returns>If shatter attempt was successful</returns>
+    public bool Shatter()
     {
-        // Knockback
-        Stun(0.75f);
-        body.AddForce((transform.position - position).normalized * magnitude, ForceMode.Impulse);
-        
         // Big shatter dmg
         if (debuffState == MatterState.Ice)
         {
             TakeDamage(100.0f);
             NeutralizeDebuffs();
+            return true;
         }
+        return false;
     }
 
     // Eliminate enemy debuffs
@@ -233,6 +224,8 @@ public class EnemyStats : MonoBehaviour
         debuffState = MatterState.None;
         agent.isStopped = false;
         agent.speed = moveSpeed;
+        heatAmt = 0;
+        iceAmt = 0;
     }
 
     public void TakeDamage(float dmgAmt)
@@ -244,13 +237,48 @@ public class EnemyStats : MonoBehaviour
     }
 
     /// <summary>
-    ///  Apply a Damage-Over-Time effect to this enemy.
+    /// Applies a debuff to the enemy.
     /// </summary>
-    /// <param name="seconds">Amount of time this effect lasts, in seconds.</param>
-    /// <param name="totalDamage">The total damage to deal over this time.</param>
-    public void ApplyDOT(float totalDamage, float seconds)
+    /// <param name="debuffName">The name of the debuff in the debuff map. 
+    /// BE CAREFUL WITH THIS - if you're trying to create an entirely new debuff, use a unique name!</param>
+    /// <param name="debuff">The debuff object to apply.</param>
+    public void ApplyDebuff(string debuffName, Debuff debuff)
     {
-        dotTime = seconds;
-        dotDmg = totalDamage / seconds;
+        debuffMap[debuffName] = debuff;
+    }
+
+    /// <summary>
+    /// Resets the timer of the specified debuff.
+    /// </summary>
+    /// <param name="debuffName">The name of the debuff to reset.</param>
+    /// <returns>True if the debuff exists.</returns>
+    public bool ResetDebuff(string debuffName)
+    {
+        if (!debuffMap.ContainsKey(debuffName)) 
+            return false;
+
+        debuffMap[debuffName].ResetTimer();
+        return true;
+    }
+
+    /// <summary>
+    /// Returns the debuff object corresponding to the specified name.
+    /// </summary>
+    /// <param name="debuffName">The name of the debuff.</param>
+    /// <returns>The corresponding debuff, or null if this name does not exist in the debuff map.</returns>
+    public Debuff GetDebuff(string debuffName)
+    {
+        return debuffMap[debuffName];
+    }
+
+    /// <summary>
+    /// Gets teh names of all currently active debuffs on this enemy.
+    /// </summary>
+    /// <returns>A string array of the names of all active debuffs.</returns>
+    public string[] GetAllDebuffNames()
+    {
+        string[] names = new string[debuffMap.Count];
+        debuffMap.Keys.CopyTo(names, 0);
+        return names;
     }
 }
