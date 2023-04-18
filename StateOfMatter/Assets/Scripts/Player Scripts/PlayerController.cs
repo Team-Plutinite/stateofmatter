@@ -73,6 +73,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private bool isCrouched;
     private float jumpTime;
+    private float jumpLingerTime;
     [SerializeField]
     private bool onLadder;
 
@@ -102,6 +103,7 @@ public class PlayerController : MonoBehaviour
         onLadder = false;
 
         jumpTime = 0.0f;
+        jumpLingerTime = 0.0f;
         dashCoolCountdown = 0.0f;
         dashEventCountdown = dashTime;
         tryDash = false;
@@ -163,6 +165,9 @@ public class PlayerController : MonoBehaviour
             zRecoilSmooth = Mathf.Clamp(0, zRecoilSmooth - Time.deltaTime/3, 0.25f);
             camTransform.localPosition = new(camTransform.localPosition.x, camTransform.localPosition.y, -zRecoilSmooth);
 
+            if (Input.GetKeyDown(KeyCode.Space))
+                jumpLingerTime = 0.12f; // add forgiveness if player didn't jump precisely enough upon touching the ground
+
             // GROUND-ONLY MOVEMENT CONTROLS \\
             if (isGrounded && jumpTime <= 0.0f)
             {
@@ -173,7 +178,7 @@ public class PlayerController : MonoBehaviour
                     TryUncrouch();
 
                 // JUMP \\
-                if (Input.GetKeyDown(KeyCode.Space))
+                if (jumpLingerTime > 0.0f)
                 {
                     jumpTime = jumpCooldown;
                     isGrounded = false;
@@ -191,6 +196,7 @@ public class PlayerController : MonoBehaviour
             // COOLDOWN REDUCTIONS \\
             dashCoolCountdown -= Time.deltaTime;
             jumpTime -= Time.deltaTime;
+            jumpLingerTime -= Time.deltaTime;
 
             if (hasGun && !playerGun.activeSelf)
             {
@@ -211,8 +217,8 @@ public class PlayerController : MonoBehaviour
             if (Physics.Raycast(transform.position, camTransform.forward, out RaycastHit hit, 100, ~(1 << 3 | 1 << 6)))
                 GameObject.Find("EnemyManager").GetComponent<EnemyManager>().SpawnEnemy(100, hit.point, Vector3.zero);
         }
-        if (Input.GetKeyDown(KeyCode.Minus)) SetCutsceneMode(true);
-        if (Input.GetKeyDown(KeyCode.Equals)) SetCutsceneMode(false);
+        if (Input.GetKeyDown(KeyCode.Minus)) CutsceneMode = true;
+        if (Input.GetKeyDown(KeyCode.Equals)) CutsceneMode = false;
 
         // kill player
         if (Input.GetKeyDown(KeyCode.K))
@@ -281,19 +287,23 @@ public class PlayerController : MonoBehaviour
     PlayerMoveState MoveState { get { return moveState; } }
 
     // Set the player's control state between gameplay and cutscene (true for cutscene)
-    public void SetCutsceneMode(bool value)
+    public bool CutsceneMode
     {
-        if (value)
+        get { return movementLocked; }
+        set 
         {
-            cutsceneLookDir = camTransform.forward;
-            currentLookDir = camTransform.forward;
-            targetLookDir = camTransform.forward;
-            movementLocked = true;
-            return;
+            if (value)
+            {
+                cutsceneLookDir = camTransform.forward;
+                currentLookDir = camTransform.forward;
+                targetLookDir = camTransform.forward;
+                movementLocked = true;
+                return;
+            }
+            camPitchYaw.x = transform.eulerAngles.y;
+            camPitchYaw.y = camTransform.eulerAngles.x > 90 ? 360 - camTransform.eulerAngles.x : -camTransform.eulerAngles.x;
+            movementLocked = false;
         }
-        camPitchYaw.x = transform.eulerAngles.y;
-        camPitchYaw.y = camTransform.eulerAngles.x > 90 ? 360 - camTransform.eulerAngles.x : -camTransform.eulerAngles.x;
-        movementLocked = false;
     }
 
     /// <summary>
@@ -336,15 +346,20 @@ public class PlayerController : MonoBehaviour
     // Check if the player is airborne with a sphere cast down
     bool CheckAirborne()
     {
-        if (Physics.SphereCast(transform.position, GetComponent<CapsuleCollider>().radius,
-            Vector3.down, out RaycastHit hit, GetComponent<CapsuleCollider>().height * 0.51f - GetComponent<CapsuleCollider>().radius))
+        CapsuleCollider col = GetComponent<CapsuleCollider>();
+
+        // Get all things hit by this sphere cast
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, col.radius, Vector3.down,
+            col.height * 0.51f - col.radius, ~(1 << 6), QueryTriggerInteraction.Ignore);
+
+        // Test if any of the hits are ground
+        foreach (RaycastHit hit in hits)
         {
             groundNormal = hit.normal;
             if (Vector3.Dot(Vector3.down, groundNormal) <= -Mathf.Cos(maxIncline * Mathf.Deg2Rad))
-            {
                 return true;
-            }
         }
+        // If not, return false
         groundNormal = transform.up;
         return false;
     }
