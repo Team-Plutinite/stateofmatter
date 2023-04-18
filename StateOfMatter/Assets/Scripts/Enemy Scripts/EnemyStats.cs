@@ -20,6 +20,7 @@ public class EnemyStats : MonoBehaviour
     private float solidMoveSpeedMult;
 
     private float maxHP;
+    [SerializeField]
     private float hp;
 
     private MatterState debuffState;

@@ -45,7 +45,7 @@ public class CheckpointManager : MonoBehaviour
                 }
             }
 
-            player.GetComponent<PlayerStats>().hp = 5;
+            player.GetComponent<PlayerStats>().hp = player.GetComponent<PlayerStats>().maxHP;
 
             // removes unnecessary homes and despawns/respawns all enemies
             GameObject enemyManager = GameObject.FindGameObjectWithTag("EnemyManager");
