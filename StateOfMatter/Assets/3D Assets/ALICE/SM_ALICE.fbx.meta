@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9735fbcd21600cd4d98137d00ca949ae
+guid: d8ce2c38b54de3e42b775207febc6965
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
@@ -7,13 +7,18 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: metal1
-    second: {fileID: 2100000, guid: 4832a6767d2194348b2378b6c30d17a9, type: 2}
+      name: alice_glass
+    second: {fileID: 2100000, guid: 1c279df362cbe9349b9d6ff3163c9b11, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: metal2
-    second: {fileID: 2100000, guid: 854fcce4932a5b947bf0f625cb229394, type: 2}
+      name: alice_metal_dark
+    second: {fileID: 2100000, guid: 3e1c16d933965504484d62a5c6822b14, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: alice_metal_light
+    second: {fileID: 2100000, guid: bf55aa97a7cfab741bbc504ee14ab10b, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
