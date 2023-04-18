@@ -276,6 +276,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
+  hp: 50
 --- !u!114 &2148574808466133939
 MonoBehaviour:
   m_ObjectHideFlags: 0

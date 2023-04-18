@@ -17,7 +17,7 @@ public interface IActivatable
 public class Interactable : MonoBehaviour
 {
     public GameObject objectToActivate;
-    public Component interactableComponent;
+    //public Component interactableComponent;
     
     public bool isInteractable;
     public bool isActivated;
@@ -30,24 +30,47 @@ public class Interactable : MonoBehaviour
     [SerializeField]
     public InteractRadius interactRadius;
 
+    //private Transform[] allChildren;
+
     // Start is called before the first frame update
     void Start()
     {
         isInRange = false;
         //isActivated = false;
-        interactableScript = (IInteractable)interactableComponent;
+        //interactableScript = (IInteractable)interactableComponent;
+
+        if (gameObject.GetComponent<IInteractable>() != null)
+        {
+            interactableScript = gameObject.GetComponent<IInteractable>();
+            Debug.Log("Interactable script found on: " + gameObject.name);
+        } else
+        {
+            Transform[] allChildren = GetComponentsInChildren<Transform>();
+            foreach (Transform child in allChildren)
+            {
+                if (child.gameObject.GetComponent<IInteractable>() != null)
+                {
+                    interactableScript = child.gameObject.GetComponent<IInteractable>();
+                    Debug.Log("Interactable script found on: " + child.gameObject.name);
+                }
+            }
+        }
+        
+        if (interactableScript == null)
+        {
+            Debug.Log("No interactable scripts found on " + gameObject.name);
+        }
+
+        if (interactableScript != null)
+        {
+            //Debug.Log("Interactable script attached to " + gameObject.name);
+        }
+
         interactRadius.InteractableEnter += InteractableInRange;
         interactRadius.InteractableExit += InteractableOutOfRange;
         if (objectToActivate != null)
         {
-            try
-            {
-                activatableScript = objectToActivate.GetComponent<IActivatable>();
-            }
-            catch
-            {
-                Debug.Log("No activatable script on object to activate");
-            }
+            activatableScript = objectToActivate.GetComponent<IActivatable>();
         }
     }
 
@@ -83,7 +106,6 @@ public class Interactable : MonoBehaviour
         }
         if (isActivated)
         {
-            //if (interactableScript != null) interactableScript.Activate();
             interactableScript.Activate();
             activatableScript.Activate();
             isActivated = false;
