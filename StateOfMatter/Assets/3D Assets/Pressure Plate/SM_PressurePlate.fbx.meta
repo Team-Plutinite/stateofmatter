@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9735fbcd21600cd4d98137d00ca949ae
+guid: 8318cb3063a9c404bafc5870ca37d208
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
@@ -7,13 +7,18 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: metal1
-    second: {fileID: 2100000, guid: 4832a6767d2194348b2378b6c30d17a9, type: 2}
+      name: pressureplate_dark
+    second: {fileID: 2100000, guid: c09e333423aa2f041a7ff385d793ad48, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: metal2
-    second: {fileID: 2100000, guid: 854fcce4932a5b947bf0f625cb229394, type: 2}
+      name: pressureplate_glow
+    second: {fileID: 2100000, guid: 720ecd09ab3d4df498934601e0cdaebe, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: pressureplate_light
+    second: {fileID: 2100000, guid: e7a843593d8567b41b1bb23feefc0509, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

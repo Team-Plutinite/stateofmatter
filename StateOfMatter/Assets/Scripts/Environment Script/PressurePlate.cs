@@ -9,6 +9,14 @@ public class PressurePlate : MonoBehaviour
     [SerializeField] // serialized for debug purposes
     private bool pressed = false;
 
+    private Animator animator;
+
+    private void Start()
+    {
+        animator = GetComponentInParent<Animator>();
+    }
+
+
     public AudioSource source;
     public AudioClip stepOnSound;
     public AudioClip stepOffSound;
@@ -17,6 +25,7 @@ public class PressurePlate : MonoBehaviour
     {
         source.volume = 0.3f;
     }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player" || other.gameObject.tag == "Enemy" || other.gameObject.tag == "Weight")
@@ -26,6 +35,7 @@ public class PressurePlate : MonoBehaviour
 
             source.PlayOneShot(stepOnSound);
             Debug.Log(pressed + " On Plate");
+            animator?.SetBool("isPressed", pressed);
         }
     }
 
@@ -37,8 +47,13 @@ public class PressurePlate : MonoBehaviour
             this.pressed = false;
             //gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 0.5f, gameObject.transform.position.z);
 
+            Debug.Log(pressed + " Off Plate");
+            animator?.SetBool("isPressed", pressed);
+
+
             source.PlayOneShot(stepOffSound);
             Debug.Log(pressed + " Off Plate");            
+
         }
 
     }
