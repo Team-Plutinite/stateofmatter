@@ -12,6 +12,8 @@ public class Weapon : MonoBehaviour
     private EnemyManager enemyManager;
     private GameObject player;
     private GameObject playerCam;
+    // player HUD controller
+    private HUDController playerHUD;
 
     private MatterState currentMode = MatterState.Ice;
     //Handles the particles that come out when firing.
@@ -22,8 +24,6 @@ public class Weapon : MonoBehaviour
     [SerializeField]
     private ParticleSystem solidSystem;
     private ParticleSystem[] FiringSystem;
-
-    public GameObject[] hudStateSprites;
 
     [Space]
 
@@ -126,6 +126,9 @@ public class Weapon : MonoBehaviour
         enemyManager = GameObject.FindGameObjectWithTag("EnemyManager").GetComponent<EnemyManager>();
         FiringSystem = new ParticleSystem[3] { solidSystem, liquidSystem, gasSystem  };
 
+        playerHUD = player.GetComponentInChildren<HUDController>();
+        if (playerHUD == null) Debug.Log("WARNING: Weapon.cs could not find HUDController!");
+
         // Fill the cloud pool
         gasClouds = new Queue<GameObject>();
         for (int i = 0; i < gasCloudPoolCount; i++)
@@ -152,20 +155,6 @@ public class Weapon : MonoBehaviour
         }
 
         currentMode = MatterState.Gas;
-
-        //Transform stateSpritesQuickReference = GameObject.FindWithTag("Player").transform.Find("PlayerHUD").Find("StateSprites");
-        if (hudStateSprites == null)
-        {
-            // This currently doesn't work for some reason so it's just set in the inspector.
-            // Will I fix it? Well we're porting the full game to a new engine in about a week so... no. 
-            hudStateSprites = new GameObject[3];
-            hudStateSprites[0] = GameObject.Find("Player/PlayerHUD/HUDCanvas/StateSprites/EmptySolidImg/FullSolidImg");
-            hudStateSprites[1] = GameObject.Find("Player/PlayerHUD/HUDCanvas/StateSprites/EmptyLiquidImg/FullLiquidImg");
-            hudStateSprites[2] = GameObject.Find("Player/PlayerHUD/HUDCanvas/StateSprites/EmptyGasImg/FullGasImg");
-        }
-
-
-        hudStateSprites[2].SetActive(true);
     }
 
     public MatterState GetMatterState()
@@ -185,10 +174,10 @@ public class Weapon : MonoBehaviour
         liquidAtkTimer -= Time.deltaTime;
 
         gasAtkTimer -= Time.deltaTime;
-        if (gasEmissionTmr <= 0.0f) 
-            gasCDTmr -= Time.deltaTime;
         if (gasReleased)
             gasEmissionTmr -= Time.deltaTime;
+        if (gasEmissionTmr <= 0.0f) 
+            gasCDTmr -= Time.deltaTime;
 
         pulseTimer -= Time.deltaTime;
         fireSoundTimer -= Time.deltaTime;
@@ -227,44 +216,35 @@ public class Weapon : MonoBehaviour
                 }
             }
 
-        //Press the r key to cycle through MatterState
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            FiringSystem[(int)currentMode].gameObject.SetActive(false);
-            hudStateSprites[(int)currentMode].SetActive(false);
+            //Press the r key to cycle through MatterState
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                FiringSystem[(int)currentMode].gameObject.SetActive(false);
 
-            currentMode++;
-            if ((int)currentMode > 2)
+                currentMode++;
+                if ((int)currentMode > 2)
+                    currentMode = MatterState.Ice;
+
+                FiringSystem[(int)currentMode].gameObject.SetActive(true);
+                ResetFire();
+            }
+
+                //Use the number keys to switch weapons.
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
                 currentMode = MatterState.Ice;
-
-            FiringSystem[(int)currentMode].gameObject.SetActive(true);
-            hudStateSprites[(int)currentMode].SetActive(true);
-        }
-
-            //Use the number keys to switch weapons.
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            ResetFire(); //Resets hitbox and particles
-            currentMode = MatterState.Ice;
-            FiringSystem[(int)currentMode].gameObject.SetActive(true);
-            hudStateSprites[(int)currentMode].SetActive(true);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            ResetFire();
-            currentMode = MatterState.Water;
-            FiringSystem[(int)currentMode].gameObject.SetActive(true);
-            hudStateSprites[(int)currentMode].SetActive(true);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            ResetFire();
-            currentMode = MatterState.Gas;
-            FiringSystem[(int)currentMode].gameObject.SetActive(true);
-            hudStateSprites[(int)currentMode].SetActive(true);
-        }
-
-            
+                ResetFire(); //Resets hitbox and particles
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                currentMode = MatterState.Water;
+                ResetFire();
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                currentMode = MatterState.Gas;
+                ResetFire();
+            }
         }
     }
 
@@ -311,9 +291,7 @@ public class Weapon : MonoBehaviour
     private void TryFire()
     {
         // activate particles
-        // FiringSystem[(int)currentMode].gameObject.SetActive(true);
         source.loop = true;
-
         // Determine the firing mode
         switch (currentMode)
         {
@@ -397,8 +375,21 @@ public class Weapon : MonoBehaviour
 
                 // activate particles and loop audio while shooting
                 source.loop = shouldShoot;
-                if (!shouldShoot) source.Stop();
-                FiringSystem[(int)currentMode].gameObject.SetActive(shouldShoot);
+
+                // Set the progress indicator to charge amt if charging, se to cooldown if on cooldown
+                if (gasCDTmr <= 0.0f)
+                    playerHUD.SetProgress(gasCharge / gasChargeTime);
+                else
+                    playerHUD.SetProgress(gasCDTmr / gasCooldown);
+
+                // Set the audio and particle systems accordingly to whether weapon is firing or not
+                if (shouldShoot)
+                    FiringSystem[(int)currentMode].Play();
+                else
+                {
+                    source.Stop();
+                    FiringSystem[(int)currentMode].Stop();
+                }
                 break;
         }
     }
@@ -407,7 +398,7 @@ public class Weapon : MonoBehaviour
     {
         gasCharge = 0.0f;
         FiringSystem[(int)currentMode].gameObject.SetActive(false);
-        hudStateSprites[(int)currentMode].gameObject.SetActive(false);
+        playerHUD.SetHUDMatterState(currentMode);
         source.loop = false;
         source.Stop();
     }
