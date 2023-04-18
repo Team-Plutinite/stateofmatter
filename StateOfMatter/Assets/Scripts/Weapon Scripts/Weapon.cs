@@ -23,6 +23,8 @@ public class Weapon : MonoBehaviour
     private ParticleSystem solidSystem;
     private ParticleSystem[] FiringSystem;
 
+    public GameObject[] hudStateSprites;
+
     [Space]
 
     [Header("Pulse Ability")]
@@ -139,6 +141,18 @@ public class Weapon : MonoBehaviour
         }
 
         currentMode = MatterState.Gas;
+        hudStateSprites[2].SetActive(true);
+
+        //Transform stateSpritesQuickReference = GameObject.FindWithTag("Player").transform.Find("PlayerHUD").Find("StateSprites");
+        if (hudStateSprites == null)
+        {
+            // This currently doesn't work for some reason so it's just set in the inspector.
+            // Will I fix it? Well we're porting the full game to a new engine in about a week so... no. 
+            hudStateSprites = new GameObject[3];
+            hudStateSprites[0] = GameObject.Find("Player/PlayerHUD/HUDCanvas/StateSprites/EmptySolidImg/FullSolidImg");
+            hudStateSprites[1] = GameObject.Find("Player/PlayerHUD/HUDCanvas/StateSprites/EmptyLiquidImg/FullLiquidImg");
+            hudStateSprites[2] = GameObject.Find("Player/PlayerHUD/HUDCanvas/StateSprites/EmptyGasImg/FullGasImg");
+        }
     }
 
     public MatterState GetMatterState()
@@ -194,12 +208,14 @@ public class Weapon : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             FiringSystem[(int)currentMode].gameObject.SetActive(false);
+            hudStateSprites[(int)currentMode].SetActive(false);
 
             currentMode++;
             if((int)currentMode > 2)
                 currentMode = MatterState.Ice;
 
-            FiringSystem[(int)currentMode].gameObject.SetActive(true);
+            //FiringSystem[(int)currentMode].gameObject.SetActive(true);
+            hudStateSprites[(int)currentMode].SetActive(true);
         }
 
         //Use the number keys to switch weapons.

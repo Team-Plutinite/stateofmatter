@@ -42,7 +42,9 @@ public class SecurityFeed : MonoBehaviour, IActivatable
         {
             if(idx - 1 < 0)
             {
-                return;
+                securityCams[idx].targetTexture = null;
+                idx = securityCams.Count - 1;
+                securityCams[idx].targetTexture = renderTexture;
             }
             else
             {
@@ -58,7 +60,9 @@ public class SecurityFeed : MonoBehaviour, IActivatable
         {
             if (idx + 1 >= securityCams.Count)
             {
-                return;
+                securityCams[idx].targetTexture = null;
+                idx = 0;
+                securityCams[idx].targetTexture = renderTexture;
             }
             else
             {

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using CheckpointData;
+using UnityEngine.UI;
 
 public enum PlayerMoveState
 {
@@ -89,6 +90,8 @@ public class PlayerController : MonoBehaviour
 
     private GameObject playerGun;
     private GameObject playerArms;
+    private GameObject playerHUD;
+    private GameObject stateSpriteHUD;
 
     // Start is called before the first frame update
     void Start()
@@ -119,6 +122,8 @@ public class PlayerController : MonoBehaviour
 
         playerGun = GameObject.Find("Player/CameraFollower/Gun_Problem");
         playerArms = GameObject.Find("Player/CameraFollower/SM_Player_SCR/SM_Player_Armed");
+        playerHUD = this.transform.Find("PlayerHUD").Find("HUDCanvas").gameObject;
+        stateSpriteHUD = playerHUD.transform.Find("StateSprites").gameObject;
     }
 
     // Update is called once per frame
@@ -197,13 +202,16 @@ public class PlayerController : MonoBehaviour
             {
                 playerGun.SetActive(true);
                 //playerArms.SetActive(true);
+                //stateSpriteHUD.SetActive(true);
             } else if (!hasGun && playerGun.activeSelf)
             {
                 playerGun.SetActive(false);
                 //playerArms.SetActive(false);
+                //stateSpriteHUD.SetActive(false);
             }
             
             playerArms.SetActive(playerGun.activeSelf);
+            stateSpriteHUD.SetActive(playerGun.activeSelf);
         }
 
         // for testing; spawn an enemy
