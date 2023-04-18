@@ -114,7 +114,6 @@ public class PlayerController : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked; // lock to middle of screen and set invisible
 
-        source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.2f;
 
         playerGun = GameObject.Find("Player/CameraFollower/Gun_Problem");
