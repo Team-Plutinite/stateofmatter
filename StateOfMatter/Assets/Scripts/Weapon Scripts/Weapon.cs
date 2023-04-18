@@ -358,7 +358,6 @@ public class Weapon : MonoBehaviour
                     fireSoundCooldown = 0.52f; //setting cooldown to length of audio clip
                     if (fireSoundTimer <= 0.0f)
                     {
-                        Debug.Log("asd");
                         source.PlayOneShot(steamFireSound); //playing audio
                         fireSoundTimer = fireSoundCooldown; //reset timer
                     }
