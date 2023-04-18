@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Lever : MonoBehaviour, IInteractable
+public class Lever : MonoBehaviour
 {
     [SerializeField]
     private GameObject ice;
@@ -16,14 +16,13 @@ public class Lever : MonoBehaviour, IInteractable
 
     public AudioSource source;
     public AudioClip leverSound;
-    private float soundTimer = 0.5f;
-    private bool startCheck = false;
 
     void Start()
     {
         animatorComponent = lever.GetComponent<Animator>();
         interactableComponent = gameObject.GetComponent<Interactable>();
 
+        source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.3f;
     }
 
@@ -33,9 +32,6 @@ public class Lever : MonoBehaviour, IInteractable
         {
             interactableComponent.isInteractable = true;
         }
-        soundTimer -= Time.deltaTime;
-        if (soundTimer <= 0)
-            startCheck = true;
     }
 
     public void Activate()
@@ -44,8 +40,7 @@ public class Lever : MonoBehaviour, IInteractable
 
         lever.GetComponent<MeshRenderer>().material = LeverOnMaterial;
 
-        if(startCheck) //levers trigger this at start of level, this ensures sound won't play upon level start
-            source.PlayOneShot(leverSound);
+        source.PlayOneShot(leverSound);
     }
 
     public void Deactivate()

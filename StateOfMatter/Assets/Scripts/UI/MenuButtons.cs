@@ -17,6 +17,7 @@ public class MenuButtons : MonoBehaviour
 
     public void Start()
     {
+        source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.3f;
     }
 
