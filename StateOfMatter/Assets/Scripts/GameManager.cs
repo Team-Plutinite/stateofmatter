@@ -19,7 +19,6 @@ public class GameManager : MonoBehaviour
         paused = false;
         ResumeGame();
 
-        source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.3f;
     }
 
