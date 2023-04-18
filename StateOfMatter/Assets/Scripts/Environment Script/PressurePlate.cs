@@ -10,13 +10,15 @@ public class PressurePlate : MonoBehaviour
     private bool pressed = false;
 
     private Animator animator;
+
     public AudioSource source;
     public AudioClip stepOnSound;
     public AudioClip stepOffSound;
 
-    void Start()
+    private void Start()
     {
         animator = GetComponentInParent<Animator>();
+
         source.volume = 0.3f;
     }
 

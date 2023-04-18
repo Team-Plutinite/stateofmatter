@@ -19,6 +19,9 @@ public class EnemyManager : MonoBehaviour
     [Tooltip("The Prefab to use to instantiate more enemies")]
     public GameObject enemyRef;
 
+    [SerializeField]
+    private float enemySpawnHP;
+
     // Start is called before the first frame update
     void Start()
     {

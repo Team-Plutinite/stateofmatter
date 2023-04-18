@@ -23,6 +23,8 @@ public class Weapon : MonoBehaviour
     private ParticleSystem solidSystem;
     private ParticleSystem[] FiringSystem;
 
+    public GameObject[] hudStateSprites;
+
     [Space]
 
     [Header("Pulse Ability")]
@@ -132,6 +134,7 @@ public class Weapon : MonoBehaviour
             newCloud.SetActive(false);
             newCloud.GetComponent<GasAttacker>().OnStay += CloudDamageEnemy;
             newCloud.GetComponent<GasAttacker>().MeltEnter += CloudDamageMeltable;
+            newCloud.GetComponent<GasAttacker>().BarrelEnter += CloudDamageBarrel;
             gasClouds.Enqueue(newCloud);
         }
 
@@ -149,6 +152,20 @@ public class Weapon : MonoBehaviour
         }
 
         currentMode = MatterState.Gas;
+
+        //Transform stateSpritesQuickReference = GameObject.FindWithTag("Player").transform.Find("PlayerHUD").Find("StateSprites");
+        if (hudStateSprites == null)
+        {
+            // This currently doesn't work for some reason so it's just set in the inspector.
+            // Will I fix it? Well we're porting the full game to a new engine in about a week so... no. 
+            hudStateSprites = new GameObject[3];
+            hudStateSprites[0] = GameObject.Find("Player/PlayerHUD/HUDCanvas/StateSprites/EmptySolidImg/FullSolidImg");
+            hudStateSprites[1] = GameObject.Find("Player/PlayerHUD/HUDCanvas/StateSprites/EmptyLiquidImg/FullLiquidImg");
+            hudStateSprites[2] = GameObject.Find("Player/PlayerHUD/HUDCanvas/StateSprites/EmptyGasImg/FullGasImg");
+        }
+
+
+        hudStateSprites[2].SetActive(true);
     }
 
     public MatterState GetMatterState()
@@ -210,34 +227,44 @@ public class Weapon : MonoBehaviour
                 }
             }
 
-            //Press the r key to cycle through MatterState
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                FiringSystem[(int)currentMode].gameObject.SetActive(false);
+        //Press the r key to cycle through MatterState
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            FiringSystem[(int)currentMode].gameObject.SetActive(false);
+            hudStateSprites[(int)currentMode].SetActive(false);
 
-                currentMode++;
-                if ((int)currentMode > 2)
-                    currentMode = MatterState.Ice;
+            currentMode++;
+            if ((int)currentMode > 2)
+                currentMode = MatterState.Ice;
 
-                FiringSystem[(int)currentMode].gameObject.SetActive(true);
-            }
+            FiringSystem[(int)currentMode].gameObject.SetActive(true);
+            hudStateSprites[(int)currentMode].SetActive(true);
+        }
 
             //Use the number keys to switch weapons.
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                ResetFire(); //Resets hitbox and particles
-                currentMode = MatterState.Ice;
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                ResetFire();
-                currentMode = MatterState.Water;
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                ResetFire();
-                currentMode = MatterState.Gas;
-            }
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            ResetFire(); //Resets hitbox and particles
+            currentMode = MatterState.Ice;
+            FiringSystem[(int)currentMode].gameObject.SetActive(true);
+            hudStateSprites[(int)currentMode].SetActive(true);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            ResetFire();
+            currentMode = MatterState.Water;
+            FiringSystem[(int)currentMode].gameObject.SetActive(true);
+            hudStateSprites[(int)currentMode].SetActive(true);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            ResetFire();
+            currentMode = MatterState.Gas;
+            FiringSystem[(int)currentMode].gameObject.SetActive(true);
+            hudStateSprites[(int)currentMode].SetActive(true);
+        }
+
+            
         }
     }
 
@@ -248,6 +275,11 @@ public class Weapon : MonoBehaviour
             enemy.ApplyDebuff("RAW_GAS_DEBUFF", new Debuff(0.25f, null, () => enemy.TakeDamage(Time.deltaTime * gasDmg), null));
         
         enemy.Afflict(MatterState.Gas, effectDur, Time.deltaTime);
+    }
+
+    private void CloudDamageBarrel(Barrel barrel)
+    {
+        barrel.DamageBarrel();
     }
 
     //Begin Damaging ice when it enters the gas cloud.
@@ -375,6 +407,7 @@ public class Weapon : MonoBehaviour
     {
         gasCharge = 0.0f;
         FiringSystem[(int)currentMode].gameObject.SetActive(false);
+        hudStateSprites[(int)currentMode].gameObject.SetActive(false);
         source.loop = false;
         source.Stop();
     }
