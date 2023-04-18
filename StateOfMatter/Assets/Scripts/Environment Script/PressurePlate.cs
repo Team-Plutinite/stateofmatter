@@ -15,14 +15,12 @@ public class PressurePlate : MonoBehaviour
     public AudioClip stepOnSound;
     public AudioClip stepOffSound;
 
-
     private void Start()
     {
         animator = GetComponentInParent<Animator>();
 
         source.volume = 0.3f;
     }
-
 
     private void OnTriggerEnter(Collider other)
     {
