@@ -53,7 +53,7 @@ public class PlayerStats : MonoBehaviour
     IEnumerator DeathCycle(float wait)
     {
         playerIsDead = true;
-        gameObject.GetComponent<PlayerController>().SetCutsceneMode(true);
+        gameObject.GetComponent<PlayerController>().CutsceneMode = true;
         gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 0.5f, gameObject.transform.position.z);
         gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePosition;
 
@@ -61,7 +61,7 @@ public class PlayerStats : MonoBehaviour
 
         checkpointManager.GetComponent<CheckpointManager>().RespawnAtCheckpoint();
         playerIsDead = false;
-        gameObject.GetComponent<PlayerController>().SetCutsceneMode(false);
+        gameObject.GetComponent<PlayerController>().CutsceneMode = false;
         gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
     }
 }

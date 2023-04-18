@@ -39,18 +39,18 @@ public class Interactable : MonoBehaviour
         //isActivated = false;
         //interactableScript = (IInteractable)interactableComponent;
 
-        if ((IInteractable)gameObject.GetComponent<IInteractable>() != null)
+        if (gameObject.GetComponent<IInteractable>() != null)
         {
-            interactableScript = (IInteractable)gameObject.GetComponent<IInteractable>();
+            interactableScript = gameObject.GetComponent<IInteractable>();
             Debug.Log("Interactable script found on: " + gameObject.name);
         } else
         {
             Transform[] allChildren = GetComponentsInChildren<Transform>();
             foreach (Transform child in allChildren)
             {
-                if ((IInteractable)child.gameObject.GetComponent<IInteractable>() != null)
+                if (child.gameObject.GetComponent<IInteractable>() != null)
                 {
-                    interactableScript = (IInteractable)child.gameObject.GetComponent<IInteractable>();
+                    interactableScript = child.gameObject.GetComponent<IInteractable>();
                     Debug.Log("Interactable script found on: " + child.gameObject.name);
                 }
             }
@@ -70,7 +70,7 @@ public class Interactable : MonoBehaviour
         interactRadius.InteractableExit += InteractableOutOfRange;
         if (objectToActivate != null)
         {
-            activatableScript = (IActivatable)objectToActivate.GetComponent(typeof(IActivatable));
+            activatableScript = objectToActivate.GetComponent<IActivatable>();
         }
     }
 

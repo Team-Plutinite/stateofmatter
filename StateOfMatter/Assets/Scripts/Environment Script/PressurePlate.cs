@@ -11,20 +11,18 @@ public class PressurePlate : MonoBehaviour
 
     private Animator animator;
 
-    private void Start()
-    {
-        animator = GetComponentInParent<Animator>();
-    }
-
-
     public AudioSource source;
     public AudioClip stepOnSound;
     public AudioClip stepOffSound;
 
-    void Start()
+
+    private void Start()
     {
+        animator = GetComponentInParent<Animator>();
+
         source.volume = 0.3f;
     }
+
 
     private void OnTriggerEnter(Collider other)
     {

@@ -151,7 +151,6 @@ public class Weapon : MonoBehaviour
         }
 
         currentMode = MatterState.Gas;
-        hudStateSprites[2].SetActive(true);
 
         //Transform stateSpritesQuickReference = GameObject.FindWithTag("Player").transform.Find("PlayerHUD").Find("StateSprites");
         if (hudStateSprites == null)
@@ -163,6 +162,9 @@ public class Weapon : MonoBehaviour
             hudStateSprites[1] = GameObject.Find("Player/PlayerHUD/HUDCanvas/StateSprites/EmptyLiquidImg/FullLiquidImg");
             hudStateSprites[2] = GameObject.Find("Player/PlayerHUD/HUDCanvas/StateSprites/EmptyGasImg/FullGasImg");
         }
+
+
+        hudStateSprites[2].SetActive(true);
     }
 
     public MatterState GetMatterState()
