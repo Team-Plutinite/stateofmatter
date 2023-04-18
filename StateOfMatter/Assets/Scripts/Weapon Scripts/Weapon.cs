@@ -134,6 +134,7 @@ public class Weapon : MonoBehaviour
             newCloud.SetActive(false);
             newCloud.GetComponent<GasAttacker>().OnStay += CloudDamageEnemy;
             newCloud.GetComponent<GasAttacker>().MeltEnter += CloudDamageMeltable;
+            newCloud.GetComponent<GasAttacker>().BarrelEnter += CloudDamageBarrel;
             gasClouds.Enqueue(newCloud);
         }
 
@@ -274,6 +275,11 @@ public class Weapon : MonoBehaviour
             enemy.ApplyDebuff("RAW_GAS_DEBUFF", new Debuff(0.25f, null, () => enemy.TakeDamage(Time.deltaTime * gasDmg), null));
         
         enemy.Afflict(MatterState.Gas, effectDur, Time.deltaTime);
+    }
+
+    private void CloudDamageBarrel(Barrel barrel)
+    {
+        barrel.DamageBarrel();
     }
 
     //Begin Damaging ice when it enters the gas cloud.
