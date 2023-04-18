@@ -91,8 +91,6 @@ public class GasAttacker : MonoBehaviour
 
             Debug.Log("Barrel Called");
         }
-
-        Debug.Log(other.gameObject.name);
     }
 
     private void OnTriggerExit(Collider other)

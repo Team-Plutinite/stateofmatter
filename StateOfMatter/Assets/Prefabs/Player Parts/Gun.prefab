@@ -221,6 +221,8 @@ MonoBehaviour:
   gasSystem: {fileID: 0}
   liquidSystem: {fileID: 0}
   solidSystem: {fileID: 0}
+  hudStateSprites:
+  - {fileID: 0}
   pulseAngle: 45
   pulseRange: 10
   pulseForce: 250
@@ -242,8 +244,6 @@ MonoBehaviour:
   gasMaxEmissionTime: 1.5
   gasCooldown: 1
   gasCharge: 0
-  gasCDTmr: 0
-  gasEmissionTmr: 0
   gasCloudPoolCount: 50
   gasCloudPrefab: {fileID: 4412169943812523958, guid: 31702495fcb0f0040898e8483cf578fb, type: 3}
   debug: 0
