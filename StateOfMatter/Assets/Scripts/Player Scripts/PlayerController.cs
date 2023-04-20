@@ -372,6 +372,13 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
+    public void PickupGun()
+    {
+        hasGun = true;
+        playerGun.SetActive(true);
+        playerGun.GetComponent<Weapon>().ResetFire(MatterState.Gas);
+    }
+
     public Vector3 InputDirection { get { return inputDir; } }
 
     public bool OnLadder { get { return onLadder; } set { onLadder = value; } }

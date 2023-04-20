@@ -232,7 +232,7 @@ public class EnemyStats : MonoBehaviour
     public void TakeDamage(float dmgAmt)
     {
         hp -= dmgAmt;
-        transform.GetComponentInChildren<TextMeshPro>().text = hp.ToString();
+        transform.GetComponentInChildren<TextMeshPro>().text = ((int)hp).ToString();
 
         if (hp <= 0) manager.KillEnemy(gameObject.GetInstanceID());
     }
