@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     public AudioClip backSound;
     public AudioClip hoverSound;
 
+    public GameObject pauseUI;
+    public GameObject optionsUI;
+
     public bool paused { get; set; }
     void Start()
     {
@@ -26,8 +29,13 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (paused)
+            if (paused && pauseUI.activeInHierarchy)
                 ResumeGame();
+            else if (paused && optionsUI.activeInHierarchy)
+            {
+                pauseUI.SetActive(true);
+                optionsUI.SetActive(false);
+            }
             else
                 PauseGame();
         }
