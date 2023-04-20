@@ -25,7 +25,6 @@ public class BarrelDispenser : MonoBehaviour
                 if (barrelPrefab == null) Debug.Log($"({name}) -> ERROR creating barrel: barrelPrefab is null. You probably didn't set it in the inspector.");
             }
         }
-            
     }
 
     // Update is called once per frame
@@ -35,10 +34,14 @@ public class BarrelDispenser : MonoBehaviour
     }
 
     /// <summary>
-    /// Resets the exploded barrel, essentially resetting and then redispensing it
+    /// Resets the exploded barrel after [delay] seconds, essentially resetting and then redispensing it
     /// </summary>
-    public void DispenseNewBarrel()
+    private IEnumerator ResetBarrel(float delay)
     {
+        for (float i = 0.0f; i < delay; i += Time.deltaTime)
+            yield return new WaitForSeconds(Time.deltaTime);
         dispensedBarrel.transform.SetPositionAndRotation(transform.position, Quaternion.identity);
+        dispensedBarrel.SetActive(true);
+        dispensedBarrel.transform.GetChild(0).gameObject.SetActive(true);
     }
 }

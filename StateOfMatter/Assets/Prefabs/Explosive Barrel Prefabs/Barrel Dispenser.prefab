@@ -97,4 +97,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dispensedBarrel: {fileID: 0}
-  barrelPrefab: {fileID: 0}
+  barrelPrefab: {fileID: 603642683481829526, guid: 087783b10d923274fa5845add6b58d5c, type: 3}
