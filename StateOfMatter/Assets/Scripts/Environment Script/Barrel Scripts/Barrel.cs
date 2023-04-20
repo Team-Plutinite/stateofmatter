@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class Barrel : MonoBehaviour
 {
-    int health;
-    bool exploded = false;
+    public delegate void BarrelDestroyEvent();
+    public BarrelDestroyEvent OnDestroyed;
+    public int health;
+    public bool exploded = false;
 
     [SerializeField] private float explosionRadius = 5f;
     [SerializeField] private float explosionForce = 60f;
@@ -43,6 +45,7 @@ public class Barrel : MonoBehaviour
             Explode();
             exploded = true;
             this.gameObject.SetActive(false);
+            OnDestroyed?.Invoke();
         }
     }
 }
