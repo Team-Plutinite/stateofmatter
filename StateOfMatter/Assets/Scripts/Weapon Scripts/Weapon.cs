@@ -137,8 +137,8 @@ public class Weapon : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         playerCam = player.transform.GetComponentInChildren<Camera>().gameObject;
         enemyManager = GameObject.FindGameObjectWithTag("EnemyManager").GetComponent<EnemyManager>();
-        FiringSystem = new ParticleSystem[3] { solidSystem, liquidSystem, gasSystem  };
-
+        FiringSystem = new ParticleSystem[3] { solidSystem, liquidSystem, gasSystem };
+        
         playerHUD = player.GetComponentInChildren<HUDController>();
         if (playerHUD == null) Debug.Log("WARNING: Weapon.cs could not find HUDController!");
 
@@ -413,7 +413,7 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    private void ResetFire(MatterState newState)
+    public void ResetFire(MatterState newState)
     {
         gasCharge = 0.0f;
         gasEmissionTmr = 0.0f;
