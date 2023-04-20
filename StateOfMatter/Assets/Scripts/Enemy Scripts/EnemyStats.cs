@@ -20,6 +20,7 @@ public class EnemyStats : MonoBehaviour
     private float solidMoveSpeedMult;
 
     private float maxHP;
+    [SerializeField]
     private float hp;
 
     private MatterState debuffState;
@@ -196,7 +197,7 @@ public class EnemyStats : MonoBehaviour
         {
             EnemyStats e = a.GetComponent<EnemyStats>();
             e.Stun(0.75f);
-            a.GetComponent<Rigidbody>().AddExplosionForce(3000f, transform.position, 3f);
+            a.GetComponent<Rigidbody>().AddExplosionForce(250f, transform.position, 3f);
             e.TakeDamage(30.0f);
         });
     }
