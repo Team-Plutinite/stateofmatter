@@ -5,15 +5,22 @@ using UnityEngine.UI;
 
 public class HUDController : MonoBehaviour
 {
-    private Image indicator;
+    // Gas mode sprites
+    private Image indicatorLeft;
+    private Image indicatorRight;
+    private Image gasCrossRed;
+
     private GameObject[] hudStateSprites;
     private GameObject[] hudCrosshairSprites;
 
     // Start is called before the first frame update
     void Start()
     {
-        indicator = transform.Find("HUDCanvas/CrosshairSprites/GasCrossImg/ChargeUp_Indicator").GetComponent<Image>();
-        if (indicator == null) Debug.Log("ERROR in Charge-Up Controller: indicator image was not found.");
+        indicatorLeft = transform.Find("HUDCanvas/CrosshairSprites/GasCrossImg/ChargeUp_Indicator_Left").GetComponent<Image>();
+        indicatorRight = transform.Find("HUDCanvas/CrosshairSprites/GasCrossImg/ChargeUp_Indicator_Right").GetComponent<Image>();
+        gasCrossRed = transform.Find("HUDCanvas/CrosshairSprites/GasCrossImg/GasCrossImgRed").GetComponent<Image>();
+        if (indicatorLeft == null) Debug.Log("ERROR in Charge-Up Controller: left indicator image was not found.");
+        if (indicatorRight == null) Debug.Log("ERROR in Charge-Up Controller: right indicator image was not found.");
 
         hudStateSprites = new GameObject[3];
         hudCrosshairSprites = new GameObject[4];
@@ -30,9 +37,25 @@ public class HUDController : MonoBehaviour
     }
 
     // Set the progress indicator for the gas mode charge state (0 = 0%, 1 = 100%)
-    public void SetProgress(float amt)
+    public void SetGasChargeProgress(float amt)
     {
-        indicator.fillAmount = amt;
+        amt = Mathf.Clamp01(amt);
+        indicatorLeft.fillAmount = amt / 2.0f; // max at
+        indicatorRight.fillAmount = amt / 2.0f;
+    }
+
+    public void SetCrosshairOpacity(float amt)
+    {
+        foreach (GameObject crosshair in hudCrosshairSprites)
+        {
+            Color c = crosshair.GetComponent<Image>().color;
+            crosshair.GetComponent<Image>().color = new(c.r, c.g, c.b, Mathf.Clamp01(amt));
+        }
+    }
+
+    public void SetGasCDProgress(float amt)
+    {
+        gasCrossRed.fillAmount = Mathf.Clamp01(amt);
     }
 
     // Set the activate state in the player HUD.

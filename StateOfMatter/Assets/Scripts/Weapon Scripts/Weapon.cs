@@ -83,11 +83,12 @@ public class Weapon : MonoBehaviour
     public float gasMaxEmissionTime = 1.5f;
     [Tooltip("Cooldown before player can charge up the next emission")]
     public float gasCooldown = 1.0f;
-    private float gasCharge = 0.0f;
+    private float gasCharge;
     private float gasCDTmr;
     private float gasEmissionTmr;
     private float gasAtkTimer;
     private bool gasReleased;
+    private bool gasButtonHeld;
     [Tooltip("Gas cloud spawn pool count.")]
     public int gasCloudPoolCount = 50;
     private Queue<GameObject> gasClouds;
@@ -123,9 +124,15 @@ public class Weapon : MonoBehaviour
 
     private void Awake()
     {
-        solidAtkTimer = liquidAtkTimer = gasAtkTimer = 
-            gasCDTmr = gasEmissionTmr = pulseTimer = 0.0f;
+        solidAtkTimer = 0.0f;
+        liquidAtkTimer = 0.0f;
+        gasCharge = 0.0f;
+        gasAtkTimer = 0.0f;
+        gasCDTmr = 0.0f; 
+        gasEmissionTmr = 0.0f; 
+        pulseTimer = 0.0f;
         gasReleased = false;
+        gasButtonHeld = false;
 
         player = GameObject.FindGameObjectWithTag("Player");
         playerCam = player.transform.GetComponentInChildren<Camera>().gameObject;
@@ -177,14 +184,10 @@ public class Weapon : MonoBehaviour
         // Reduce timers
         solidAtkTimer -= Time.deltaTime;
         liquidAtkTimer -= Time.deltaTime;
-
         gasAtkTimer -= Time.deltaTime;
-        if (gasReleased)
-            gasEmissionTmr -= Time.deltaTime;
-        if (gasEmissionTmr <= 0.0f) 
-            gasCDTmr -= Time.deltaTime;
-
         pulseTimer -= Time.deltaTime;
+        if (gasEmissionTmr <= 0.0f)
+            gasCDTmr -= Time.deltaTime;
         fireSoundTimer -= Time.deltaTime;
 
         // Weapon Controls - ONLY if in Gameplay Mode
@@ -224,31 +227,22 @@ public class Weapon : MonoBehaviour
             //Press the r key to cycle through MatterState
             if (Input.GetKeyDown(KeyCode.R))
             {
-                FiringSystem[(int)currentMode].gameObject.SetActive(false);
-
-                currentMode++;
-                if ((int)currentMode > 2)
-                    currentMode = MatterState.Ice;
-
-                FiringSystem[(int)currentMode].gameObject.SetActive(true);
-                ResetFire();
+                int s = ((int)currentMode + 1) % 3;
+                ResetFire((MatterState)s);
             }
 
                 //Use the number keys to switch weapons.
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                currentMode = MatterState.Ice;
-                ResetFire(); //Resets hitbox and particles
+                ResetFire(MatterState.Ice); //Resets hitbox and particles
             }
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                currentMode = MatterState.Water;
-                ResetFire();
+                ResetFire(MatterState.Water);
             }
             if (Input.GetKeyDown(KeyCode.Alpha3))
             {
-                currentMode = MatterState.Gas;
-                ResetFire();
+                ResetFire(MatterState.Gas);
             }
         }
     }
@@ -300,7 +294,9 @@ public class Weapon : MonoBehaviour
         // Determine the firing mode
         switch (currentMode)
         {
-            case MatterState.Ice: // SOLID MODE PRIMARY FIRE
+            // -- SOLID MODE PRIMARY FIRE -- \\
+
+            case MatterState.Ice: 
                 source.loop = false; // semi-auto, so no loop
                 if (Input.GetMouseButtonDown(0) && solidAtkTimer <= 0.0f)
                 {
@@ -308,18 +304,21 @@ public class Weapon : MonoBehaviour
                     // Shotgun blast
                     player.GetComponent<PlayerController>().AddZRecoil(0.1f);
                     ShotgunAttack(innerSpreadAngle, outerSpreadAngle, solidRange, innerPelletCount, outerPelletCount, pelletDamage);
-
                     source.PlayOneShot(iceFireSound);
                 }
                 break;
 
-            case MatterState.Water: // LIQUID MODE PRIMARY FIRE
+            //  -- LIQUID MODE PRIMARY FIRE -- \\
+
+            case MatterState.Water: 
                 if (Input.GetMouseButton(0) && liquidAtkTimer <= 0.0f)
                 {
                     // Laser shot and activate particles
                     liquidAtkTimer = 1 / (liquidRPM / 60.0f);
                     LineAttack(liquidDmg, liquidRange);
-                    FiringSystem[(int)currentMode].gameObject.SetActive(true);
+
+                    if (!FiringSystem[(int)currentMode].isEmitting) 
+                        FiringSystem[(int)currentMode].Play();
 
                     if (fireSoundTimer <= 0.0f)
                     {
@@ -329,90 +328,101 @@ public class Weapon : MonoBehaviour
                 }
                 if (Input.GetMouseButtonUp(0))
                 {
-                    FiringSystem[(int)currentMode].gameObject.SetActive(false);
+                    FiringSystem[(int)currentMode].Stop();
                     source.Stop();
                 }
-
                 break;
 
-            case MatterState.Gas: // GAS MODE PRIMARY FIRE
-                gasReleased = true;
-                // Begin charge-up
-                if (Input.GetMouseButton(0) && gasCDTmr <= 0.0f)
+            // -- GAS MODE PRIMARY FIRE -- \\
+
+            case MatterState.Gas:
+
+                // Set the progress indicator to charge amt if charging, se to cooldown if on cooldown
+                playerHUD.SetGasChargeProgress(gasEmissionTmr / gasMaxEmissionTime);
+
+                // Begin emitting if there is charge (emit at rate of gasRPM)
+                if (gasReleased)
+                {
+                    if (gasAtkTimer <= 0.0f)
+                    {
+                        // Emit a gas cloud from the pool (dequeuing it, activating it, then requeuing it)
+                        if (!gasClouds.Peek().activeSelf)
+                        {
+                            GameObject activatedCloud = gasClouds.Dequeue();
+                            activatedCloud.GetComponent<GasAttacker>().Spawn(transform.position + transform.forward, transform.rotation, gasLife);
+                            gasClouds.Enqueue(activatedCloud);
+                        }
+                        gasAtkTimer = 1 / (gasRPM / 60.0f);
+                    }
+                    
+                    gasEmissionTmr -= Time.deltaTime;
+                    // if this is the last frame of fire, end the attack
+                    if (gasEmissionTmr <= 0.0f)
+                    {
+                        source.Stop();
+                        FiringSystem[(int)currentMode].Stop();
+                    }
+                }
+                if (gasEmissionTmr <= 0.0f)
                 {
                     gasReleased = false;
+                    playerHUD.SetCrosshairOpacity(0.5f);
+                    playerHUD.SetGasCDProgress(gasCDTmr / gasCooldown);
+                    // Last frame of cooldown, set button held to false so player can't just keep holding down
+                    if (gasCDTmr <= 0.0f)
+                        playerHUD.SetCrosshairOpacity(1.0f);
+                }
+
+                // Begin charge-up
+                if (Input.GetMouseButtonDown(0))
+                    gasButtonHeld = true;
+                if (gasButtonHeld && gasCDTmr <= 0.0f)
+                {
                     gasCharge += Time.deltaTime;
                     gasEmissionTmr = Mathf.Lerp(0, gasMaxEmissionTime, gasCharge / gasChargeTime);
 
-                        source.PlayOneShot(steamChargeSound); //playing audio
-
-                    Debug.Log("mouse is being held down");
+                    if (!source.isPlaying) source.PlayOneShot(steamChargeSound); //playing audio
 
                     // Immediately release once hitting max charge time
                     if (gasCharge >= gasChargeTime)
                     {
+                        gasButtonHeld = false;
                         gasReleased = true;
                         gasCDTmr = gasCooldown;
                         gasCharge = 0.0f;
+                        FiringSystem[(int)currentMode].Play();
+                        source.PlayOneShot(steamFireSound);
                     }
                 }
-
                 // Reset charge when letting go
-                if (Input.GetMouseButtonUp(0))
+                if (Input.GetMouseButtonUp(0) && gasButtonHeld)
                 {
-                    gasCharge = 0.0f;
+                    gasButtonHeld = false;
+                    
                     if (gasCDTmr <= 0.0f)
+                    {
+                        gasReleased = true;
                         gasCDTmr = gasCooldown;
-                    source.Stop();
-                }
-
-                // Begin emitting if there is charge (emit at rate of gasRPM)
-                bool shouldShoot = gasReleased && gasEmissionTmr > 0.0f;
-                if (shouldShoot && gasAtkTimer <= 0.0f)
-                {
-                    gasAtkTimer = 1 / (gasRPM / 60.0f);
-
-                    // Emit a gas cloud from the pool (dequeuing it, activating it, then requeuing it)
-                    if (!gasClouds.Peek().activeSelf)
-                    {
-                        GameObject activatedCloud = gasClouds.Dequeue();
-                        activatedCloud.GetComponent<GasAttacker>().Spawn(transform.position + transform.forward, transform.rotation, gasLife);
-                        gasClouds.Enqueue(activatedCloud);
+                        gasCharge = 0.0f;
+                        FiringSystem[(int)currentMode].Play();
+                        source.Stop(); // stop the charge sound short
+                        source.PlayOneShot(steamFireSound);
                     }
-
-                    if (fireSoundTimer <= 0.0f)
-                    {
-                       // source.PlayOneShot(steamFireSound); //playing audio
-                        fireSoundTimer = steamFireSoundCooldown; //reset timer
-                    }
-                }
-
-                // activate particles and loop audio while shooting
-                source.loop = shouldShoot;
-
-                // Set the progress indicator to charge amt if charging, se to cooldown if on cooldown
-                if (gasCDTmr <= 0.0f)
-                    playerHUD.SetProgress(gasCharge / gasChargeTime);
-                else
-                    playerHUD.SetProgress(gasCDTmr / gasCooldown);
-
-                // Set the audio and particle systems accordingly to whether weapon is firing or not
-                if (shouldShoot)
-                    FiringSystem[(int)currentMode].Play();
-                else
-                {
-                    source.Stop();
-                    FiringSystem[(int)currentMode].Stop();
                 }
                 break;
         }
     }
 
-    private void ResetFire()
+    private void ResetFire(MatterState newState)
     {
         gasCharge = 0.0f;
-        FiringSystem[(int)currentMode].gameObject.SetActive(false);
+        gasEmissionTmr = 0.0f;
+        FiringSystem[(int)currentMode].Stop();
+
+        currentMode = newState;
+
         playerHUD.SetHUDMatterState(currentMode);
+        playerHUD.SetCrosshairOpacity(1.0f);
         source.loop = false;
         source.Stop();
     }
