@@ -16,11 +16,12 @@ public class HUDController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Set references
         indicatorLeft = transform.Find("HUDCanvas/CrosshairSprites/GasCrossImg/ChargeUp_Indicator_Left").GetComponent<Image>();
         indicatorRight = transform.Find("HUDCanvas/CrosshairSprites/GasCrossImg/ChargeUp_Indicator_Right").GetComponent<Image>();
         gasCrossRed = transform.Find("HUDCanvas/CrosshairSprites/GasCrossImg/GasCrossImgRed").GetComponent<Image>();
-        if (indicatorLeft == null) Debug.Log("ERROR in Charge-Up Controller: left indicator image was not found.");
-        if (indicatorRight == null) Debug.Log("ERROR in Charge-Up Controller: right indicator image was not found.");
+        if (indicatorLeft == null) Debug.Log("ERROR in HUDController: left indicator image was not found.");
+        if (indicatorRight == null) Debug.Log("ERROR in HUDController: right indicator image was not found.");
 
         hudStateSprites = new GameObject[3];
         hudCrosshairSprites = new GameObject[4];
@@ -40,10 +41,16 @@ public class HUDController : MonoBehaviour
     public void SetGasChargeProgress(float amt)
     {
         amt = Mathf.Clamp01(amt);
+        Color c = indicatorLeft.color;
+        c = new(Mathf.Lerp(1.0f, 0.25f, amt), c.g, c.b, c.a);
+
         indicatorLeft.fillAmount = amt / 2.0f; // max at
         indicatorRight.fillAmount = amt / 2.0f;
+        indicatorLeft.color = c;
+        indicatorRight.color = c;
     }
 
+    // Sets the opacity of the crosshair (between 0 and 1)
     public void SetCrosshairOpacity(float amt)
     {
         foreach (GameObject crosshair in hudCrosshairSprites)
@@ -53,12 +60,13 @@ public class HUDController : MonoBehaviour
         }
     }
 
+    // Set the Progess visual of gas mode cooldown (the red crosshair) (between 0 and 1)
     public void SetGasCDProgress(float amt)
     {
         gasCrossRed.fillAmount = Mathf.Clamp01(amt);
     }
 
-    // Set the activate state in the player HUD.
+    // Set the activated state in the player HUD (setting the active crosshair and bottom-left image).
     public void SetHUDMatterState(MatterState state)
     {
         for (int i = 0; i < 3; i++)
