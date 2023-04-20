@@ -109,11 +109,17 @@ public class Weapon : MonoBehaviour
     [SerializeField]
     public AudioSource source;
     private float fireSoundTimer;
-    private float fireSoundCooldown;
+    private const float steamFireSoundCooldown = 0.52f;
+    private const float waterFireSoundCooldown = 0.897f;
+
     [SerializeField]
     public AudioClip steamFireSound;
     [SerializeField]
-    public AudioClip freezeFireSound;
+    public AudioClip steamChargeSound;
+    [SerializeField]
+    public AudioClip iceFireSound;
+    [SerializeField]
+    public AudioClip waterFireSound;
 
     private void Awake()
     {
@@ -144,7 +150,6 @@ public class Weapon : MonoBehaviour
         source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.2f;
         fireSoundTimer = 0.0f;
-        fireSoundCooldown = 0.52f;
 
         if (debug)
         {
@@ -304,12 +309,7 @@ public class Weapon : MonoBehaviour
                     player.GetComponent<PlayerController>().AddZRecoil(0.1f);
                     ShotgunAttack(innerSpreadAngle, outerSpreadAngle, solidRange, innerPelletCount, outerPelletCount, pelletDamage);
 
-                    fireSoundCooldown = 0.83f;
-                    if (fireSoundTimer <= 0.0f)
-                    {
-                        source.PlayOneShot(freezeFireSound);
-                        fireSoundTimer = fireSoundCooldown;
-                    }
+                    source.PlayOneShot(iceFireSound);
                 }
                 break;
 
@@ -320,9 +320,19 @@ public class Weapon : MonoBehaviour
                     liquidAtkTimer = 1 / (liquidRPM / 60.0f);
                     LineAttack(liquidDmg, liquidRange);
                     FiringSystem[(int)currentMode].gameObject.SetActive(true);
+
+                    if (fireSoundTimer <= 0.0f)
+                    {
+                        source.PlayOneShot(waterFireSound); //playing audio
+                        fireSoundTimer = waterFireSoundCooldown; //reset timer
+                    }
                 }
                 if (Input.GetMouseButtonUp(0))
+                {
                     FiringSystem[(int)currentMode].gameObject.SetActive(false);
+                    source.Stop();
+                }
+
                 break;
 
             case MatterState.Gas: // GAS MODE PRIMARY FIRE
@@ -333,6 +343,10 @@ public class Weapon : MonoBehaviour
                     gasReleased = false;
                     gasCharge += Time.deltaTime;
                     gasEmissionTmr = Mathf.Lerp(0, gasMaxEmissionTime, gasCharge / gasChargeTime);
+
+                        source.PlayOneShot(steamChargeSound); //playing audio
+
+                    Debug.Log("mouse is being held down");
 
                     // Immediately release once hitting max charge time
                     if (gasCharge >= gasChargeTime)
@@ -349,6 +363,7 @@ public class Weapon : MonoBehaviour
                     gasCharge = 0.0f;
                     if (gasCDTmr <= 0.0f)
                         gasCDTmr = gasCooldown;
+                    source.Stop();
                 }
 
                 // Begin emitting if there is charge (emit at rate of gasRPM)
@@ -365,11 +380,10 @@ public class Weapon : MonoBehaviour
                         gasClouds.Enqueue(activatedCloud);
                     }
 
-                    fireSoundCooldown = 0.52f; //setting cooldown to length of audio clip
                     if (fireSoundTimer <= 0.0f)
                     {
-                        source.PlayOneShot(steamFireSound); //playing audio
-                        fireSoundTimer = fireSoundCooldown; //reset timer
+                       // source.PlayOneShot(steamFireSound); //playing audio
+                        fireSoundTimer = steamFireSoundCooldown; //reset timer
                     }
                 }
 

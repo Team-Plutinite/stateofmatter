@@ -221,8 +221,6 @@ MonoBehaviour:
   gasSystem: {fileID: 0}
   liquidSystem: {fileID: 0}
   solidSystem: {fileID: 0}
-  hudStateSprites:
-  - {fileID: 0}
   pulseAngle: 45
   pulseRange: 10
   pulseForce: 250
@@ -243,14 +241,15 @@ MonoBehaviour:
   gasChargeTime: 1
   gasMaxEmissionTime: 1.5
   gasCooldown: 1
-  gasCharge: 0
   gasCloudPoolCount: 50
   gasCloudPrefab: {fileID: 4412169943812523958, guid: 31702495fcb0f0040898e8483cf578fb, type: 3}
   debug: 0
   effectDur: 5
   source: {fileID: 0}
   steamFireSound: {fileID: 8300000, guid: bbf1c6d3754b89d4b8a1c91aaaf0b6b5, type: 3}
-  freezeFireSound: {fileID: 8300000, guid: c76990b4719b04f47acf3a014b8b47aa, type: 3}
+  steamChargeSound: {fileID: 8300000, guid: a246220e7bd2db64dbc45a913df72c27, type: 3}
+  iceFireSound: {fileID: 8300000, guid: 2c372b78ec1625149b54984d25e2a3db, type: 3}
+  waterFireSound: {fileID: 8300000, guid: ae7723fdd0fedfc4baa676b5870d983f, type: 3}
 --- !u!1 &2034437677648025772
 GameObject:
   m_ObjectHideFlags: 0
