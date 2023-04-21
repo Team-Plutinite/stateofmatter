@@ -250,6 +250,7 @@ MonoBehaviour:
   steamChargeSound: {fileID: 8300000, guid: 4b95a108fc4979f4492fe51fcd037026, type: 3}
   iceFireSound: {fileID: 8300000, guid: 2c372b78ec1625149b54984d25e2a3db, type: 3}
   waterFireSound: {fileID: 8300000, guid: ae7723fdd0fedfc4baa676b5870d983f, type: 3}
+  modeSwitchSound: {fileID: 8300000, guid: 82f8dd5bd321ad148aa77056d1a7d147, type: 3}
 --- !u!1 &2034437677648025772
 GameObject:
   m_ObjectHideFlags: 0
