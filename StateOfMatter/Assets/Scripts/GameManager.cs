@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
 
     public void ResumeGame()
     {
-        Time.timeScale = 1f;
+        Time.timeScale = 1;
         pauseScreen.SetActive(false);
         greenOverlay.SetActive(false);
         paused = false;
@@ -55,11 +55,12 @@ public class GameManager : MonoBehaviour
 
     public void PauseGame()
     {
-        Time.timeScale = 0f;
+        Time.timeScale = 0;
         pauseScreen.SetActive(true);
         greenOverlay.SetActive(true);
         paused = true;
         Cursor.lockState = CursorLockMode.None;
+        
         Cursor.visible = true;
     }
     public void GoToMainMenu()
