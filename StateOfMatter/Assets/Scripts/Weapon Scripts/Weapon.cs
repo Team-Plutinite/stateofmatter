@@ -122,6 +122,8 @@ public class Weapon : MonoBehaviour
     public AudioClip iceFireSound;
     [SerializeField]
     public AudioClip waterFireSound;
+    [SerializeField]
+    public AudioClip modeSwitchSound;
 
     private void Awake()
     {
@@ -425,6 +427,8 @@ public class Weapon : MonoBehaviour
         playerHUD.SetCrosshairOpacity(1.0f);
         source.loop = false;
         source.Stop();
+
+        source.PlayOneShot(modeSwitchSound);
     }
 
     /// <summary>

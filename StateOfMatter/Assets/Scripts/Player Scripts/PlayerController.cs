@@ -159,8 +159,18 @@ public class PlayerController : MonoBehaviour
         else
         {
             // CAMERA CONTROL \\
-            camPitchYaw.x += Input.GetAxisRaw("Mouse X") * lookSensitivity;
-            camPitchYaw.y = Mathf.Clamp(camPitchYaw.y + Input.GetAxisRaw("Mouse Y") * lookSensitivity, -89f, 89f);
+            if(Time.timeScale == 0)
+            {
+                //camPitchYaw.x = camPitchYaw.x; //stays where it is
+                //camPitchYaw.y = camPitchYaw.y; //stays where it is
+                Debug.Log("PAUSEDDDDDDD (hello from the playercontroller script)");
+            }
+            else
+            {
+
+                camPitchYaw.x += Input.GetAxisRaw("Mouse X") * lookSensitivity;
+                camPitchYaw.y = Mathf.Clamp(camPitchYaw.y + Input.GetAxisRaw("Mouse Y") * lookSensitivity, -89f, 89f);
+            }
 
             camRotQuat.eulerAngles = new(0, camPitchYaw.x, 0);
             body.MoveRotation(camRotQuat.normalized); // camera pitch (also character transform pitch)
