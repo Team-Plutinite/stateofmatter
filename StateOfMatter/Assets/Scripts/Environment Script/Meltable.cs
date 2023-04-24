@@ -26,6 +26,11 @@ public class Meltable : MonoBehaviour
     //Determines which axis the meltable melts from
     private Dictionary<MeltDirection, Vector3> meltDirectionDic = new Dictionary<MeltDirection, Vector3>();
 
+    // audio
+    public AudioSource source;
+    public AudioClip meltingSound;
+    private float meltSoundTimer;
+    private const float meltSoundCooldown = 0.145f;
 
     private void Awake()
     {
@@ -33,8 +38,16 @@ public class Meltable : MonoBehaviour
         meltDirectionDic.Add(MeltDirection.Y, new Vector3( 0f, deltaScaleAll.y, 0f));
         meltDirectionDic.Add(MeltDirection.Z, new Vector3(0f, 0f, deltaScaleAll.z));
         meltDirectionDic.Add(MeltDirection.All, deltaScaleAll);
+
+        source = gameObject.AddComponent<AudioSource>();
+        source.volume = 0.2f;
+        meltSoundTimer = 0.0f;
     }
 
+    void Update()
+    {
+        meltSoundTimer -= Time.deltaTime;
+    }
 
     public GameObject GetMelter()
     {
@@ -51,6 +64,12 @@ public class Meltable : MonoBehaviour
     {
         if (matterState == MatterState.Gas)
         {
+            if (meltSoundTimer <= 0.0f)
+            {
+                source.PlayOneShot(meltingSound);
+                Debug.Log("melting sound playing");
+                meltSoundTimer = meltSoundCooldown;
+            }
 
             melter.transform.localScale += meltDirectionDic[direction];
             if (melter.transform.localScale.x <= 0 || melter.transform.localScale.y <= 0 || melter.transform.localScale.z <= 0)
