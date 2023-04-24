@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8290443161721899930
+--- !u!1 &5568757186310264415
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,30 +8,30 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8290443161721899909}
-  - component: {fileID: 8290443161721899908}
-  - component: {fileID: 8290443161721899911}
-  - component: {fileID: 8290443161721899910}
-  - component: {fileID: 8290443161721899929}
-  - component: {fileID: 8290443161721899928}
-  - component: {fileID: 8290443161721899931}
-  - component: {fileID: 8290443161721899906}
-  - component: {fileID: 8290443161721899907}
+  - component: {fileID: 5568757186310264384}
+  - component: {fileID: 5568757186310264385}
+  - component: {fileID: 5568757186310264386}
+  - component: {fileID: 5568757186310264387}
+  - component: {fileID: 5568757186310264412}
+  - component: {fileID: 5568757186310264413}
+  - component: {fileID: 5568757186310264414}
+  - component: {fileID: 5568757186310264391}
+  - component: {fileID: 5568757186310264390}
   m_Layer: 0
-  m_Name: Meltables
+  m_Name: Ice Block
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 40
   m_IsActive: 1
---- !u!4 &8290443161721899909
+--- !u!4 &5568757186310264384
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8290443161721899930}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_GameObject: {fileID: 5568757186310264415}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 8, y: 1, z: 22}
   m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
@@ -39,13 +39,13 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8290443161721899908
+--- !u!114 &5568757186310264385
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8290443161721899930}
+  m_GameObject: {fileID: 5568757186310264415}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8233d90336aea43098adf6dbabd606a2, type: 3}
@@ -275,18 +275,18 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 2825
+  m_VersionIndex: 2828
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!114 &8290443161721899911
+--- !u!114 &5568757186310264386
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8290443161721899930}
+  m_GameObject: {fileID: 5568757186310264415}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ca002da428252441b92f28d83c8a65f, type: 3}
@@ -307,13 +307,13 @@ MonoBehaviour:
     RefIds:
     - rid: 8839801141505294340
       type: {class: Cube, ns: UnityEngine.ProBuilder.Shapes, asm: Unity.ProBuilder}
---- !u!23 &8290443161721899910
+--- !u!23 &5568757186310264387
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8290443161721899930}
+  m_GameObject: {fileID: 5568757186310264415}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -327,7 +327,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c22777d6e868e4f2fb421913386b154e, type: 2}
+  - {fileID: 2100000, guid: e8a7db8bb30ba7846922a11cebbe1a2f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -349,21 +349,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &8290443161721899929
+--- !u!33 &5568757186310264412
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8290443161721899930}
+  m_GameObject: {fileID: 5568757186310264415}
   m_Mesh: {fileID: 0}
---- !u!64 &8290443161721899928
+--- !u!64 &5568757186310264413
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8290443161721899930}
+  m_GameObject: {fileID: 5568757186310264415}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
@@ -371,44 +371,44 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
---- !u!114 &8290443161721899931
+--- !u!114 &5568757186310264414
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8290443161721899930}
+  m_GameObject: {fileID: 5568757186310264415}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9310e682d0f87174baaf727eed472230, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  melter: {fileID: 8290443161721899930}
+  melter: {fileID: 5568757186310264415}
   deltaScaleAll: {x: -0.01, y: -0.01, z: -0.01}
   direction: 1
---- !u!54 &8290443161721899906
+--- !u!54 &5568757186310264391
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8290443161721899930}
+  m_GameObject: {fileID: 5568757186310264415}
   serializedVersion: 2
-  m_Mass: 1
+  m_Mass: 1000
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &8290443161721899907
+--- !u!65 &5568757186310264390
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8290443161721899930}
+  m_GameObject: {fileID: 5568757186310264415}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
