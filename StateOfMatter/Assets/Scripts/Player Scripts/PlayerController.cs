@@ -163,7 +163,7 @@ public class PlayerController : MonoBehaviour
             {
                 //camPitchYaw.x = camPitchYaw.x; //stays where it is
                 //camPitchYaw.y = camPitchYaw.y; //stays where it is
-                Debug.Log("PAUSEDDDDDDD (hello from the playercontroller script)");
+                //Debug.Log("PAUSEDDDDDDD (hello from the playercontroller script)");
             }
             else
             {

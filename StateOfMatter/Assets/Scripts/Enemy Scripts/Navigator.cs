@@ -40,6 +40,7 @@ public class Navigator : MonoBehaviour
         if (activateOnSight) {
             movementEnabled = false;
         }
+        
 
     }
 
