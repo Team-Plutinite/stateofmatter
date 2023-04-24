@@ -7,14 +7,15 @@ public class ForwardButton : MonoBehaviour, IInteractable
     [SerializeField]
     SecurityFeed feed;
 
-   
-    // Start is called before the first frame update
+    public AudioSource source;
+    [SerializeField]
+    public AudioClip buttonSound;
+
     void Start()
     {
-        
+        source.volume = 0.2f;
     }
 
-    // Update is called once per frame
     void Update()
     {
         
@@ -23,6 +24,7 @@ public class ForwardButton : MonoBehaviour, IInteractable
     public void Activate()
     {
         feed.BackButton = false;
+        source.PlayOneShot(buttonSound);
     }
 
     public void Deactivate()
