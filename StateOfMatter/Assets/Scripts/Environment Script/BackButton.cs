@@ -8,21 +8,19 @@ public class BackButton : MonoBehaviour, IInteractable
     [SerializeField]
     SecurityFeed feed;
 
-    // Start is called before the first frame update
+    public AudioSource source;
+    [SerializeField]
+    public AudioClip buttonSound;
+
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        source.volume = 0.3f;
     }
 
     public void Activate()
     {
         feed.BackButton = true;
+        source.PlayOneShot(buttonSound);
     }
 
     public void Deactivate()
