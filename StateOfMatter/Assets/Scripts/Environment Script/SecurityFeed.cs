@@ -37,35 +37,37 @@ public class SecurityFeed : MonoBehaviour, IActivatable
 
     public void Activate()
     {
+        securityCams[idx].targetTexture = null;
 
         if (backButt)
         {
-            if(idx - 1 < 0)
+            //If statement handles rolling over the camera feed.
+            if (idx - 1 < 0)
             {
-                return;
+                idx = securityCams.Count;
             }
-            else
-            {
-                securityCams[idx].targetTexture = null ;
-                idx--;
-                securityCams[idx].targetTexture = renderTexture;
+          
+            idx--;
+            securityCams[idx].targetTexture = renderTexture;
 
                
-            }
+            
             
         }
         if (!backButt)
         {
+
+            //If statement handles rolling over the camera feed.
             if (idx + 1 >= securityCams.Count)
             {
-                return;
+                idx = -1;
             }
-            else
-            {
-                securityCams[idx].targetTexture = null;
-                idx++;
-                securityCams[idx].targetTexture = renderTexture;
-            }
+            
+            
+                
+            idx++;
+            securityCams[idx].targetTexture = renderTexture;
+            
         }
 
         Debug.Log(idx);

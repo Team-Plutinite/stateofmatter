@@ -12,6 +12,8 @@ public class Weapon : MonoBehaviour
     private EnemyManager enemyManager;
     private GameObject player;
     private GameObject playerCam;
+    // player HUD controller
+    private HUDController playerHUD;
 
     private MatterState currentMode = MatterState.Ice;
     //Handles the particles that come out when firing.
@@ -81,14 +83,16 @@ public class Weapon : MonoBehaviour
     public float gasMaxEmissionTime = 1.5f;
     [Tooltip("Cooldown before player can charge up the next emission")]
     public float gasCooldown = 1.0f;
-    private float gasCharge = 0.0f;
+    private float gasCharge;
     private float gasCDTmr;
     private float gasEmissionTmr;
     private float gasAtkTimer;
     private bool gasReleased;
+    private bool gasButtonHeld;
     [Tooltip("Gas cloud spawn pool count.")]
     public int gasCloudPoolCount = 50;
     private Queue<GameObject> gasClouds;
+    private GameObject gasCloudPool;
     public GameObject gasCloudPrefab;
 
     [Space]
@@ -107,38 +111,57 @@ public class Weapon : MonoBehaviour
     [SerializeField]
     public AudioSource source;
     private float fireSoundTimer;
-    private float fireSoundCooldown;
+    private const float steamFireSoundCooldown = 0.52f;
+    private const float waterFireSoundCooldown = 0.897f;
+
     [SerializeField]
     public AudioClip steamFireSound;
     [SerializeField]
-    public AudioClip freezeFireSound;
+    public AudioClip steamChargeSound;
+    [SerializeField]
+    public AudioClip iceFireSound;
+    [SerializeField]
+    public AudioClip waterFireSound;
+    [SerializeField]
+    public AudioClip modeSwitchSound;
 
     private void Awake()
     {
-        solidAtkTimer = liquidAtkTimer = gasAtkTimer = 
-            gasCDTmr = gasEmissionTmr = pulseTimer = 0.0f;
+        solidAtkTimer = 0.0f;
+        liquidAtkTimer = 0.0f;
+        gasCharge = 0.0f;
+        gasAtkTimer = 0.0f;
+        gasCDTmr = 0.0f; 
+        gasEmissionTmr = 0.0f; 
+        pulseTimer = 0.0f;
         gasReleased = false;
+        gasButtonHeld = false;
 
         player = GameObject.FindGameObjectWithTag("Player");
         playerCam = player.transform.GetComponentInChildren<Camera>().gameObject;
         enemyManager = GameObject.FindGameObjectWithTag("EnemyManager").GetComponent<EnemyManager>();
-        FiringSystem = new ParticleSystem[3] { solidSystem, liquidSystem, gasSystem  };
+        FiringSystem = new ParticleSystem[3] { solidSystem, liquidSystem, gasSystem };
+        
+        playerHUD = player.GetComponentInChildren<HUDController>();
+        if (playerHUD == null) Debug.Log("WARNING: Weapon.cs could not find HUDController!");
 
         // Fill the cloud pool
+        gasCloudPool = new GameObject();
+        gasCloudPool.name = "Gas Cloud Pool";
         gasClouds = new Queue<GameObject>();
         for (int i = 0; i < gasCloudPoolCount; i++)
         {
-            GameObject newCloud = Instantiate(gasCloudPrefab);
+            GameObject newCloud = Instantiate(gasCloudPrefab, gasCloudPool.transform);
             newCloud.SetActive(false);
             newCloud.GetComponent<GasAttacker>().OnStay += CloudDamageEnemy;
             newCloud.GetComponent<GasAttacker>().MeltEnter += CloudDamageMeltable;
+            newCloud.GetComponent<GasAttacker>().BarrelEnter += CloudDamageBarrel;
             gasClouds.Enqueue(newCloud);
         }
 
         source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.2f;
         fireSoundTimer = 0.0f;
-        fireSoundCooldown = 0.52f;
 
         if (debug)
         {
@@ -166,14 +189,10 @@ public class Weapon : MonoBehaviour
         // Reduce timers
         solidAtkTimer -= Time.deltaTime;
         liquidAtkTimer -= Time.deltaTime;
-
         gasAtkTimer -= Time.deltaTime;
-        if (gasEmissionTmr <= 0.0f) 
-            gasCDTmr -= Time.deltaTime;
-        if (gasReleased)
-            gasEmissionTmr -= Time.deltaTime;
-
         pulseTimer -= Time.deltaTime;
+        if (gasEmissionTmr <= 0.0f)
+            gasCDTmr -= Time.deltaTime;
         fireSoundTimer -= Time.deltaTime;
 
         // Weapon Controls - ONLY if in Gameplay Mode
@@ -213,30 +232,22 @@ public class Weapon : MonoBehaviour
             //Press the r key to cycle through MatterState
             if (Input.GetKeyDown(KeyCode.R))
             {
-                FiringSystem[(int)currentMode].gameObject.SetActive(false);
-
-                currentMode++;
-                if ((int)currentMode > 2)
-                    currentMode = MatterState.Ice;
-
-                FiringSystem[(int)currentMode].gameObject.SetActive(true);
+                int s = ((int)currentMode + 1) % 3;
+                ResetFire((MatterState)s);
             }
 
-            //Use the number keys to switch weapons.
+                //Use the number keys to switch weapons.
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                ResetFire(); //Resets hitbox and particles
-                currentMode = MatterState.Ice;
+                ResetFire(MatterState.Ice); //Resets hitbox and particles
             }
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                ResetFire();
-                currentMode = MatterState.Water;
+                ResetFire(MatterState.Water);
             }
             if (Input.GetKeyDown(KeyCode.Alpha3))
             {
-                ResetFire();
-                currentMode = MatterState.Gas;
+                ResetFire(MatterState.Gas);
             }
         }
     }
@@ -245,9 +256,21 @@ public class Weapon : MonoBehaviour
     {
         // If enemy already has a DOT on it, just reset its DOT timer.
         if (!enemy.ResetDebuff("RAW_GAS_DEBUFF"))
-            enemy.ApplyDebuff("RAW_GAS_DEBUFF", new Debuff(0.25f, null, () => enemy.TakeDamage(Time.deltaTime * gasDmg), null));
+            enemy.ApplyDebuff("RAW_GAS_DEBUFF", new Debuff(0.25f, 
+                () =>
+                {
+                    if (!enemy.gasFX.isEmitting) 
+                        enemy.gasFX.Play();
+                }, 
+                () => enemy.TakeDamage(Time.deltaTime * gasDmg), 
+                () => enemy.gasFX.Stop()));
         
         enemy.Afflict(MatterState.Gas, effectDur, Time.deltaTime);
+    }
+
+    private void CloudDamageBarrel(Barrel barrel)
+    {
+        barrel.DamageBarrel();
     }
 
     //Begin Damaging ice when it enters the gas cloud.
@@ -279,13 +302,13 @@ public class Weapon : MonoBehaviour
     private void TryFire()
     {
         // activate particles
-        // FiringSystem[(int)currentMode].gameObject.SetActive(true);
         source.loop = true;
-
         // Determine the firing mode
         switch (currentMode)
         {
-            case MatterState.Ice: // SOLID MODE PRIMARY FIRE
+            // -- SOLID MODE PRIMARY FIRE -- \\
+
+            case MatterState.Ice: 
                 source.loop = false; // semi-auto, so no loop
                 if (Input.GetMouseButtonDown(0) && solidAtkTimer <= 0.0f)
                 {
@@ -293,91 +316,119 @@ public class Weapon : MonoBehaviour
                     // Shotgun blast
                     player.GetComponent<PlayerController>().AddZRecoil(0.1f);
                     ShotgunAttack(innerSpreadAngle, outerSpreadAngle, solidRange, innerPelletCount, outerPelletCount, pelletDamage);
-
-                    fireSoundCooldown = 0.83f;
-                    if (fireSoundTimer <= 0.0f)
-                    {
-                        source.PlayOneShot(freezeFireSound);
-                        fireSoundTimer = fireSoundCooldown;
-                    }
+                    source.PlayOneShot(iceFireSound);
                 }
                 break;
 
-            case MatterState.Water: // LIQUID MODE PRIMARY FIRE
+            //  -- LIQUID MODE PRIMARY FIRE -- \\
+
+            case MatterState.Water: 
                 if (Input.GetMouseButton(0) && liquidAtkTimer <= 0.0f)
                 {
                     // Laser shot and activate particles
                     liquidAtkTimer = 1 / (liquidRPM / 60.0f);
                     LineAttack(liquidDmg, liquidRange);
-                    FiringSystem[(int)currentMode].gameObject.SetActive(true);
+
+                    if (!FiringSystem[(int)currentMode].isEmitting) 
+                        FiringSystem[(int)currentMode].Play();
+
+                    if (fireSoundTimer <= 0.0f)
+                    {
+                        source.PlayOneShot(waterFireSound); //playing audio
+                        fireSoundTimer = waterFireSoundCooldown; //reset timer
+                    }
                 }
                 if (Input.GetMouseButtonUp(0))
-                    FiringSystem[(int)currentMode].gameObject.SetActive(false);
+                {
+                    FiringSystem[(int)currentMode].Stop();
+                    source.Stop();
+                }
                 break;
 
-            case MatterState.Gas: // GAS MODE PRIMARY FIRE
-                gasReleased = true;
+            // -- GAS MODE PRIMARY FIRE -- \\
+
+            case MatterState.Gas:
+
                 // Begin charge-up
-                if (Input.GetMouseButton(0) && gasCDTmr <= 0.0f)
+                if (Input.GetMouseButtonDown(0))
+                    gasButtonHeld = true;
+                if (gasButtonHeld && gasCDTmr <= 0.0f)
                 {
-                    gasReleased = false;
                     gasCharge += Time.deltaTime;
                     gasEmissionTmr = Mathf.Lerp(0, gasMaxEmissionTime, gasCharge / gasChargeTime);
+                    // play charge-up audio during the charging process
+                    if (!source.isPlaying && gasCharge < gasChargeTime) 
+                        source.PlayOneShot(steamChargeSound);
+                }
+                // Reset charge when letting go
+                if (Input.GetMouseButtonUp(0) && gasButtonHeld)
+                {
+                    gasButtonHeld = false;
 
-                    // Immediately release once hitting max charge time
-                    if (gasCharge >= gasChargeTime)
+                    if (gasCDTmr <= 0.0f)
                     {
                         gasReleased = true;
                         gasCDTmr = gasCooldown;
                         gasCharge = 0.0f;
+                        FiringSystem[(int)currentMode].Play();
+                        source.Stop(); // stop the charge sound short
+                        source.PlayOneShot(steamFireSound);
                     }
                 }
 
-                // Reset charge when letting go
-                if (Input.GetMouseButtonUp(0))
-                {
-                    gasCharge = 0.0f;
-                    if (gasCDTmr <= 0.0f)
-                        gasCDTmr = gasCooldown;
-                }
+                // Set the progress indicator to charge amt if charging, se to cooldown if on cooldown
+                playerHUD.SetGasChargeProgress(gasEmissionTmr / gasMaxEmissionTime);
 
                 // Begin emitting if there is charge (emit at rate of gasRPM)
-                bool shouldShoot = gasReleased && gasEmissionTmr > 0.0f;
-                if (shouldShoot && gasAtkTimer <= 0.0f)
+                if (gasReleased)
                 {
-                    gasAtkTimer = 1 / (gasRPM / 60.0f);
-
-                    // Emit a gas cloud from the pool (dequeuing it, activating it, then requeuing it)
-                    if (!gasClouds.Peek().activeSelf)
+                    if (gasAtkTimer <= 0.0f)
                     {
-                        GameObject activatedCloud = gasClouds.Dequeue();
-                        activatedCloud.GetComponent<GasAttacker>().Spawn(transform.position + transform.forward, transform.rotation, gasLife);
-                        gasClouds.Enqueue(activatedCloud);
+                        // Emit a gas cloud from the pool (dequeuing it, activating it, then requeuing it)
+                        if (!gasClouds.Peek().activeSelf)
+                        {
+                            GameObject activatedCloud = gasClouds.Dequeue();
+                            activatedCloud.GetComponent<GasAttacker>().Spawn(transform.position + transform.forward, transform.rotation, gasLife);
+                            gasClouds.Enqueue(activatedCloud);
+                        }
+                        gasAtkTimer = 1 / (gasRPM / 60.0f);
                     }
-
-                    fireSoundCooldown = 0.52f; //setting cooldown to length of audio clip
-                    if (fireSoundTimer <= 0.0f)
+                    
+                    gasEmissionTmr -= Time.deltaTime;
+                    // if this is the last frame of fire, end the attack
+                    if (gasEmissionTmr <= 0.0f)
                     {
-                        Debug.Log("asd");
-                        source.PlayOneShot(steamFireSound); //playing audio
-                        fireSoundTimer = fireSoundCooldown; //reset timer
+                        source.Stop();
+                        FiringSystem[(int)currentMode].Stop();
                     }
                 }
-
-                // activate particles and loop audio while shooting
-                source.loop = shouldShoot;
-                if (!shouldShoot) source.Stop();
-                FiringSystem[(int)currentMode].gameObject.SetActive(shouldShoot);
+                if (gasEmissionTmr <= 0.0f)
+                {
+                    gasReleased = false;
+                    playerHUD.SetCrosshairOpacity(0.5f);
+                    playerHUD.SetGasCDProgress(gasCDTmr / gasCooldown);
+                    // Last frame of cooldown, set button held to false so player can't just keep holding down
+                    if (gasCDTmr <= 0.0f)
+                        playerHUD.SetCrosshairOpacity(1.0f);
+                }
                 break;
         }
     }
 
-    private void ResetFire()
+    public void ResetFire(MatterState newState)
     {
         gasCharge = 0.0f;
-        FiringSystem[(int)currentMode].gameObject.SetActive(false);
+        gasEmissionTmr = 0.0f;
+        FiringSystem[(int)currentMode].Stop();
+
+        currentMode = newState;
+
+        playerHUD.SetHUDMatterState(currentMode);
+        playerHUD.SetCrosshairOpacity(1.0f);
         source.loop = false;
         source.Stop();
+
+        source.PlayOneShot(modeSwitchSound);
     }
 
     /// <summary>

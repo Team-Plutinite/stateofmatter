@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,6 +21,7 @@ public class EnemyStats : MonoBehaviour
     private float solidMoveSpeedMult;
 
     private float maxHP;
+    [SerializeField]
     private float hp;
 
     private MatterState debuffState;
@@ -32,6 +34,10 @@ public class EnemyStats : MonoBehaviour
     // component references
     private NavMeshAgent agent;
     private Rigidbody body;
+    [Tooltip("Ref to this enemy's gas VFX")]
+    public ParticleSystem gasFX;
+    [Tooltip("Ref to burst VFX prefab")]
+    public GameObject gasBurstFX;
 
     Dictionary<string, Debuff> debuffMap;
 
@@ -186,12 +192,17 @@ public class EnemyStats : MonoBehaviour
         agent.isStopped = true;
     }
 
-    // Burst the enemy, doing single-shot AOE then adding individual DOT effect
+    // Burst the enemy, doing single-shot AOE
     public void Burst()
     {
         heatAmt = 0;
         debuffState = MatterState.Gas;
-        
+
+        // Create the explopsion particle, play it, then destroy it
+        // Hoping this doesn't kill frames when there are a crapton of these, we'll have to see
+        GameObject particle = Instantiate(gasBurstFX, transform.position, Quaternion.identity);
+        Destroy(particle, 3.0f);
+
         manager.CreateAOE(transform.position, 3.0f, a =>
         {
             EnemyStats e = a.GetComponent<EnemyStats>();
@@ -231,7 +242,7 @@ public class EnemyStats : MonoBehaviour
     public void TakeDamage(float dmgAmt)
     {
         hp -= dmgAmt;
-        transform.GetComponentInChildren<TextMeshPro>().text = hp.ToString();
+        transform.GetComponentInChildren<TextMeshPro>().text = ((int)hp).ToString();
 
         if (hp <= 0) manager.KillEnemy(gameObject.GetInstanceID());
     }
