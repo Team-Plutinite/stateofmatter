@@ -1,10 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class HUDController : MonoBehaviour
 {
+    private struct Dialogue
+    {
+        public Dialogue(string speaker, string message, float time)
+        {
+            this.speaker = speaker;
+            this.message = message;
+            this.time = time;
+        }
+        public string speaker;
+        public string message;
+        public float time;
+    }
     // Gas mode sprites
     private Image indicatorLeft;
     private Image indicatorRight;
@@ -12,6 +25,11 @@ public class HUDController : MonoBehaviour
 
     private GameObject[] hudStateSprites;
     private GameObject[] hudCrosshairSprites;
+
+    [SerializeField] private GameObject hudSubtitle;
+
+    private Queue<Dialogue> dialogueQ;
+    private Dialogue currentDialogue;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +53,21 @@ public class HUDController : MonoBehaviour
         hudCrosshairSprites[3] = transform.Find("HUDCanvas/CrosshairSprites/DefaultCrossImg").gameObject;
 
         hudStateSprites[2].SetActive(true);
+
+        if (hudSubtitle == null) 
+            Debug.Log("ERROR in HUDController: HUD Subtitle object reference is null.");
+        dialogueQ = new();
+    }
+
+    private void Update()
+    {
+        currentDialogue.time -= Time.deltaTime;
+        if (currentDialogue.time <= 0)
+        {
+            hudSubtitle.SetActive(dialogueQ.TryDequeue(out currentDialogue));
+            hudSubtitle.transform.Find("Speaker").GetComponent<TextMeshProUGUI>().text = currentDialogue.speaker + ":";
+            hudSubtitle.transform.Find("Dialogue").GetComponent<TextMeshProUGUI>().text = currentDialogue.message;
+        }
     }
 
     // Set the progress indicator for the gas mode charge state (0 = 0%, 1 = 100%)
@@ -78,5 +111,16 @@ public class HUDController : MonoBehaviour
 
         hudCrosshairSprites[(int)state].SetActive(true);
         hudStateSprites[(int)state].SetActive(true);
+    }
+
+    /// <summary>
+    /// Add a new subtitle text to the subtitle queue.
+    /// </summary>
+    /// <param name="speakerName">The name of the one speaking.</param>
+    /// <param name="message">The message being spoken.</param>
+    /// <param name="time">How long this subtitle should display for.</param>
+    public void QueueSubtitle(string speakerName, string message, float time)
+    {
+        dialogueQ.Enqueue(new Dialogue(speakerName, message, time));
     }
 }

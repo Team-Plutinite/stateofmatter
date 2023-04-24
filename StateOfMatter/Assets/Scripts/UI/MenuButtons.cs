@@ -20,6 +20,19 @@ public class MenuButtons : MonoBehaviour
         source.volume = 0.3f;
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (optionsMenu.activeInHierarchy)
+                BackButtonPressed();
+            else if (controlsMenu.activeInHierarchy)
+                BackButtonPressed();
+            else
+                QuitGame();
+        }
+    }
+
     public void ReturnToMainMenu()
     {
         SceneManager.LoadScene(0);

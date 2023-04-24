@@ -8,16 +8,21 @@ public class Climber : MonoBehaviour
     public float climbSpeed = 5.0f;
     private GameObject player;
 
-    // Start is called before the first frame update
+    public AudioSource source;
+    public AudioClip climbingSound;
+    private float fireSoundTimer;
+    private const float climbingSoundCooldown = 0.316f;
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+
+        source.volume = 0.2f;
+        fireSoundTimer = 0.0f;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        fireSoundTimer -= Time.deltaTime;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -26,12 +31,20 @@ public class Climber : MonoBehaviour
         {
             player.GetComponent<Rigidbody>().useGravity = false;
             player.GetComponent<PlayerController>().OnLadder = true;
+
         }
     }
     private void OnTriggerStay(Collider other)
     {
         if (other.gameObject == player)
         {
+
+            if (fireSoundTimer <= 0.0f)
+            {
+                source.PlayOneShot(climbingSound);
+                fireSoundTimer = climbingSoundCooldown;
+            }
+
             Rigidbody body = player.GetComponent<Rigidbody>();
             PlayerController pctrl = player.GetComponent<PlayerController>();
             float yVel = 0;
@@ -53,6 +66,10 @@ public class Climber : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject == player)
+        {
             player.GetComponent<PlayerController>().OnLadder = false;
+
+            source.Stop();
+        }
     }
 }
