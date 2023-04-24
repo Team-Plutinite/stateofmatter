@@ -64,7 +64,7 @@ public class EnemyStats : MonoBehaviour
         // HP data
         this.hp = hp;
         maxHP = hp;
-        transform.GetComponentInChildren<TextMeshPro>().text = hp.ToString();
+        //transform.GetComponentInChildren<TextMeshPro>().text = hp.ToString();
 
         // DEBUFF data
         heatAmt = iceAmt = 0;
@@ -242,7 +242,7 @@ public class EnemyStats : MonoBehaviour
     public void TakeDamage(float dmgAmt)
     {
         hp -= dmgAmt;
-        transform.GetComponentInChildren<TextMeshPro>().text = ((int)hp).ToString();
+        //transform.GetComponentInChildren<TextMeshPro>().text = ((int)hp).ToString();
 
         if (hp <= 0) manager.KillEnemy(gameObject.GetInstanceID());
     }
