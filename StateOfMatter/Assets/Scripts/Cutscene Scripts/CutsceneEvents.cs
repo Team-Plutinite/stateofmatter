@@ -17,6 +17,8 @@ public class CutsceneEvents : MonoBehaviour
     public GameObject pHUD;
     private HUDController pHUDController;
 
+    public AudioSource source;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -55,6 +57,7 @@ public class CutsceneEvents : MonoBehaviour
                 aliceAnimator.enabled = true;
                 aliceAS.Play();
                 SubtitledCutscene();
+                source.volume = 0.01f;
             }
         }
     }
