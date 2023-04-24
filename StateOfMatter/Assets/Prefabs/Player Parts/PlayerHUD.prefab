@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7915206443348854192}
   - component: {fileID: 8233239760519666860}
   - component: {fileID: 7106972219056463093}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ChargeUp_Indicator_Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,7 +87,7 @@ GameObject:
   - component: {fileID: 6345114951449966984}
   - component: {fileID: 3558104489170442254}
   - component: {fileID: 5556326655118169141}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ChargeUp_Indicator_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -163,7 +163,7 @@ GameObject:
   - component: {fileID: 1055779812969635834}
   - component: {fileID: 7843221941974942010}
   - component: {fileID: 2916431416685256337}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: GasCrossImgRed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -239,7 +239,7 @@ GameObject:
   - component: {fileID: 6748473791366777199}
   - component: {fileID: 6748473791366777197}
   - component: {fileID: 6748473791366777198}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: GasCrossImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -318,7 +318,7 @@ GameObject:
   - component: {fileID: 6748473791367734900}
   - component: {fileID: 6748473791367734898}
   - component: {fileID: 6748473791367734899}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HUDLineElements
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -394,7 +394,7 @@ GameObject:
   - component: {fileID: 6748473791439978999}
   - component: {fileID: 6748473791439978997}
   - component: {fileID: 6748473791439978998}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Glow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -470,7 +470,7 @@ GameObject:
   - component: {fileID: 6748473791459279088}
   - component: {fileID: 6748473791459279086}
   - component: {fileID: 6748473791459279087}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: SolidCrossImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -546,7 +546,7 @@ GameObject:
   - component: {fileID: 6748473791485819383}
   - component: {fileID: 6748473791485819381}
   - component: {fileID: 6748473791485819382}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: LiquidCrossImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -622,7 +622,7 @@ GameObject:
   - component: {fileID: 6748473791525431799}
   - component: {fileID: 6748473791525431797}
   - component: {fileID: 6748473791525431798}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HelmetBRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -698,7 +698,7 @@ GameObject:
   - component: {fileID: 6748473791606835493}
   - component: {fileID: 6748473791606835491}
   - component: {fileID: 6748473791606835492}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FullLiquidImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -774,7 +774,7 @@ GameObject:
   - component: {fileID: 6748473791690826274}
   - component: {fileID: 6748473791690826272}
   - component: {fileID: 6748473791690826273}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HelmetBLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -851,7 +851,7 @@ GameObject:
   - component: {fileID: 6748473791907713127}
   - component: {fileID: 6748473791907713128}
   - component: {fileID: 6748473791907713129}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HUDCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -955,7 +955,7 @@ GameObject:
   - component: {fileID: 6748473792031854102}
   - component: {fileID: 6748473792031854100}
   - component: {fileID: 6748473792031854101}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: EmptySolidImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1030,7 +1030,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6748473792072854588}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: CrosshairSprites
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1072,7 +1072,7 @@ GameObject:
   - component: {fileID: 6748473792151556675}
   - component: {fileID: 6748473792151556673}
   - component: {fileID: 6748473792151556674}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HelmetBottomBorder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1147,7 +1147,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6748473792229835010}
   - component: {fileID: 2332712258177259217}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PlayerHUD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1193,7 +1193,7 @@ GameObject:
   - component: {fileID: 6748473792468734876}
   - component: {fileID: 6748473792468734874}
   - component: {fileID: 6748473792468734875}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FullGasImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1267,7 +1267,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6748473792558924905}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HelmetSprites
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1310,7 +1310,7 @@ GameObject:
   - component: {fileID: 6748473792592528824}
   - component: {fileID: 6748473792592528822}
   - component: {fileID: 6748473792592528823}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FullSolidImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1386,7 +1386,7 @@ GameObject:
   - component: {fileID: 6748473792749800304}
   - component: {fileID: 6748473792749800302}
   - component: {fileID: 6748473792749800303}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: DefaultCrossImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1462,7 +1462,7 @@ GameObject:
   - component: {fileID: 6748473792794583397}
   - component: {fileID: 6748473792794583395}
   - component: {fileID: 6748473792794583396}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: EmptyGasImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1539,7 +1539,7 @@ GameObject:
   - component: {fileID: 6748473792816631148}
   - component: {fileID: 6748473792816631146}
   - component: {fileID: 6748473792816631147}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: EmptyLiquidImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1616,7 +1616,7 @@ GameObject:
   - component: {fileID: 6748473793110814163}
   - component: {fileID: 6748473793110814161}
   - component: {fileID: 6748473793110814162}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HelmetTop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1693,7 +1693,7 @@ GameObject:
   - component: {fileID: 6748473793342730415}
   - component: {fileID: 6748473793342730416}
   - component: {fileID: 6748473793342730417}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HelmetTopBorder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1781,7 +1781,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6748473793368124514}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: StateSprites
   m_TagString: Untagged
   m_Icon: {fileID: 0}

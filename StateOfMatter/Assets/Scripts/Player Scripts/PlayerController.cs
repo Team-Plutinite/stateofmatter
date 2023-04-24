@@ -16,26 +16,27 @@ public enum PlayerMoveState
 
 public class PlayerController : MonoBehaviour
 {// Instance Editable variables
-    [Header("Walk & Crouch Settings")]
-    public float maxWalkSpeed = 5.0f;
-    public float movementAccelGround = 50.0f;
-    public float crouchSpeedMultiplier = 0.5f;
-    public float movementAccelAir = 2.0f;
-    public float groundDrag = 10.0f;
+    [Header("Movement Settings")]
+    public float movementAccelGround = 80.0f;
+    public float crouchSpeedMultiplier = 0.35f;
+    public float drag = 15.0f;
+    [Tooltip("How much control the player has over their movement while in the air (0 for no control, 1 for full control)")]
+    public float airborneMultiplier = 0.1f;
     [Tooltip("Set the max incline angle the player can walk up, in degrees")]
     public float maxIncline = 47.5f;
 
     // jumping variables
     [Header("Jump Settings")]
-    public float airDrag = 2.0f;
     public float jumpHeight = 300.0f;
-    public float jumpCooldown = 0.25f;
+    private float jumpCooldown = 0.25f;
 
     // dashing variables
     [Header("Dash Settings")]
     public float dashCooldown = 0.5f;
     public float dashDistance = 5.0f;
     public float dashTime = 0.33f;
+    [Tooltip("The speed to set the player at when the dash completes")]
+    public float dashEndSpeed = 6.0f;
 
     [Header("Look Settings")]
     public float lookSensitivity = 2.5f;
@@ -54,7 +55,7 @@ public class PlayerController : MonoBehaviour
     private Transform camTransform;
     private Vector2 camPitchYaw = Vector2.zero;
     private Quaternion camRotQuat;
-    private float zRecoilTarget = 0, zRecoilSmooth = 0;
+    private float zRecoilSmooth = 0;
 
     // Cutscene camera stuff
     [Header("Cutscene Mode")]
@@ -66,16 +67,12 @@ public class PlayerController : MonoBehaviour
 
     // grounded, crouched, ladder, lock states
     [Header("Exposed Debug States")]
-    [SerializeField]
     private bool movementLocked;
-    [SerializeField]
-    private bool isGrounded;
+    [SerializeField] private bool isGrounded;
     private Vector3 groundNormal; // Surface normal of where player is stepping
-    [SerializeField]
     private bool isCrouched;
     private float jumpTime;
     private float jumpLingerTime;
-    [SerializeField]
     private bool onLadder;
 
     // Internal dash data
@@ -125,6 +122,11 @@ public class PlayerController : MonoBehaviour
         playerArms = GameObject.Find("Player/CameraFollower/SM_Player_SCR/SM_Player_Armed");
         playerHUD = this.transform.Find("PlayerHUD").Find("HUDCanvas").gameObject;
         stateSpriteHUD = playerHUD.transform.Find("StateSprites").gameObject;
+
+        // if player does not have gun on start, hide arms and gun HUD
+        playerArms.SetActive(hasGun);
+        stateSpriteHUD.SetActive(hasGun);
+        if (hasGun) PickupGun();
     }
 
     // Update is called once per frame
@@ -133,8 +135,6 @@ public class PlayerController : MonoBehaviour
         // -- CUTSCENE MODE -- \\
         if (movementLocked)  
         {
-            // CAMERA CONTROL (Smooth Mode) \\
-
             targetLookDir = Matrix4x4.Rotate(Quaternion.Euler(new(0, Input.GetAxisRaw("Mouse X") * lookSensitivity, 0)) * 
                 Quaternion.AngleAxis(-Input.GetAxisRaw("Mouse Y") * lookSensitivity, camTransform.right)) * targetLookDir;
 
@@ -159,8 +159,18 @@ public class PlayerController : MonoBehaviour
         else
         {
             // CAMERA CONTROL \\
-            camPitchYaw.x += Input.GetAxisRaw("Mouse X") * lookSensitivity;
-            camPitchYaw.y = Mathf.Clamp(camPitchYaw.y + Input.GetAxisRaw("Mouse Y") * lookSensitivity, -89f, 89f);
+            if(Time.timeScale == 0)
+            {
+                //camPitchYaw.x = camPitchYaw.x; //stays where it is
+                //camPitchYaw.y = camPitchYaw.y; //stays where it is
+                Debug.Log("PAUSEDDDDDDD (hello from the playercontroller script)");
+            }
+            else
+            {
+
+                camPitchYaw.x += Input.GetAxisRaw("Mouse X") * lookSensitivity;
+                camPitchYaw.y = Mathf.Clamp(camPitchYaw.y + Input.GetAxisRaw("Mouse Y") * lookSensitivity, -89f, 89f);
+            }
 
             camRotQuat.eulerAngles = new(0, camPitchYaw.x, 0);
             body.MoveRotation(camRotQuat.normalized); // camera pitch (also character transform pitch)
@@ -171,7 +181,7 @@ public class PlayerController : MonoBehaviour
             camTransform.localPosition = new(camTransform.localPosition.x, camTransform.localPosition.y, -zRecoilSmooth);
 
             if (Input.GetKeyDown(KeyCode.Space))
-                jumpLingerTime = 0.12f; // add forgiveness if player didn't jump precisely enough upon touching the ground
+                jumpLingerTime = 0.15f; // add forgiveness if player didn't jump precisely enough upon touching the ground
 
             // GROUND-ONLY MOVEMENT CONTROLS \\
             if (isGrounded && jumpTime <= 0.0f)
@@ -202,21 +212,6 @@ public class PlayerController : MonoBehaviour
             dashCoolCountdown -= Time.deltaTime;
             jumpTime -= Time.deltaTime;
             jumpLingerTime -= Time.deltaTime;
-
-            if (hasGun && !playerGun.activeSelf)
-            {
-                playerGun.SetActive(true);
-                //playerArms.SetActive(true);
-                //stateSpriteHUD.SetActive(true);
-            } else if (!hasGun && playerGun.activeSelf)
-            {
-                playerGun.SetActive(false);
-                //playerArms.SetActive(false);
-                //stateSpriteHUD.SetActive(false);
-            }
-            
-            playerArms.SetActive(playerGun.activeSelf);
-            stateSpriteHUD.SetActive(playerGun.activeSelf);
         }
 
         // for testing; spawn an enemy
@@ -225,8 +220,6 @@ public class PlayerController : MonoBehaviour
             if (Physics.Raycast(transform.position, camTransform.forward, out RaycastHit hit, 100, ~(1 << 3 | 1 << 6)))
                 GameObject.Find("EnemyManager").GetComponent<EnemyManager>().SpawnEnemy(100, hit.point, Vector3.zero);
         }
-        if (Input.GetKeyDown(KeyCode.Minus)) CutsceneMode = true;
-        if (Input.GetKeyDown(KeyCode.Equals)) CutsceneMode = false;
 
         // kill player
         if (Input.GetKeyDown(KeyCode.K))
@@ -251,17 +244,11 @@ public class PlayerController : MonoBehaviour
 
         inputDir = Vector3.ProjectOnPlane(movementForce, groundNormal).normalized;
 
-        // Accelerate the player in their movement direction and apply ground drag force
-        body.AddForce((isGrounded ?
-            isCrouched ? crouchSpeedMultiplier * movementAccelGround : movementAccelGround :
-            movementAccelAir) * inputDir);
-
-        // APPLY WALKING DRAG FORCE \\
-
-        // Get velocity of player projected onto the surface walked on (or the XZ plane if airborne)
-        Vector3 velProjected = isGrounded ? Vector3.ProjectOnPlane(body.velocity, groundNormal) :
-            new(body.velocity.x, 0, body.velocity.z);
-        body.AddForce(-(isGrounded ? groundDrag : airDrag) * velProjected);
+        // Accelerate the player in their movement direction and apply drag force
+        body.AddForce((isCrouched ? crouchSpeedMultiplier : 1) * movementAccelGround * (isGrounded ? 1f : airborneMultiplier) * inputDir);
+        Vector3 dragVel = -body.velocity;
+        if (!isGrounded) dragVel.y = 0;
+        body.AddForce(drag * (isGrounded ? 1f : airborneMultiplier) * dragVel);
 
         // -- DASH ABILITY -- \\
 
@@ -272,7 +259,7 @@ public class PlayerController : MonoBehaviour
             {
                 dashCoolCountdown = dashCooldown;
                 dashDirection = (inputDir.sqrMagnitude > 0 ? inputDir :
-                    Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized) * maxWalkSpeed;
+                    Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized) * dashEndSpeed;
                 body.useGravity = false;
                 source.PlayOneShot(dashSound);
             }
@@ -355,19 +342,20 @@ public class PlayerController : MonoBehaviour
     bool CheckAirborne()
     {
         CapsuleCollider col = GetComponent<CapsuleCollider>();
+        // SPHERE CAST RADIUS IS SLIGHTLY LESS THAN COLLIDER RADIUS SO IT
+        // DOESN'T START ALREADY OVERLAPPING SOMETHING, WHICH MESSES IT UP
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, col.radius * 0.99f, Vector3.down,
+            col.height * 0.5f, ~(1 << 6), QueryTriggerInteraction.Ignore);
 
-        // Get all things hit by this sphere cast
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position, col.radius, Vector3.down,
-            col.height * 0.51f - col.radius, ~(1 << 6), QueryTriggerInteraction.Ignore);
-
-        // Test if any of the hits are ground
         foreach (RaycastHit hit in hits)
         {
-            groundNormal = hit.normal;
-            if (Vector3.Dot(Vector3.down, groundNormal) <= -Mathf.Cos(maxIncline * Mathf.Deg2Rad))
-                return true;
+            if (transform.position.y - hit.point.y <= col.height * 0.51f)
+            {
+                groundNormal = hit.normal;
+                if (Vector3.Dot(Vector3.down, groundNormal) <= -Mathf.Cos(maxIncline * Mathf.Deg2Rad))
+                    return true;
+            }
         }
-        // If not, return false
         groundNormal = transform.up;
         return false;
     }
@@ -375,6 +363,8 @@ public class PlayerController : MonoBehaviour
     public void PickupGun()
     {
         hasGun = true;
+        playerArms.SetActive(true);
+        stateSpriteHUD.SetActive(true);
         playerGun.SetActive(true);
         playerGun.GetComponent<Weapon>().ResetFire(MatterState.Gas);
     }

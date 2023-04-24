@@ -92,6 +92,7 @@ public class Weapon : MonoBehaviour
     [Tooltip("Gas cloud spawn pool count.")]
     public int gasCloudPoolCount = 50;
     private Queue<GameObject> gasClouds;
+    private GameObject gasCloudPool;
     public GameObject gasCloudPrefab;
 
     [Space]
@@ -121,6 +122,8 @@ public class Weapon : MonoBehaviour
     public AudioClip iceFireSound;
     [SerializeField]
     public AudioClip waterFireSound;
+    [SerializeField]
+    public AudioClip modeSwitchSound;
 
     private void Awake()
     {
@@ -143,10 +146,12 @@ public class Weapon : MonoBehaviour
         if (playerHUD == null) Debug.Log("WARNING: Weapon.cs could not find HUDController!");
 
         // Fill the cloud pool
+        gasCloudPool = new GameObject();
+        gasCloudPool.name = "Gas Cloud Pool";
         gasClouds = new Queue<GameObject>();
         for (int i = 0; i < gasCloudPoolCount; i++)
         {
-            GameObject newCloud = Instantiate(gasCloudPrefab);
+            GameObject newCloud = Instantiate(gasCloudPrefab, gasCloudPool.transform);
             newCloud.SetActive(false);
             newCloud.GetComponent<GasAttacker>().OnStay += CloudDamageEnemy;
             newCloud.GetComponent<GasAttacker>().MeltEnter += CloudDamageMeltable;
@@ -251,7 +256,14 @@ public class Weapon : MonoBehaviour
     {
         // If enemy already has a DOT on it, just reset its DOT timer.
         if (!enemy.ResetDebuff("RAW_GAS_DEBUFF"))
-            enemy.ApplyDebuff("RAW_GAS_DEBUFF", new Debuff(0.25f, null, () => enemy.TakeDamage(Time.deltaTime * gasDmg), null));
+            enemy.ApplyDebuff("RAW_GAS_DEBUFF", new Debuff(0.25f, 
+                () =>
+                {
+                    if (!enemy.gasFX.isEmitting) 
+                        enemy.gasFX.Play();
+                }, 
+                () => enemy.TakeDamage(Time.deltaTime * gasDmg), 
+                () => enemy.gasFX.Stop()));
         
         enemy.Afflict(MatterState.Gas, effectDur, Time.deltaTime);
     }
@@ -337,6 +349,33 @@ public class Weapon : MonoBehaviour
 
             case MatterState.Gas:
 
+                // Begin charge-up
+                if (Input.GetMouseButtonDown(0))
+                    gasButtonHeld = true;
+                if (gasButtonHeld && gasCDTmr <= 0.0f)
+                {
+                    gasCharge += Time.deltaTime;
+                    gasEmissionTmr = Mathf.Lerp(0, gasMaxEmissionTime, gasCharge / gasChargeTime);
+                    // play charge-up audio during the charging process
+                    if (!source.isPlaying && gasCharge < gasChargeTime) 
+                        source.PlayOneShot(steamChargeSound);
+                }
+                // Reset charge when letting go
+                if (Input.GetMouseButtonUp(0) && gasButtonHeld)
+                {
+                    gasButtonHeld = false;
+
+                    if (gasCDTmr <= 0.0f)
+                    {
+                        gasReleased = true;
+                        gasCDTmr = gasCooldown;
+                        gasCharge = 0.0f;
+                        FiringSystem[(int)currentMode].Play();
+                        source.Stop(); // stop the charge sound short
+                        source.PlayOneShot(steamFireSound);
+                    }
+                }
+
                 // Set the progress indicator to charge amt if charging, se to cooldown if on cooldown
                 playerHUD.SetGasChargeProgress(gasEmissionTmr / gasMaxEmissionTime);
 
@@ -372,43 +411,6 @@ public class Weapon : MonoBehaviour
                     if (gasCDTmr <= 0.0f)
                         playerHUD.SetCrosshairOpacity(1.0f);
                 }
-
-                // Begin charge-up
-                if (Input.GetMouseButtonDown(0))
-                    gasButtonHeld = true;
-                if (gasButtonHeld && gasCDTmr <= 0.0f)
-                {
-                    gasCharge += Time.deltaTime;
-                    gasEmissionTmr = Mathf.Lerp(0, gasMaxEmissionTime, gasCharge / gasChargeTime);
-
-                    if (!source.isPlaying) source.PlayOneShot(steamChargeSound); //playing audio
-
-                    // Immediately release once hitting max charge time
-                    if (gasCharge >= gasChargeTime)
-                    {
-                        gasButtonHeld = false;
-                        gasReleased = true;
-                        gasCDTmr = gasCooldown;
-                        gasCharge = 0.0f;
-                        FiringSystem[(int)currentMode].Play();
-                        source.PlayOneShot(steamFireSound);
-                    }
-                }
-                // Reset charge when letting go
-                if (Input.GetMouseButtonUp(0) && gasButtonHeld)
-                {
-                    gasButtonHeld = false;
-                    
-                    if (gasCDTmr <= 0.0f)
-                    {
-                        gasReleased = true;
-                        gasCDTmr = gasCooldown;
-                        gasCharge = 0.0f;
-                        FiringSystem[(int)currentMode].Play();
-                        source.Stop(); // stop the charge sound short
-                        source.PlayOneShot(steamFireSound);
-                    }
-                }
                 break;
         }
     }
@@ -425,6 +427,8 @@ public class Weapon : MonoBehaviour
         playerHUD.SetCrosshairOpacity(1.0f);
         source.loop = false;
         source.Stop();
+
+        source.PlayOneShot(modeSwitchSound);
     }
 
     /// <summary>

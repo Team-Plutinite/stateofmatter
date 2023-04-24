@@ -237,7 +237,7 @@ MonoBehaviour:
   liquidRPM: 1000
   gasDmg: 5
   gasLife: 5
-  gasRPM: 250
+  gasRPM: 300
   gasChargeTime: 1
   gasMaxEmissionTime: 1.5
   gasCooldown: 1
@@ -247,9 +247,10 @@ MonoBehaviour:
   effectDur: 5
   source: {fileID: 0}
   steamFireSound: {fileID: 8300000, guid: bbf1c6d3754b89d4b8a1c91aaaf0b6b5, type: 3}
-  steamChargeSound: {fileID: 8300000, guid: a246220e7bd2db64dbc45a913df72c27, type: 3}
+  steamChargeSound: {fileID: 8300000, guid: 4b95a108fc4979f4492fe51fcd037026, type: 3}
   iceFireSound: {fileID: 8300000, guid: 2c372b78ec1625149b54984d25e2a3db, type: 3}
   waterFireSound: {fileID: 8300000, guid: ae7723fdd0fedfc4baa676b5870d983f, type: 3}
+  modeSwitchSound: {fileID: 8300000, guid: 82f8dd5bd321ad148aa77056d1a7d147, type: 3}
 --- !u!1 &2034437677648025772
 GameObject:
   m_ObjectHideFlags: 0
@@ -10140,7 +10141,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1824827258223664, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4363000815121756, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}
       propertyPath: m_RootOrder
@@ -10160,7 +10161,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4363000815121756, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.781
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 4363000815121756, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}
       propertyPath: m_LocalPosition.y
@@ -10225,10 +10226,6 @@ PrefabInstance:
     - target: {fileID: 198985416474409296, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}
       propertyPath: InitialModule.startColor.maxColor.a
       value: 0.22745098
-      objectReference: {fileID: 0}
-    - target: {fileID: 199092248008267778, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}
-      propertyPath: m_Materials.Array.size
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 199287826736471690, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}
       propertyPath: m_Materials.Array.size
