@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 2033075105334261977}
   - component: {fileID: 776576750132668805}
   - component: {fileID: 2809359282711722361}
+  - component: {fileID: 2336302514717353870}
   m_Layer: 0
   m_Name: EnemyFinal
   m_TagString: Untagged
@@ -140,8 +141,8 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0.5
+  m_Height: 1.65
+  m_BaseOffset: -0.16
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!23 &776576750132668805
@@ -199,6 +200,26 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.38907242, y: 0.36396587, z: 1.701176}
   m_Center: {x: 0.91639113, y: 0.38496798, z: 0.89456433}
+--- !u!95 &2336302514717353870
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6534035884068602828}
+  m_Enabled: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 05c6c10ca7a4c984480e56e96eb008aa, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1001 &7286985637140279492
 PrefabInstance:
   m_ObjectHideFlags: 0
