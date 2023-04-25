@@ -224,8 +224,6 @@ public class PlayerController : MonoBehaviour
         // kill player
         if (Input.GetKeyDown(KeyCode.K))
             gameObject.GetComponent<PlayerStats>().hp = 0;
-
-        if (Input.GetKeyDown(KeyCode.Alpha8)) CutsceneMode = !CutsceneMode;
     }
 
     private void FixedUpdate()
@@ -280,7 +278,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Returns the current movement state of the player.
+    // Returns the current movement state of the player. NOT IMPLEMENTED YET
     PlayerMoveState MoveState { get { return moveState; } }
 
     // Set the player's control state between gameplay and cutscene (true for cutscene)
@@ -295,13 +293,13 @@ public class PlayerController : MonoBehaviour
                 currentLookDir = camTransform.forward;
                 targetLookDir = camTransform.forward;
                 movementLocked = true;
-                playerHUD.SetActive(false);
+                playerHUD.GetComponent<HUDController>().SetVisibility(false);
                 return;
             }
             camPitchYaw.x = transform.eulerAngles.y;
             camPitchYaw.y = camTransform.eulerAngles.x > 90 ? 360 - camTransform.eulerAngles.x : -camTransform.eulerAngles.x;
             movementLocked = false;
-            playerHUD.SetActive(true);
+            playerHUD.GetComponent<HUDController>().SetVisibility(true);
         }
     }
 
