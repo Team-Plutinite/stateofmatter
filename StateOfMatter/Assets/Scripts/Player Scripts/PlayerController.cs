@@ -120,8 +120,8 @@ public class PlayerController : MonoBehaviour
 
         playerGun = GameObject.Find("Player/CameraFollower/Gun_Problem");
         playerArms = GameObject.Find("Player/CameraFollower/SM_Player_SCR/SM_Player_Armed");
-        playerHUD = this.transform.Find("PlayerHUD").Find("HUDCanvas").gameObject;
-        stateSpriteHUD = playerHUD.transform.Find("StateSprites").gameObject;
+        playerHUD = this.transform.Find("PlayerHUD").gameObject;
+        stateSpriteHUD = playerHUD.transform.Find("HUDCanvas/StateSprites").gameObject;
 
         // if player does not have gun on start, hide arms and gun HUD
         playerArms.SetActive(hasGun);
@@ -224,6 +224,8 @@ public class PlayerController : MonoBehaviour
         // kill player
         if (Input.GetKeyDown(KeyCode.K))
             gameObject.GetComponent<PlayerStats>().hp = 0;
+
+        if (Input.GetKeyDown(KeyCode.Alpha8)) CutsceneMode = !CutsceneMode;
     }
 
     private void FixedUpdate()
@@ -293,11 +295,13 @@ public class PlayerController : MonoBehaviour
                 currentLookDir = camTransform.forward;
                 targetLookDir = camTransform.forward;
                 movementLocked = true;
+                playerHUD.SetActive(false);
                 return;
             }
             camPitchYaw.x = transform.eulerAngles.y;
             camPitchYaw.y = camTransform.eulerAngles.x > 90 ? 360 - camTransform.eulerAngles.x : -camTransform.eulerAngles.x;
             movementLocked = false;
+            playerHUD.SetActive(true);
         }
     }
 
