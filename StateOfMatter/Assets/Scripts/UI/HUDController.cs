@@ -130,7 +130,5 @@ public class HUDController : MonoBehaviour
     {
         hudStateSprites[0].transform.parent.parent.gameObject.SetActive(value);
         hudCrosshairSprites[0].transform.parent.gameObject.SetActive(value);
-        hudHelmet.SetActive(value);
-        hudLines.SetActive(value);
     }
 }
