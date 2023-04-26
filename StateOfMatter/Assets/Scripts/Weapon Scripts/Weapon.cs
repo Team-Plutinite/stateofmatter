@@ -159,7 +159,7 @@ public class Weapon : MonoBehaviour
             gasClouds.Enqueue(newCloud);
         }
 
-        source = gameObject.AddComponent<AudioSource>();
+        //source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.2f;
         fireSoundTimer = 0.0f;
 

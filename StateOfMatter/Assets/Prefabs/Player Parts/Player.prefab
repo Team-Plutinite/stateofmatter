@@ -809,7 +809,7 @@ GameObject:
   - component: {fileID: 2389748625049299343}
   - component: {fileID: 2389748625049299331}
   - component: {fileID: -6030132350112573881}
-  - component: {fileID: 219150017}
+  - component: {fileID: -2518677797085566012}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -887,7 +887,7 @@ MonoBehaviour:
   dashTime: 0.15
   dashEndSpeed: 6
   lookSensitivity: 2.5
-  source: {fileID: 219150017}
+  source: {fileID: -2518677797085566012}
   moveSound: {fileID: 0}
   dashSound: {fileID: 8300000, guid: 4bdc89b14cbbbdd49844e8e035891082, type: 3}
   jumpSound: {fileID: 8300000, guid: 280ddb6a9a2640a4bbaed5b1d588edab, type: 3}
@@ -909,7 +909,7 @@ MonoBehaviour:
   maxHP: 5
   hp: 0
   checkpointManager: {fileID: 0}
---- !u!82 &219150017
+--- !u!82 &-2518677797085566012
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -918,10 +918,10 @@ AudioSource:
   m_GameObject: {fileID: 2389748625049299336}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -2881946645888851125, guid: e92043fc4cbfbd3458433459320dc357, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.3
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -2702,9 +2702,9 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.4
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

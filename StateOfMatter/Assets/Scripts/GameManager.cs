@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class GameManager : MonoBehaviour
 
     public GameObject pauseUI;
     public GameObject optionsUI;
+
+    public AudioMixer volumeMixer;
 
     public bool paused { get; set; }
     void Start()
@@ -89,5 +92,18 @@ public class GameManager : MonoBehaviour
     public void PlayHoverSound()
     {
         source.PlayOneShot(hoverSound);
+    }
+
+    // ui sliders
+    public void SetSFXVolume(float volume)
+    {
+
+        volumeMixer.SetFloat("sfxVolume", Mathf.Log10(volume)*20);
+    }
+
+    public void SetMusicVolume(float volume)
+    {
+        volumeMixer.SetFloat("musicVolume", Mathf.Log10(volume) * 20);
+        //Debug.Log(volume);
     }
 }
