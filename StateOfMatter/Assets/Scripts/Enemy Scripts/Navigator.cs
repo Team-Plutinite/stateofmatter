@@ -30,6 +30,8 @@ public class Navigator : MonoBehaviour
     public float distanceToGoal;
     [HideInInspector]
     public NavMeshAgent agent;
+
+    private Animator animatorController;
     
     private NavMeshHit hit;
 
@@ -40,6 +42,9 @@ public class Navigator : MonoBehaviour
         if (activateOnSight) {
             movementEnabled = false;
         }
+
+        //animatorController = gameObject.GetComponent<Animator>();
+        
 
     }
 
@@ -70,11 +75,16 @@ public class Navigator : MonoBehaviour
                 if (!agent.Raycast(goal.transform.position, out hit))
                 {
                     movementEnabled = true;
+                    //animatorController.SetBool("SeesPlayer", true);
                 }
             }
             else if (activateOnSight == false && movementEnabled == false)
             {
                 movementEnabled = true;
+                //animatorController.SetBool("SeesPlayer", true);
+            } else
+            {
+                //animatorController.SetBool("SeesPlayer", false);
             }
 
             if (movementEnabled)
@@ -104,6 +114,9 @@ public class Navigator : MonoBehaviour
                 {
                     agent.destination = transform.position;
                 }
+            } else
+            {
+                animatorController.SetTrigger("CantSeePlayer");
             }
         }
     }
