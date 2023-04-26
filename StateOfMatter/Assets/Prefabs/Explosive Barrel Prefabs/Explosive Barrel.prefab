@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5093307598293470437}
   - component: {fileID: 4772901032647125450}
   - component: {fileID: 7210123194416825543}
+  - component: {fileID: 8380266105367653084}
   m_Layer: 0
   m_Name: Explosive Barrel
   m_TagString: Untagged
@@ -145,6 +146,22 @@ MonoBehaviour:
   explosionForce: 200
   source: {fileID: 0}
   barrelSound: {fileID: 8300000, guid: 63cac00685ffd95469004e95c3fffcac, type: 3}
+--- !u!208 &8380266105367653084
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1117467525367367349}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.5, y: 1, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &7790108987410532762
 GameObject:
   m_ObjectHideFlags: 0
