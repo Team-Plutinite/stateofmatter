@@ -12,10 +12,15 @@ public class Barrel : MonoBehaviour
     [SerializeField] private float explosionRadius = 5f;
     [SerializeField] private float explosionForce = 60f;
 
+    public AudioSource source;
+    public AudioClip barrelSound;
+
     // Start is called before the first frame update
     void Start()
     {
         health = 100;
+        source = gameObject.AddComponent<AudioSource>();
+        source.volume = 0.3f;
     }
 
     private void Explode()
@@ -28,6 +33,7 @@ public class Barrel : MonoBehaviour
             if (rb == null) continue;
 
             rb.AddExplosionForce(explosionForce, transform.position, explosionRadius);
+            source.PlayOneShot(barrelSound);
         }
     }
 

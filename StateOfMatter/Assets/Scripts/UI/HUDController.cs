@@ -27,6 +27,8 @@ public class HUDController : MonoBehaviour
     private GameObject[] hudCrosshairSprites;
 
     [SerializeField] private GameObject hudSubtitle;
+    [SerializeField] private GameObject hudHelmet;
+    [SerializeField] private GameObject hudLines;
 
     private Queue<Dialogue> dialogueQ;
     private Dialogue currentDialogue;
@@ -122,5 +124,11 @@ public class HUDController : MonoBehaviour
     public void QueueSubtitle(string speakerName, string message, float time)
     {
         dialogueQ.Enqueue(new Dialogue(speakerName, message, time));
+    }
+
+    public void SetVisibility(bool value)
+    {
+        hudStateSprites[0].transform.parent.parent.gameObject.SetActive(value);
+        hudCrosshairSprites[0].transform.parent.gameObject.SetActive(value);
     }
 }

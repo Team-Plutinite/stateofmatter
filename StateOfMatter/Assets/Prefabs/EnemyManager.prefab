@@ -46,4 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   poolSize: 10
   player: {fileID: 2389748625049299336, guid: 43399144f8de42344ba8f49f99277f36, type: 3}
-  enemyRef: {fileID: 7370248711260464510, guid: 2a8ab4523a44fbd47a7a0136ab8e2422, type: 3}
+  enemyRef: {fileID: 6534035884068602828, guid: 276ba17d0521b2d438befbf579689ea9, type: 3}
+  enemySpawnHP: 0

@@ -1564,6 +1564,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hudSubtitle: {fileID: 4017896366360555859}
+  hudHelmet: {fileID: 6748473792558924906}
+  hudLines: {fileID: 6748473791367734901}
 --- !u!1 &6748473792468734877
 GameObject:
   m_ObjectHideFlags: 0
