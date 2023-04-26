@@ -116,7 +116,7 @@ public class Navigator : MonoBehaviour
                 }
             } else
             {
-                animatorController.SetTrigger("CantSeePlayer");
+                //animatorController.SetTrigger("CantSeePlayer");
             }
         }
     }
