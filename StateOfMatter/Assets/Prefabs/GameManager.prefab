@@ -149,3 +149,4 @@ MonoBehaviour:
   hoverSound: {fileID: 8300000, guid: 6740f1c396708074b90a5e67dbf9dc83, type: 3}
   pauseUI: {fileID: 0}
   optionsUI: {fileID: 0}
+  volumeMixer: {fileID: 24100000, guid: e92043fc4cbfbd3458433459320dc357, type: 2}

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Audio;
 
 public class MenuButtons : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class MenuButtons : MonoBehaviour
     public AudioClip backSound;
     public AudioClip hoverSound;
     public AudioClip playSound;
+
+    public AudioMixer volumeMixer;
 
     public void Start()
     {
@@ -83,5 +86,18 @@ public class MenuButtons : MonoBehaviour
     public void PlayPlaySound()
     {
         source.PlayOneShot(playSound);
+    }
+
+    // ui sliders
+    public void SetSFXVolume(float volume)
+    {
+
+        volumeMixer.SetFloat("sfxVolume", Mathf.Log10(volume) * 20);
+    }
+
+    public void SetMusicVolume(float volume)
+    {
+        volumeMixer.SetFloat("musicVolume", Mathf.Log10(volume) * 20);
+        //Debug.Log(volume);
     }
 }

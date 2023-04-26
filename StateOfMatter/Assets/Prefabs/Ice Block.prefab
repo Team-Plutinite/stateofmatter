@@ -388,7 +388,8 @@ MonoBehaviour:
   deltaScaleAll: {x: -0.01, y: -0.01, z: -0.01}
   direction: 1
   source: {fileID: 0}
-  meltingSound: {fileID: 8300000, guid: 6b51b7ca4a71d014c861dea40237cfb9, type: 3}
+  meltingSound: {fileID: 8300000, guid: 7673001a4a6131546b6b0e32f2cb2711, type: 3}
+  volumeMixer: {fileID: -2881946645888851125, guid: e92043fc4cbfbd3458433459320dc357, type: 2}
 --- !u!54 &5568757186310264391
 Rigidbody:
   m_ObjectHideFlags: 0

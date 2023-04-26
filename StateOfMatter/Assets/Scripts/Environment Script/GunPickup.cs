@@ -10,11 +10,6 @@ public class GunPickup : MonoBehaviour
     public AudioSource source;
     public AudioClip itemPickupSound;
 
-    void Start()
-    {
-        source.volume = 5.0f;
-    }
-
     public void OnTriggerEnter(Collider other)
     {
         if (other.gameObject == player)

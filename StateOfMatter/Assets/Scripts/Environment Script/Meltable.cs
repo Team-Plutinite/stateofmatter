@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 enum MeltDirection //Used to determine the direction to melt the meltable/
 {
@@ -31,6 +32,7 @@ public class Meltable : MonoBehaviour
     public AudioClip meltingSound;
     private float meltSoundTimer;
     private const float meltSoundCooldown = 0.145f;
+    public AudioMixerGroup volumeMixer;
 
     private void Awake()
     {
@@ -41,6 +43,7 @@ public class Meltable : MonoBehaviour
 
         source = gameObject.AddComponent<AudioSource>();
         source.volume = 0.2f;
+        source.outputAudioMixerGroup = volumeMixer;
         meltSoundTimer = 0.0f;
     }
 
