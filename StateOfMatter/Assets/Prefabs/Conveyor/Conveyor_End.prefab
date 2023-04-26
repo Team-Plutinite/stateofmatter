@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 3725261722788148352}
   - component: {fileID: 5626141748560060237}
   - component: {fileID: 189680872962235871}
+  - component: {fileID: 3898232570415497407}
+  - component: {fileID: 6255405546977466891}
   m_Layer: 0
   m_Name: axle1
   m_TagString: Untagged
@@ -83,6 +85,36 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!136 &3898232570415497407
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1852235604813992599}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.4
+  m_Height: 2
+  m_Direction: 0
+  m_Center: {x: 0, y: 0, z: -0.000000007450581}
+--- !u!54 &6255405546977466891
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1852235604813992599}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 110
+  m_CollisionDetection: 0
 --- !u!1 &2990868641208601078
 GameObject:
   m_ObjectHideFlags: 0
@@ -94,6 +126,8 @@ GameObject:
   - component: {fileID: 8813957196725773920}
   - component: {fileID: 3183087647971715484}
   - component: {fileID: 2759474089759275083}
+  - component: {fileID: 7888936488261057196}
+  - component: {fileID: 7776124024276836383}
   m_Layer: 0
   m_Name: axle
   m_TagString: Untagged
@@ -166,6 +200,36 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!136 &7888936488261057196
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2990868641208601078}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.4
+  m_Height: 2
+  m_Direction: 0
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &7776124024276836383
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2990868641208601078}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 110
+  m_CollisionDetection: 0
 --- !u!1 &4303047686940012545
 GameObject:
   m_ObjectHideFlags: 0
@@ -178,6 +242,7 @@ GameObject:
   - component: {fileID: 527893310491026718}
   - component: {fileID: 2357497389718147540}
   - component: {fileID: 4274043496507419177}
+  - component: {fileID: 9042009000765724173}
   m_Layer: 0
   m_Name: Conveyor_End
   m_TagString: Untagged
@@ -264,5 +329,21 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 2.2976942, y: 1.4044706, z: 2.1029372}
-  m_Center: {x: 0, y: 0.70557386, z: 0.0514685}
+  m_Size: {x: 2.2976942, y: 0.6, z: 2.1029372}
+  m_Center: {x: 0, y: 0.3050514, z: 0.05146849}
+--- !u!114 &9042009000765724173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4303047686940012545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 261329a491cd4b94ebe63f41bd072420, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  axles:
+  - {fileID: 2990868641208601078}
+  - {fileID: 1852235604813992599}
+  beltSpeed: 300
