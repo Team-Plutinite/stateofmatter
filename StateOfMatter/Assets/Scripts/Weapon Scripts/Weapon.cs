@@ -420,6 +420,7 @@ public class Weapon : MonoBehaviour
         gasCharge = 0.0f;
         gasEmissionTmr = 0.0f;
         FiringSystem[(int)currentMode].Stop();
+        gasButtonHeld = false;
 
         currentMode = newState;
 
