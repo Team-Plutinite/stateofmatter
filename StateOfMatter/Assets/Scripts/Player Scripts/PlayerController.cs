@@ -120,8 +120,8 @@ public class PlayerController : MonoBehaviour
 
         playerGun = GameObject.Find("Player/CameraFollower/Gun_Problem");
         playerArms = GameObject.Find("Player/CameraFollower/SM_Player_SCR/SM_Player_Armed");
-        playerHUD = this.transform.Find("PlayerHUD").Find("HUDCanvas").gameObject;
-        stateSpriteHUD = playerHUD.transform.Find("StateSprites").gameObject;
+        playerHUD = this.transform.Find("PlayerHUD").gameObject;
+        stateSpriteHUD = playerHUD.transform.Find("HUDCanvas/StateSprites").gameObject;
 
         // if player does not have gun on start, hide arms and gun HUD
         playerArms.SetActive(hasGun);
@@ -163,7 +163,7 @@ public class PlayerController : MonoBehaviour
             {
                 //camPitchYaw.x = camPitchYaw.x; //stays where it is
                 //camPitchYaw.y = camPitchYaw.y; //stays where it is
-                Debug.Log("PAUSEDDDDDDD (hello from the playercontroller script)");
+                //Debug.Log("PAUSEDDDDDDD (hello from the playercontroller script)");
             }
             else
             {
@@ -278,7 +278,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Returns the current movement state of the player.
+    // Returns the current movement state of the player. NOT IMPLEMENTED YET
     PlayerMoveState MoveState { get { return moveState; } }
 
     // Set the player's control state between gameplay and cutscene (true for cutscene)
@@ -293,11 +293,13 @@ public class PlayerController : MonoBehaviour
                 currentLookDir = camTransform.forward;
                 targetLookDir = camTransform.forward;
                 movementLocked = true;
+                playerHUD.GetComponent<HUDController>().SetVisibility(false);
                 return;
             }
             camPitchYaw.x = transform.eulerAngles.y;
             camPitchYaw.y = camTransform.eulerAngles.x > 90 ? 360 - camTransform.eulerAngles.x : -camTransform.eulerAngles.x;
             movementLocked = false;
+            playerHUD.GetComponent<HUDController>().SetVisibility(true);
         }
     }
 

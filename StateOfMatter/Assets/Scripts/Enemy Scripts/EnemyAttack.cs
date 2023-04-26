@@ -7,7 +7,7 @@ public class EnemyAttack : MonoBehaviour
 {
     public float attackDmg;
     [Tooltip("Enemy's attack cooldown, in seconds")]
-    public float attackCD;
+    public float attackCD = 2.0f;
     [Tooltip("Enemy movement speed")]
     public float speed;
     [Tooltip("Minimum attack distance between enemy and player")]
@@ -22,13 +22,13 @@ public class EnemyAttack : MonoBehaviour
     private IEnumerator coroutine;
 
     // purely for testing purposes
-    private GameObject stick;
+    //private GameObject stick;
 
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.FindWithTag("Player");
-        stick = GameObject.Find("Stick");
+        //stick = GameObject.Find("Stick");
         attackCountdown = 0f;
         navigator = GetComponent<Navigator>();
     }
@@ -45,7 +45,7 @@ public class EnemyAttack : MonoBehaviour
     {
         // This stops the enemy's movement and restarts it after the time passed into RestartMovement
         navigator.agent.isStopped = true;
-        coroutine = RestartMovement(2.0f);
+        coroutine = RestartMovement(attackCD);
         StartCoroutine(coroutine);
 
         coroutine = WaitThenAttack(0.5f);
@@ -69,7 +69,7 @@ public class EnemyAttack : MonoBehaviour
         yield return new WaitForSeconds(wait);
         navigator.agent.isStopped = false;
         // testing purposes only
-        stick.transform.Rotate(0, 30, 0, Space.Self);
+        //stick.transform.Rotate(0, 30, 0, Space.Self);
     }
 
     // Waits a given amount of time, then attacks
@@ -82,6 +82,6 @@ public class EnemyAttack : MonoBehaviour
         }
 
         // testing purposes only
-        stick.transform.Rotate(0, -30, 0, Space.Self);
+        //stick.transform.Rotate(0, -30, 0, Space.Self);
     }
 }
