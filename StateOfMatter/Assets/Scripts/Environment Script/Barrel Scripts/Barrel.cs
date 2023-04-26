@@ -8,13 +8,12 @@ public class Barrel : MonoBehaviour
     public BarrelDestroyEvent OnDestroyed;
     [SerializeField] private int health;
     private bool exploded = false;
-    private bool timerOn = false;
 
-    [SerializeField]private float timer = 6f;
+    [SerializeField]private float timer = 6.0f;
 
 
-    [SerializeField] private float explosionRadius = 5f;
-    [SerializeField] private float explosionForce = 60f;
+    [SerializeField] private float explosionRadius = 5.0f;
+    [SerializeField] private float explosionForce = 60.0f;
 
     public AudioSource source;
     public AudioClip barrelSound;
@@ -29,19 +28,8 @@ public class Barrel : MonoBehaviour
 
     private void Explode()
     {
-        while(timerOn)
-        {
-            if(timer > 0)
-            {
-                timer -= Time.deltaTime;
-                Debug.Log(timer);
-            }
-            else
-            {
-                timer = 0;
-                timerOn = false;
-            }
-        }
+ 
+       
         Collider[] objectsInExplosion = Physics.OverlapSphere(transform.position, explosionRadius);
 
         foreach (var objectToDamage in objectsInExplosion)
@@ -49,8 +37,25 @@ public class Barrel : MonoBehaviour
             var rb = objectToDamage.GetComponent<Rigidbody>();
             if (rb == null) continue;
 
+            //Check if this object is an enemy. If so: damage and afflict gas
+           if(objectToDamage.TryGetComponent(out EnemyStats e))
+            {
+                e.Afflict(MatterState.Gas, 4.0f);
+                e.TakeDamage(25.0f);
+            }
+
+           //Check if object in the radius is a player, if so: damage
+           if(objectToDamage.TryGetComponent(out PlayerStats p))
+            {
+                p.hp -= 1;
+            }
+
             rb.AddExplosionForce(explosionForce, transform.position, explosionRadius);
             source.PlayOneShot(barrelSound);
+
+            exploded = true;
+            this.gameObject.SetActive(false);
+            OnDestroyed?.Invoke();
         }
     }
 
@@ -64,15 +69,19 @@ public class Barrel : MonoBehaviour
         }
         else if (!exploded)
         {
-            Debug.Log("Timer On");
-            timerOn = true;   
-            Explode();
-            exploded = true;
-            this.gameObject.SetActive(false);
-            OnDestroyed?.Invoke();
+            StartCoroutine(StartExplosion(timer));
+            
         }
     }
 
+    IEnumerator StartExplosion(float seconds)
+    {
+        Debug.Log("Timer Started");
+        yield return new WaitForSeconds(seconds);
+        Debug.Log("Timer Ended");
+        Explode();
+
+    }
     public int Health
     {
         get { return health; }
