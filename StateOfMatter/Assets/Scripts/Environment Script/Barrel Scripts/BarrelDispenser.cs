@@ -44,8 +44,8 @@ public class BarrelDispenser : MonoBehaviour
             yield return new WaitForSeconds(Time.deltaTime);
 
         dispensedBarrel.transform.SetPositionAndRotation(transform.position, Quaternion.identity);
-        dispensedBarrel.GetComponent<Barrel>().health = 100;
-        dispensedBarrel.GetComponent<Barrel>().exploded = false;
+        dispensedBarrel.GetComponent<Barrel>().Health = 100;
+        dispensedBarrel.GetComponent<Barrel>().Exploded = false;
         dispensedBarrel.SetActive(true);
     }
 }

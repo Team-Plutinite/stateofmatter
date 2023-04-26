@@ -6,11 +6,14 @@ public class Barrel : MonoBehaviour
 {
     public delegate void BarrelDestroyEvent();
     public BarrelDestroyEvent OnDestroyed;
-    public int health;
-    public bool exploded = false;
+    [SerializeField] private int health;
+    private bool exploded = false;
 
-    [SerializeField] private float explosionRadius = 5f;
-    [SerializeField] private float explosionForce = 60f;
+    [SerializeField]private float timer = 6.0f;
+
+
+    [SerializeField] private float explosionRadius = 5.0f;
+    [SerializeField] private float explosionForce = 60.0f;
 
     public AudioSource source;
     public AudioClip barrelSound;
@@ -25,15 +28,34 @@ public class Barrel : MonoBehaviour
 
     private void Explode()
     {
+ 
+       
         Collider[] objectsInExplosion = Physics.OverlapSphere(transform.position, explosionRadius);
-      
-        foreach(var objectToDamage in objectsInExplosion)
+
+        foreach (var objectToDamage in objectsInExplosion)
         {
             var rb = objectToDamage.GetComponent<Rigidbody>();
             if (rb == null) continue;
 
+            //Check if this object is an enemy. If so: damage and afflict gas
+           if(objectToDamage.TryGetComponent(out EnemyStats e))
+            {
+                e.Afflict(MatterState.Gas, 4.0f);
+                e.TakeDamage(25.0f);
+            }
+
+           //Check if object in the radius is a player, if so: damage
+           if(objectToDamage.TryGetComponent(out PlayerStats p))
+            {
+                p.hp -= 1;
+            }
+
             rb.AddExplosionForce(explosionForce, transform.position, explosionRadius);
             source.PlayOneShot(barrelSound);
+
+            exploded = true;
+            this.gameObject.SetActive(false);
+            OnDestroyed?.Invoke();
         }
     }
 
@@ -44,14 +66,31 @@ public class Barrel : MonoBehaviour
         {
 
             health -= 10;
-            Debug.Log(health);
         }
-        else if(!exploded)
+        else if (!exploded)
         {
-            Explode();
-            exploded = true;
-            this.gameObject.SetActive(false);
-            OnDestroyed?.Invoke();
+            StartCoroutine(StartExplosion(timer));
+            
         }
+    }
+
+    IEnumerator StartExplosion(float seconds)
+    {
+        Debug.Log("Timer Started");
+        yield return new WaitForSeconds(seconds);
+        Debug.Log("Timer Ended");
+        Explode();
+
+    }
+    public int Health
+    {
+        get { return health; }
+        set { health = value; }
+    }
+
+    public bool Exploded
+    {
+        get { return exploded; }
+        set { exploded = value; }
     }
 }
