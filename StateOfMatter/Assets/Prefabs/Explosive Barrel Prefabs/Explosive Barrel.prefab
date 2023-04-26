@@ -143,6 +143,8 @@ MonoBehaviour:
   exploded: 0
   explosionRadius: 5
   explosionForce: 200
+  source: {fileID: 0}
+  barrelSound: {fileID: 8300000, guid: 63cac00685ffd95469004e95c3fffcac, type: 3}
 --- !u!1 &7790108987410532762
 GameObject:
   m_ObjectHideFlags: 0

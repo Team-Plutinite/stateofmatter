@@ -10,7 +10,6 @@ public class CutsceneEvents : MonoBehaviour
     public float duration = 120.0f;
     public float timer;
     private bool triggerCutscene = true;
-
     public GameObject alice;
     private AudioSource aliceAS;
     private Animator aliceAnimator;
@@ -57,7 +56,7 @@ public class CutsceneEvents : MonoBehaviour
                 aliceAnimator.enabled = true;
                 aliceAS.Play();
                 SubtitledCutscene();
-                source.volume = 0.01f;
+                source.volume = 0.05f;
             }
         }
     }
