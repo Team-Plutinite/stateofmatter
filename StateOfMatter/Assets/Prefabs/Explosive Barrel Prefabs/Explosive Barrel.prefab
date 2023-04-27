@@ -140,10 +140,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 678d43ff6528b244893108a724c3ceb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 100
-  timer: 6
+  health: 50
+  timer: 4
   explosionRadius: 5
-  explosionForce: 200
+  explosionForce: 500
   source: {fileID: 0}
   barrelSound: {fileID: 8300000, guid: 63cac00685ffd95469004e95c3fffcac, type: 3}
 --- !u!208 &8380266105367653084
