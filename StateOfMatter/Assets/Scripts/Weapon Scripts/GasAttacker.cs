@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -27,7 +28,7 @@ public class GasAttacker : MonoBehaviour
     public EnemyEnteredEvent OnExit;
 
     private List<EnemyStats> EnemiesHit = new List<EnemyStats>();
-    private List<Meltable> MeltablesInRadius = new List<Meltable>();
+    private List<Meltable> MeltablesHit = new List<Meltable>();
     private List<Barrel> BarrelsInRadius = new List<Barrel>();
 
     private float lifetime;
@@ -45,19 +46,28 @@ public class GasAttacker : MonoBehaviour
 
         // Clear enemies hit and deactivate cloud when it's done
         if (lifetime <= 0.0f && gameObject.activeSelf)
-        {
             gameObject.SetActive(false);
-            EnemiesHit.Clear();
-        }
     }
 
     // Spawns this gas cloud at the given location with the given rotation
     public void Spawn(Vector3 position, Quaternion rotation, float lifetime)
     {
+        EnemiesHit.Clear();
+        MeltablesHit.Clear();
         transform.SetPositionAndRotation(position, rotation);
         this.lifetime = lifetime;
         this.lifetimeMax = lifetime;
         gameObject.SetActive(true);
+    }
+
+    // Melts the ice for the set amount of time
+    private IEnumerator MeltIceFor(Meltable ice, float seconds)
+    {
+        for (float i = 0f; i < seconds; i += Time.deltaTime)
+        {
+            MeltEnter?.Invoke(ice);
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
     }
 
     private void OnTriggerStay(Collider other)
@@ -78,8 +88,11 @@ public class GasAttacker : MonoBehaviour
 
         if (other.TryGetComponent(out Meltable ice))
         {
-            MeltablesInRadius.Add(ice);
-            MeltEnter?.Invoke(ice);
+            if (!MeltablesHit.Contains(ice) && knockbackable)
+            {
+                MeltablesHit.Add(ice);
+                StartCoroutine(MeltIceFor(ice, 0.2f));
+            }
         }
 
         if (other.TryGetComponent(out Barrel barrel))
@@ -99,7 +112,7 @@ public class GasAttacker : MonoBehaviour
 
         if (other.TryGetComponent(out Meltable ice))
         {
-            MeltablesInRadius.Remove(ice);
+            MeltablesHit.Remove(ice);
             MeltExit?.Invoke(ice);
         }
 
