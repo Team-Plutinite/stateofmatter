@@ -10,19 +10,19 @@ public class Climber : MonoBehaviour
 
     public AudioSource source;
     public AudioClip climbingSound;
-    private float fireSoundTimer;
+    private float climbingSoundTimer;
     private const float climbingSoundCooldown = 0.316f;
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
 
         source.volume = 0.2f;
-        fireSoundTimer = 0.0f;
+        climbingSoundTimer = 0.0f;
     }
 
     void Update()
     {
-        fireSoundTimer -= Time.deltaTime;
+        climbingSoundTimer -= Time.deltaTime;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -39,16 +39,18 @@ public class Climber : MonoBehaviour
         if (other.gameObject == player)
         {
 
-            if (fireSoundTimer <= 0.0f)
-            {
-                source.PlayOneShot(climbingSound);
-                fireSoundTimer = climbingSoundCooldown;
-            }
 
             Rigidbody body = player.GetComponent<Rigidbody>();
             PlayerController pctrl = player.GetComponent<PlayerController>();
             float yVel = 0;
 
+            if (climbingSoundTimer <= 0.0f && pctrl.InputDirection != Vector3.zero)
+            {
+                source.PlayOneShot(climbingSound);
+                climbingSoundTimer = climbingSoundCooldown;
+            }
+            else
+                climbingSoundTimer = climbingSoundCooldown;
             // If the player is moving into the ladder, lift them up
             if (pctrl.InputDirection.sqrMagnitude > 0 && 
                 Vector3.Dot((transform.position - player.transform.position).normalized, 

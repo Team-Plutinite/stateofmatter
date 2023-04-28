@@ -23,7 +23,7 @@ public class Barrel : MonoBehaviour
     void Start()
     {
         health = 100;
-        source = gameObject.AddComponent<AudioSource>();
+        source = GameObject.FindGameObjectWithTag("GameManager").GetComponent<AudioSource>();
         source.volume = 0.3f;
     }
 

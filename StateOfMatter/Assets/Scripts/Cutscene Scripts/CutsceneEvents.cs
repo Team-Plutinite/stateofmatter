@@ -15,6 +15,7 @@ public class CutsceneEvents : MonoBehaviour
     private Animator aliceAnimator;
     public GameObject pHUD;
     private HUDController pHUDController;
+    private Vector3 lDirection;
 
     public AudioSource source;
 
@@ -51,7 +52,10 @@ public class CutsceneEvents : MonoBehaviour
             triggerCutscene = false;
             if (other.gameObject.layer == 6)
             {
+                lDirection = alice.transform.position - player.transform.position;
+                lDirection.Normalize();
                 pController.CutsceneMode = true;
+                pController.CutsceneLookDir = lDirection;
                 startTimer = true;
                 aliceAnimator.enabled = true;
                 aliceAS.Play();
