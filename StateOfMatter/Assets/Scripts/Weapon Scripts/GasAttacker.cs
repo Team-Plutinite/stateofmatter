@@ -92,6 +92,7 @@ public class GasAttacker : MonoBehaviour
             {
                 MeltablesHit.Add(ice);
                 StartCoroutine(MeltIceFor(ice, 0.2f));
+                Debug.Log("asdf");
             }
         }
 
