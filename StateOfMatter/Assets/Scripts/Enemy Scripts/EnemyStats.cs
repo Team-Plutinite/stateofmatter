@@ -64,7 +64,7 @@ public class EnemyStats : MonoBehaviour
         // HP data
         this.hp = hp;
         maxHP = hp;
-        //transform.GetComponentInChildren<TextMeshPro>().text = hp.ToString();
+        transform.GetComponentInChildren<TextMeshPro>().text = hp.ToString();
 
         // DEBUFF data
         heatAmt = iceAmt = 0;
@@ -203,11 +203,11 @@ public class EnemyStats : MonoBehaviour
         GameObject particle = Instantiate(gasBurstFX, transform.position, Quaternion.identity);
         Destroy(particle, 3.0f);
 
-        manager.CreateAOE(transform.position, 3.0f, a =>
+        manager.CreateAOE(transform.position, 5.0f, a =>
         {
             EnemyStats e = a.GetComponent<EnemyStats>();
             e.Stun(0.75f);
-            a.GetComponent<Rigidbody>().AddExplosionForce(250f, transform.position, 3f);
+            a.GetComponent<Rigidbody>().AddExplosionForce(2000f, transform.position, 3f, 0f, ForceMode.Acceleration);
             e.TakeDamage(30.0f);
         });
     }
@@ -242,7 +242,7 @@ public class EnemyStats : MonoBehaviour
     public void TakeDamage(float dmgAmt)
     {
         hp -= dmgAmt;
-        //transform.GetComponentInChildren<TextMeshPro>().text = ((int)hp).ToString();
+        transform.GetComponentInChildren<TextMeshPro>().text = ((int)hp).ToString();
 
         if (hp <= 0) manager.KillEnemy(gameObject.GetInstanceID());
     }
