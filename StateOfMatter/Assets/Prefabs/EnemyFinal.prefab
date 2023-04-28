@@ -238,6 +238,8 @@ MonoBehaviour:
   activateOnSight: 1
   distanceToGoal: 0
   agent: {fileID: 0}
+  source: {fileID: 6502263929647346397}
+  hoverSound: {fileID: 8300000, guid: b8af86d4827f1754f8bf9f8220b9f508, type: 3}
 --- !u!65 &1015522215781694871
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -404,7 +406,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6534035884068602828}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -2881946645888851125, guid: e92043fc4cbfbd3458433459320dc357, type: 2}
   m_audioClip: {fileID: 0}

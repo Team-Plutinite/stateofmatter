@@ -17,6 +17,7 @@ public class Barrel : MonoBehaviour
 
     public AudioSource source;
     public AudioClip barrelSound;
+    public GameObject explosionFX;
 
     // Start is called before the first frame update
     void Start()
@@ -57,6 +58,11 @@ public class Barrel : MonoBehaviour
             this.gameObject.SetActive(false);
             OnDestroyed?.Invoke();
         }
+
+        // Create the explopsion particle, play it, then destroy it
+        // Hoping this doesn't kill frames when there are a crapton of these, we'll have to see
+        GameObject particle = Instantiate(explosionFX, transform.position, Quaternion.identity);
+        Destroy(particle, 3.0f);
     }
 
     public void DamageBarrel()
