@@ -146,6 +146,7 @@ MonoBehaviour:
   explosionForce: 500
   source: {fileID: 0}
   barrelSound: {fileID: 8300000, guid: 63cac00685ffd95469004e95c3fffcac, type: 3}
+  explosionFX: {fileID: 6541803645313941228, guid: d74d58229cf8aa14fa3087de8e223ebe, type: 3}
 --- !u!208 &8380266105367653084
 NavMeshObstacle:
   m_ObjectHideFlags: 0
