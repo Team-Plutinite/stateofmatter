@@ -14,7 +14,14 @@ public class PlayerStats : MonoBehaviour
 
     private bool playerIsDead;
 
-    // Start is called before the first frame update
+
+    public AudioSource source;
+    public AudioClip slowHeartbeatSound;
+    public AudioClip fastHeartbeatSound;
+
+    private float heartbeatSoundTimer;
+    private const float heartbeatSoundCooldown = 1.57f;
+
     void Start()
     {
         playerIsDead = false;
@@ -22,9 +29,11 @@ public class PlayerStats : MonoBehaviour
         hp = maxHP;
 
         hudGlow = this.transform.Find("PlayerHUD").Find("HUDCanvas").Find("Glow").gameObject.GetComponent<Image>();
+
+        heartbeatSoundTimer = heartbeatSoundCooldown;
+
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (playerIsDead)
@@ -39,6 +48,19 @@ public class PlayerStats : MonoBehaviour
         {
             Die();
         }
+
+        if (hp > 1 && hp < 5 && heartbeatSoundTimer<=0.0f)
+        {
+            source.PlayOneShot(slowHeartbeatSound);
+            heartbeatSoundTimer = heartbeatSoundCooldown;
+        }
+        if (hp == 1 && heartbeatSoundTimer <= 0.0f)
+        {
+            source.PlayOneShot(fastHeartbeatSound);
+            heartbeatSoundTimer = heartbeatSoundCooldown;
+        }
+
+        heartbeatSoundTimer -= Time.deltaTime;
     }
 
     void Die()
