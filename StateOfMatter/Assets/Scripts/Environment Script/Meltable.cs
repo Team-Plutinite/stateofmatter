@@ -65,6 +65,7 @@ public class Meltable : MonoBehaviour
     //As the meltable is hit by gas, it size decreases
     public void Melt(MatterState matterState)
     {
+        Vector3 meltDirDelta = meltDirectionDic[direction] * Time.deltaTime * 100f;
         if (matterState == MatterState.Gas)
         {
             if (meltSoundTimer <= 0.0f)
@@ -74,14 +75,14 @@ public class Meltable : MonoBehaviour
                 meltSoundTimer = meltSoundCooldown;
             }
 
-            melter.transform.localScale += meltDirectionDic[direction];
+            melter.transform.localScale += meltDirDelta;
             if (melter.transform.localScale.x <= 0 || melter.transform.localScale.y <= 0 || melter.transform.localScale.z <= 0)
             {
                 melter.gameObject.SetActive(false);
             }
             if(direction != MeltDirection.All)
             {
-                melter.transform.localPosition += meltDirectionDic[direction] / 2;
+                melter.transform.localPosition += meltDirDelta / 2;
             }
             
         }
@@ -89,7 +90,7 @@ public class Meltable : MonoBehaviour
         {
             if (melter.transform.localScale.x <= 1f && melter.transform.localScale.y <= 1f && melter.transform.localScale.z <= 1f)
             {
-                melter.transform.localScale -= meltDirectionDic[direction];
+                melter.transform.localScale -= meltDirDelta;
                 //waterState.SetActive(false);
             }
             else
@@ -98,7 +99,7 @@ public class Meltable : MonoBehaviour
             }
             if (direction != MeltDirection.All)
             {
-                melter.transform.localPosition -= meltDirectionDic[direction] / 2;
+                melter.transform.localPosition -= meltDirDelta / 2;
             }
             
         }
