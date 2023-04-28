@@ -21,19 +21,23 @@ public class EnemyAttack : MonoBehaviour
 
     private IEnumerator coroutine;
 
+    public AudioSource source;
+    public AudioClip attackSound;
+
     // purely for testing purposes
     //private GameObject stick;
 
-    // Start is called before the first frame update
     void Start()
     {
         player = GameObject.FindWithTag("Player");
         //stick = GameObject.Find("Stick");
         attackCountdown = 0f;
         navigator = GetComponent<Navigator>();
+
+        source.volume = 0.4f;
     }
 
-    // Update is called once per frame
+
     void Update()
     {
         if (attackCountdown <= 0f && navigator.distanceToGoal <= minAttackDistance) TryAttack();
@@ -51,7 +55,7 @@ public class EnemyAttack : MonoBehaviour
         coroutine = WaitThenAttack(0.5f);
         StartCoroutine(coroutine);
 
-
+        source.PlayOneShot(attackSound);
         attackCountdown = 3f;
     }
 

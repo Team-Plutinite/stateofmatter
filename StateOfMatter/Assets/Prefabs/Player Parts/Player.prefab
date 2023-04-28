@@ -888,9 +888,14 @@ MonoBehaviour:
   dashEndSpeed: 6
   lookSensitivity: 2.5
   source: {fileID: -2518677797085566012}
-  moveSound: {fileID: 0}
   dashSound: {fileID: 8300000, guid: 4bdc89b14cbbbdd49844e8e035891082, type: 3}
   jumpSound: {fileID: 8300000, guid: 280ddb6a9a2640a4bbaed5b1d588edab, type: 3}
+  footstep1: {fileID: 8300000, guid: 2e4a605bc7c632d49b9bf0f957289798, type: 3}
+  footstep2: {fileID: 8300000, guid: c53b4f59a04a6574dafcb461810fab3f, type: 3}
+  footstep3: {fileID: 8300000, guid: 859aedefdd4f3b0468dda365c7393836, type: 3}
+  footstep4: {fileID: 8300000, guid: 5ebdb0041b9537a4dafd4c08adc00b3f, type: 3}
+  footstep5: {fileID: 8300000, guid: 0530a7ca1d1e25a4085e9f8f2cebc380, type: 3}
+  footstep6: {fileID: 8300000, guid: 66cc49da33d458f44ad19d8a5b9b71b3, type: 3}
   maxAngleOffset: 20
   isGrounded: 0
   hasGun: 0
@@ -909,6 +914,9 @@ MonoBehaviour:
   maxHP: 5
   hp: 0
   checkpointManager: {fileID: 0}
+  source: {fileID: -2518677797085566012}
+  slowHeartbeatSound: {fileID: 8300000, guid: aaf4d9b859c554e47b5284b6ac3385a2, type: 3}
+  fastHeartbeatSound: {fileID: 8300000, guid: 7cb1337fb780f2948988b23c5efafac1, type: 3}
 --- !u!82 &-2518677797085566012
 AudioSource:
   m_ObjectHideFlags: 0

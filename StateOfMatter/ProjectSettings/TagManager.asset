@@ -10,6 +10,7 @@ TagManager:
   - EnemyHome
   - Weight
   - CheckpointManager
+  - GameManager
   layers:
   - Default
   - TransparentFX

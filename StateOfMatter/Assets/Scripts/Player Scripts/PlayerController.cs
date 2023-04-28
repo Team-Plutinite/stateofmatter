@@ -44,9 +44,18 @@ public class PlayerController : MonoBehaviour
     // audio
     [Header("Audio Settings")]
     public AudioSource source;
-    public AudioClip moveSound;
     public AudioClip dashSound;
     public AudioClip jumpSound;
+
+    public AudioClip footstep1;
+    public AudioClip footstep2;
+    public AudioClip footstep3;
+    public AudioClip footstep4;
+    public AudioClip footstep5;
+    public AudioClip footstep6;
+
+    private double footstepTimer;
+    private double footstepTimerMax;
 
     // Store the player's input movement
     private Vector3 inputDir;
@@ -127,6 +136,9 @@ public class PlayerController : MonoBehaviour
         playerArms.SetActive(hasGun);
         stateSpriteHUD.SetActive(hasGun);
         if (hasGun) PickupGun();
+
+        footstepTimerMax = 0.33; //0.33s.. the length of each of the footstep mp3s
+        footstepTimer = footstepTimerMax;
     }
 
     // Update is called once per frame
@@ -224,6 +236,49 @@ public class PlayerController : MonoBehaviour
         // kill player
         if (Input.GetKeyDown(KeyCode.K))
             gameObject.GetComponent<PlayerStats>().hp = 0;
+
+        // footstep audio
+        footstepTimer -= Time.deltaTime; //updating footstep timer
+        int footstepNum = 0;
+        if (isGrounded && PlayFootsteps() == true) //footsteps
+        {
+            // ensure NEW random footstep sound (one that wasn't *just* played)
+            bool randCheck = true;
+            int newNum = Random.Range(1, 6);
+            while (randCheck)
+            {
+                if (newNum != footstepNum) //if new random sound isn't equal to the previous sound
+                {
+                    footstepNum = newNum; //setting the random num
+                    randCheck = false; //breaking the loop
+                }
+                else
+                    newNum = Random.Range(1, 6);
+            }
+
+            switch (footstepNum)
+            {
+                case 1:
+                    source.PlayOneShot(footstep1);
+                    break;
+                case 2:
+                    source.PlayOneShot(footstep2);
+                    break;
+                case 3:
+                    source.PlayOneShot(footstep3);
+                    break;
+                case 4:
+                    source.PlayOneShot(footstep4);
+                    break;
+                case 5:
+                    source.PlayOneShot(footstep5);
+                    break;
+                case 6:
+                    source.PlayOneShot(footstep6);
+                    break;
+            }
+
+        }
     }
 
     private void FixedUpdate()
@@ -369,6 +424,18 @@ public class PlayerController : MonoBehaviour
         stateSpriteHUD.SetActive(true);
         playerGun.SetActive(true);
         playerGun.GetComponent<Weapon>().ResetFire(MatterState.Gas);
+    }
+
+    public bool PlayFootsteps()
+    {
+        if ((Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
+            /*isMoving*/ && footstepTimer <= 0)
+        {
+            footstepTimer = footstepTimerMax; //resets timer
+            return true;
+        }
+        else
+            return false;
     }
 
     public Vector3 InputDirection { get { return inputDir; } }
