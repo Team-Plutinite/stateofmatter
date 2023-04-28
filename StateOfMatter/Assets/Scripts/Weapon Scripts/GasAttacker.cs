@@ -30,8 +30,6 @@ public class GasAttacker : MonoBehaviour
     private List<Meltable> MeltablesInRadius = new List<Meltable>();
     private List<Barrel> BarrelsInRadius = new List<Barrel>();
 
-
-
     private float lifetime;
     private float lifetimeMax;
 
@@ -42,8 +40,8 @@ public class GasAttacker : MonoBehaviour
     {
         // Set inactive when lifetime runs out
         lifetime -= Time.deltaTime;
-        // cloud knocks enemies back for the first 20% of its life
-        knockbackable = lifetime >= lifetimeMax * 0.8f;
+        // cloud knocks enemies back for the first 10% of its life
+        knockbackable = lifetime >= lifetimeMax * 0.9f;
 
         // Clear enemies hit and deactivate cloud when it's done
         if (lifetime <= 0.0f && gameObject.activeSelf)
@@ -58,12 +56,12 @@ public class GasAttacker : MonoBehaviour
     {
         transform.SetPositionAndRotation(position, rotation);
         this.lifetime = lifetime;
+        this.lifetimeMax = lifetime;
         gameObject.SetActive(true);
     }
 
     private void OnTriggerStay(Collider other)
     {
-        //This function will handle collison with various objects.
         //This function will handle collison with various objects.
         if (other.TryGetComponent(out EnemyStats enemy))
         {
@@ -72,10 +70,10 @@ public class GasAttacker : MonoBehaviour
             if (!EnemiesHit.Contains(enemy) && knockbackable)
             {
                 EnemiesHit.Add(enemy);
-                enemy.gameObject.GetComponent<Rigidbody>().AddForce(-transform.forward * 50f);
+                enemy.gameObject.GetComponent<Rigidbody>().AddForce(-transform.forward * 500f, ForceMode.Acceleration);
                 enemy.TakeDamage(5.0f);
             }
-            OnStay?.Invoke(enemy, this.gameObject);
+            OnStay?.Invoke(enemy, gameObject);
         }
 
         if (other.TryGetComponent(out Meltable ice))
@@ -88,8 +86,6 @@ public class GasAttacker : MonoBehaviour
         {
             BarrelsInRadius.Add(barrel);
             BarrelEnter?.Invoke(barrel);
-
-            Debug.Log("Barrel Called");
         }
     }
 
