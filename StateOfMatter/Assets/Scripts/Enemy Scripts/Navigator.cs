@@ -35,7 +35,12 @@ public class Navigator : MonoBehaviour
     
     private NavMeshHit hit;
 
-    // Start is called before the first frame update
+
+    public AudioSource source;
+    public AudioClip hoverSound;
+    private float hoverSoundTimer;
+    private const float hoverSoundCooldown = 0.57f;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -44,8 +49,8 @@ public class Navigator : MonoBehaviour
         }
 
         //animatorController = gameObject.GetComponent<Animator>();
-        
 
+        hoverSoundTimer = hoverSoundCooldown;
     }
 
     // Called by EnemyStats.Init() when enemy is spawned
@@ -119,5 +124,14 @@ public class Navigator : MonoBehaviour
                 //animatorController.SetTrigger("CantSeePlayer");
             }
         }
+
+        /*if(hoverSoundTimer<= 0.0f)
+        {
+            source.PlayOneShot(hoverSound);
+            hoverSoundTimer = hoverSoundCooldown;
+        }
+
+
+        hoverSoundTimer -= Time.deltaTime;*/
     }
 }
