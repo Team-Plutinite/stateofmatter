@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Milestone3.unity
     guid: 9cd8f642c80ecba44b9f643bf59108fb
+  - enabled: 1
+    path: Assets/Scenes/GameComplete.unity
+    guid: afcf8b4e7933e2f4d87e0b29d290e51d
   m_configObjects: {}
