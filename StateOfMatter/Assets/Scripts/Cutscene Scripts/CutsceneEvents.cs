@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CutsceneEvents : MonoBehaviour
 {
@@ -41,6 +42,7 @@ public class CutsceneEvents : MonoBehaviour
                 pController.CutsceneMode = false;
                 startTimer = false;
                 // timer = duration;
+                SceneManager.LoadScene("GameComplete");
             }
         }
     }
