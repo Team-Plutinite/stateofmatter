@@ -77,13 +77,13 @@ public class PlayerStats : MonoBehaviour
         playerIsDead = true;
         gameObject.GetComponent<PlayerController>().CutsceneMode = true;
         gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 0.5f, gameObject.transform.position.z);
-        gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePosition;
+        gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
 
         yield return new WaitForSeconds(wait);
 
         checkpointManager.GetComponent<CheckpointManager>().RespawnAtCheckpoint();
         playerIsDead = false;
         gameObject.GetComponent<PlayerController>().CutsceneMode = false;
-        gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+        gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation;
     }
 }
